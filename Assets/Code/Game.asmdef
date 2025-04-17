@@ -1,0 +1,26 @@
+{
+    "name": "Game",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0d8beb7f090555447a6cf5ce9e54dbb4",
+        "GUID:bcc75752368a72b4aba4043ea13b2a1a",
+        "GUID:05dbf8cd246c9274c8a78a65142e5f8a",
+        "GUID:865b414a121ed594e91db2e09f65d38c",
+        "GUID:041029188fa88c54f9efffc039b6a1c9",
+        "GUID:15fc0a57446b3144c949da3e2b9737a9",
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:7793e5cd8d2e94e21b56de41db6606bb",
+        "GUID:626070ea3273cb844a310aa4f53b31fa",
+        "GUID:5f193089d0fe18b44b1ff856634213c0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

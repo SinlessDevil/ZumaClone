@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_1
+  m_EditorClassIdentifier: 
+  LevelName: Zuma
+  LevelId: 1
+  LevelTypeId: 0
+  LevelHolder: {fileID: 986213291232290063, guid: e252e9ad4265ed94f9a71b89ba0bd7ae, type: 3}
+  LevelConfig:
+    CountItem: 6
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

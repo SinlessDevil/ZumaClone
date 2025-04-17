@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5f193089d0fe18b44b1ff856634213c0
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 136082
+  packageName: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+  packageVersion: 1.2
+  assetPath: Assets/PathCreator/Core/Runtime/PathCreator.asmdef
+  uploadId: 317492

@@ -1,0 +1,21 @@
+                    -HE:\Unity\Projects\zuma-restaurant\Library\Bee\Android\Prj\Mono2x\Gradle\unityLibrary\src\main\cpp
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=23
+-DANDROID_PLATFORM=android-23
+-DANDROID_ABI=armeabi-v7a
+-DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a
+-DANDROID_NDK=E:\Unity\2023.2.1f1\Editor\Data\PlaybackEngines\AndroidPlayer\NDK
+-DCMAKE_ANDROID_NDK=E:\Unity\2023.2.1f1\Editor\Data\PlaybackEngines\AndroidPlayer\NDK
+-DCMAKE_TOOLCHAIN_FILE=E:\Unity\2023.2.1f1\Editor\Data\PlaybackEngines\AndroidPlayer\NDK\build\cmake\android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=E:\Unity\2023.2.1f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\cmake\3.22.1\bin\ninja.exe
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=E:\Unity\Projects\zuma-restaurant\Library\Bee\Android\Prj\Mono2x\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\6w5a4q29\obj\armeabi-v7a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=E:\Unity\Projects\zuma-restaurant\Library\Bee\Android\Prj\Mono2x\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\6w5a4q29\obj\armeabi-v7a
+-DCMAKE_BUILD_TYPE=RelWithDebInfo
+-DCMAKE_FIND_ROOT_PATH=E:\Unity\Projects\zuma-restaurant\.utmp\RelWithDebInfo\6w5a4q29\prefab\armeabi-v7a\prefab
+-BE:\Unity\Projects\zuma-restaurant\.utmp\RelWithDebInfo\6w5a4q29\armeabi-v7a
+-GNinja
+-DBUILD_GRADLE_DIRECTORY=E:\Unity\Projects\zuma-restaurant\Library\Bee\Android\Prj\Mono2x\Gradle\unityLibrary
+-DANDROID_STL=c++_shared
+                    Build command args: []
+                    Version: 2
