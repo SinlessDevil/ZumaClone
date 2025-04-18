@@ -11,7 +11,6 @@ using Code.Services.Levels;
 using Code.Services.LocalProgress;
 using Code.Services.Providers.Balls;
 using Code.Services.Providers.Widgets;
-using Code.Services.Random;
 using Code.Services.Timer;
 using Cysharp.Threading.Tasks;
 using PathCreation;
@@ -40,7 +39,6 @@ namespace Code.Services.BallController
         
         private readonly IBallProvider _ballProvider;
         private readonly IWidgetProvider _widgetProvider;
-        private readonly IRandomService _randomService;
         private readonly ILevelService _levelService;
         private readonly ILevelLocalProgressService _levelLocalProgressService;
         private readonly IFinishService _finishService;
@@ -51,7 +49,6 @@ namespace Code.Services.BallController
         public BallChainController(
             IBallProvider ballProvider,
             IWidgetProvider widgetProvider,
-            IRandomService randomService,
             ILevelService levelService,
             ILevelLocalProgressService levelLocalProgressService,
             IFinishService finishService,
@@ -61,7 +58,6 @@ namespace Code.Services.BallController
         {
             _ballProvider = ballProvider;
             _widgetProvider = widgetProvider;
-            _randomService = randomService;
             _levelService = levelService;
             _levelLocalProgressService = levelLocalProgressService;
             _finishService = finishService;
@@ -87,7 +83,7 @@ namespace Code.Services.BallController
                 _levelLocalProgressService, _levelService);
             _loseBallChainHandler = new LoseBallChainHandler(_ballChainDto, _pathCreator,_chainTracker, _timeService, 
                 _levelService, _inputService, _gameFactory, _finishService);
-            _attachingBallChainHandler = new AttachingBallChainHandler(_pathCreator,_ballChainDto, _chainTracker, 
+            _attachingBallChainHandler = new AttachingBallChainHandler(_pathCreator, _ballChainDto, _chainTracker, 
                 _widgetBallChainProvider, _winBallChainHandler, _levelService, _levelLocalProgressService);
         }
         
@@ -95,8 +91,8 @@ namespace Code.Services.BallController
         {
             MoveBalls();
         }
-        
-        public void StartBallSpawning()
+
+        public void StartBallSpawning(List<Color> colorItems)
         {
             if (_pathCreator == null)
                 return;
@@ -104,7 +100,7 @@ namespace Code.Services.BallController
             _startBallSpawning?.Cancel();
             _startBallSpawning = new CancellationTokenSource();
 
-            _colorItems = _randomService.GetColorsByLevelRandomConfig();
+            _colorItems = colorItems;
             _countItems = _levelService.GetCurrentLevelStaticData().LevelConfig.CountItem;
 
             BoostSpeedAsync(_startBallSpawning.Token).Forget();
@@ -123,7 +119,7 @@ namespace Code.Services.BallController
             
             _countItems = 0;
             _chainTracker.ResetDistanceTravelled();
-            
+
             _isBoosting = true;
         }
 

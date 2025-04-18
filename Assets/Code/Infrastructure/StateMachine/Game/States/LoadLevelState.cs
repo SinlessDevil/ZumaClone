@@ -1,4 +1,5 @@
-﻿using Code.Services.BallController;
+﻿using System.Collections.Generic;
+using Code.Services.BallController;
 using Code.Services.Factories.Game;
 using Code.Services.Factories.UIFactory;
 using Code.Services.Input;
@@ -6,6 +7,7 @@ using Code.Services.Input.Device;
 using Code.Services.Levels;
 using Code.Services.Providers.Balls;
 using Code.Services.Providers.Widgets;
+using Code.Services.Random;
 using Code.Services.StaticData;
 using Code.StaticData;
 using Cysharp.Threading.Tasks;
@@ -26,6 +28,7 @@ namespace Code.Infrastructure.StateMachine.Game.States
         private readonly IWidgetProvider _widgetProvider;
         private readonly IBallChainController _ballChainController;
         private readonly IStaticDataService _staticDataService;
+        private readonly IRandomService _randomService;
 
         public LoadLevelState(
             IStateMachine<IGameState> gameStateMachine, 
@@ -38,7 +41,8 @@ namespace Code.Infrastructure.StateMachine.Game.States
             IBallProvider ballProvider,
             IWidgetProvider widgetProvider,
             IBallChainController ballChainController,
-            IStaticDataService staticDataService)
+            IStaticDataService staticDataService,
+            IRandomService randomService)
         {
             _gameFactory = gameFactory;
             _gameStateMachine = gameStateMachine;
@@ -51,6 +55,7 @@ namespace Code.Infrastructure.StateMachine.Game.States
             _widgetProvider = widgetProvider;
             _ballChainController = ballChainController;
             _staticDataService = staticDataService;
+            _randomService = randomService;
         }
 
         public void Enter(string payload)
@@ -141,8 +146,10 @@ namespace Code.Infrastructure.StateMachine.Game.States
             
             await _ballChainController.MoveParticleAlongPathAsync(_levelService.GetLevelHolder().DefaultParticleSystemHolder);
             
-            _ballChainController.StartBallSpawning();
-            _gameFactory.Player.PlayerShooting.Activate();
+            List<Color> colors = _randomService.GetColorsByLevelRandomConfig();
+            
+            _gameFactory.Player.PlayerShooting.Activate(colors);
+            _ballChainController.StartBallSpawning(colors);
 
             switch (_staticDataService.GameConfig.TypeInput)
             {

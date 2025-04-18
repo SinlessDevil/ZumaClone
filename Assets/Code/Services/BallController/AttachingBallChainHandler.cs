@@ -157,10 +157,11 @@ namespace Code.Services.BallController
             {
                 ball.PlayDestroyAnimation(() =>
                 {
-                    insertedBall.SetInteractive(false);
                     balls.Remove(ball);
                     ball.Deactivate();
-                        
+                 
+                    insertedBall.SetInteractive(false);
+                    
                     _chainTracker.SubtractDistanceTravelled(_ballChainDto.SpacingBalls);
                 });
             }

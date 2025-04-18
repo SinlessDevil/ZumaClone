@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Code.Extensions;
 using Code.Logic.Zuma.Balls;
 using Code.Services.BallController;
@@ -88,9 +89,9 @@ namespace Code.Logic.Zuma.Players
             }
         }
 
-        public void Activate()
+        public void Activate(List<Color> colors)
         {
-            SetUpBall(transform);
+            SetUpFirstBalls(colors, transform);
             PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
             SetIndicatorSpareBall();
         }
@@ -171,28 +172,33 @@ namespace Code.Logic.Zuma.Players
 
             _currentBall = _spareBall;
             PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
-            SetUpBall(transform);
+            SetUpSpareBall(transform);
             SetIndicatorSpareBall();
 
             _reloadCoroutine = null;
         }
 
-        private void SetUpBall(Transform parent)
+        private void SetUpSpareBall(Transform parent)
         {
-            if (_currentBall == null)
-            {
-                var currentColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, null);
-                _currentBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
-                _currentBall.SetColor(currentColor);
-                _currentBall.transform.SetParent(parent, false);
-            }
-
-            var spareColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, null);
+            Color spareColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, _currentBall);
             _spareBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
             _spareBall.SetColor(spareColor);
             _spareBall.transform.SetParent(parent, false);
         }
 
+        private void SetUpFirstBalls(List<Color> colors, Transform parent)
+        {
+            Color currentColor = _randomService.GetColorByCurrentItems(colors, null);
+            _currentBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
+            _currentBall.SetColor(currentColor);
+            _currentBall.transform.SetParent(parent, false);
+
+            Color spareColor = _randomService.GetColorByCurrentItems(colors, _currentBall.Color);
+            _spareBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
+            _spareBall.SetColor(spareColor);
+            _spareBall.transform.SetParent(parent, false);
+        }
+        
         private void PlayAnimationReloading(Ball ball, Vector3 localTargetPos)
         {
             ball.BallRotator.StartRotate();

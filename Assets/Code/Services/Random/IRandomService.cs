@@ -9,5 +9,6 @@ namespace Code.Services.Random
         string GenerateId();
         List<Color> GetColorsByLevelRandomConfig();
         Color GetColorByCurrentItems(List<Item> items, Item currentItem);
+        Color GetColorByCurrentItems(List<Color> colors, Color? currentColor);
     }
 }

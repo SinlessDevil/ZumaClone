@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Code.Logic.Zuma;
 using Code.Services.Levels;
 using UnityEngine;
@@ -48,22 +49,35 @@ namespace Code.Services.Random
         {
             if (items == null || items.Count == 0)
                 return Color.clear;
-
-            List<Color> availableColors = new List<Color>();
-            
-            foreach (var item in items)
-            {
-                if (!availableColors.Contains(item.Color))
-                    availableColors.Add(item.Color);
-            }
-
-            if (availableColors.Count == 1) 
-                return availableColors[0];
-            
+    
+            List<Color> availableColors = items
+                .Select(item => item.Color)
+                .Distinct()
+                .ToList();
+    
             if (currentItem != null && availableColors.Contains(currentItem.Color) && availableColors.Count > 1)
                 availableColors.Remove(currentItem.Color);
+    
+            Color result = availableColors[UnityEngine.Random.Range(0, availableColors.Count)];
+            return result;
+        }
+        
+        public Color GetColorByCurrentItems(List<Color> colors, Color? currentColor)
+        {
+            if (colors == null || colors.Count == 0)
+                return Color.clear;
 
-            return availableColors[UnityEngine.Random.Range(0, availableColors.Count)];
+            List<Color> availableColors = colors
+                .Distinct()
+                .ToList();
+
+            if (currentColor.HasValue && availableColors.Contains(currentColor.Value) && availableColors.Count > 1)
+            {
+                availableColors.Remove(currentColor.Value);
+            }
+
+            Color result = availableColors[UnityEngine.Random.Range(0, availableColors.Count)];
+            return result;
         }
         
         public string GenerateId() => System.Guid.NewGuid().ToString();
