@@ -123,6 +123,8 @@ namespace Code.Services.BallController
             
             _countItems = 0;
             _chainTracker.ResetDistanceTravelled();
+            
+            _isBoosting = true;
         }
 
         public void TryAttachBall(Ball newBall)
