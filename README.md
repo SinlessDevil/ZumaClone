@@ -10,27 +10,27 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
 ### 🎞️ Gameplay GIFs
 
 <p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_1.gif?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_2.gif?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_3.gif?raw=true" width="30%" height="40%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_1.gif?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_2.gif?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_3.gif?raw=true" width="20%" height="20%" />
 </p>
 <p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_4.gif?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_5.gif?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/GIf_6.gif?raw=true" width="30%" height="40%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_4.gif?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_5.gif?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/GIf_6.gif?raw=true" width="20%" height="20%" />
 </p>
 
 ### 🖼️ Screenshots
 
 <p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_1.png?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_2.png?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_3.png?raw=true" width="30%" height="40%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_1.png?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_2.png?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_3.png?raw=true" width="20%" height="20%" />
 </p>
 <p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_4.png?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_5.png?raw=true" width="30%" height="40%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true" width="30%" height="40%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_4.png?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_5.png?raw=true" width="20%" height="20%" />
+  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true" width="20%" height="20%" />
 </p>
 
 ---
