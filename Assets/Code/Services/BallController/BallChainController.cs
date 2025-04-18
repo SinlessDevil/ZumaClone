@@ -87,7 +87,7 @@ namespace Code.Services.BallController
                 _levelLocalProgressService, _levelService);
             _loseBallChainHandler = new LoseBallChainHandler(_ballChainDto, _pathCreator,_chainTracker, _timeService, 
                 _levelService, _inputService, _gameFactory, _finishService);
-            _attachingBallChainHandler = new AttachingBallChainHandler(_ballChainDto, _chainTracker, 
+            _attachingBallChainHandler = new AttachingBallChainHandler(_pathCreator,_ballChainDto, _chainTracker, 
                 _widgetBallChainProvider, _winBallChainHandler, _levelService, _levelLocalProgressService);
         }
         

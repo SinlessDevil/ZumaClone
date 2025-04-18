@@ -4,12 +4,14 @@ using Code.Logic.Zuma.Balls;
 using Code.Services.Levels;
 using Code.Services.LocalProgress;
 using Cysharp.Threading.Tasks;
+using PathCreation;
 using UnityEngine;
 
 namespace Code.Services.BallController
 {
     public class AttachingBallChainHandler
     {
+        private readonly PathCreator _pathCreator;
         private readonly BallChainDTO _ballChainDto;
         private readonly ChainTracker _chainTracker;
         private readonly WidgetBallChainProvider _widgetBallChainProvider;
@@ -18,6 +20,7 @@ namespace Code.Services.BallController
         private readonly ILevelLocalProgressService _levelLocalProgressService;
 
         public AttachingBallChainHandler(
+            PathCreator pathCreator,
             BallChainDTO ballChainDto,
             ChainTracker chainTracker, 
             WidgetBallChainProvider widgetBallChainProvider, 
@@ -25,6 +28,7 @@ namespace Code.Services.BallController
             ILevelService levelService, 
             ILevelLocalProgressService levelLocalProgressService)
         {
+            _pathCreator = pathCreator;
             _ballChainDto = ballChainDto;
             _chainTracker = chainTracker;
             _widgetBallChainProvider = widgetBallChainProvider;
@@ -35,34 +39,58 @@ namespace Code.Services.BallController
 
         public void TryAttachBall(Ball newBall)
         {
-            List<(Ball ball, float distance, int index)> ballsCollision = new();
+            var collision = GetClosestCollision(newBall);
+            if (collision == null)
+                return;
+
+            InsertBallToChainByDistance(newBall, collision);
+        }
+        
+        private CollisionData GetClosestCollision(Ball newBall)
+        {
+            var path = _pathCreator.path;
+            float minDistance = float.MaxValue;
+            CollisionData closest = null;
 
             for (int i = 0; i < _chainTracker.Balls.Count; i++)
             {
                 Ball existingBall = _chainTracker.Balls[i];
                 float distance = Vector3.Distance(existingBall.transform.position, newBall.transform.position);
 
-                if (distance <= _ballChainDto.CollisionThreshold)
+                if (distance <= _ballChainDto.CollisionThreshold && distance < minDistance)
                 {
-                    ballsCollision.Add((existingBall, distance, i));
+                    closest = new CollisionData
+                    {
+                        Ball = existingBall,
+                        Distance = distance,
+                        Index = i
+                    };
+                    minDistance = distance;
                 }
             }
 
-            if (ballsCollision.Count == 0)
-                return;
+            return closest;
+        }
 
-            ballsCollision = ballsCollision.OrderBy(b => b.distance).ToList();
+        private void InsertBallToChainByDistance(Ball newBall, CollisionData collision)
+        {
+            var path = _pathCreator.path;
 
-            Ball closestBall = ballsCollision.First().ball;
-            int closestIndex = ballsCollision.First().index;
+            float newBallDist = path.GetClosestDistanceAlongPath(newBall.transform.position);
+            float closestBallDist = path.GetClosestDistanceAlongPath(collision.Ball.transform.position);
 
-            if (closestIndex == 0 || _chainTracker.Balls[closestIndex - 1].transform.position.z > closestBall.transform.position.z)
-            { 
-                AttachBallToChain(newBall, closestIndex);
+            if (collision.Index == _chainTracker.Balls.Count - 1 && newBallDist < closestBallDist)
+            {
+                AttachBallToChain(newBall, _chainTracker.Balls.Count);
+            }
+            else if (collision.Index == 0 && newBallDist > closestBallDist)
+            {
+                AttachBallToChain(newBall, 0);
             }
             else
             {
-                AttachBallToChain(newBall, closestIndex + 1);   
+                int insertIndex = (newBallDist > closestBallDist) ? collision.Index : collision.Index + 1;
+                AttachBallToChain(newBall, insertIndex);
             }
         }
         
@@ -144,6 +172,13 @@ namespace Code.Services.BallController
             {
                 _chainTracker.Balls[i].SetIndex(i);
             }
+        }
+        
+        private class CollisionData
+        {
+            public Ball Ball;
+            public float Distance;
+            public int Index;
         }
     }
 }
