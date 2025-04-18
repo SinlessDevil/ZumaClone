@@ -21,7 +21,7 @@ namespace Code.Services.BallController
     public class BallChainController : IBallChainController
     {
         private bool _isBoosting = true;
-        
+
         private List<Color> _colorItems = new();
         private int _countItems = 0;
 
@@ -36,7 +36,7 @@ namespace Code.Services.BallController
         private WinBallChainHandler _winBallChainHandler;
         private LoseBallChainHandler _loseBallChainHandler;
         private AttachingBallChainHandler _attachingBallChainHandler;
-        
+
         private readonly IBallProvider _ballProvider;
         private readonly IWidgetProvider _widgetProvider;
         private readonly ILevelService _levelService;
@@ -65,28 +65,28 @@ namespace Code.Services.BallController
             _gameFactory = gameFactory;
             _timeService = timeService;
         }
-        
+
         public List<Item> ActiveItems => _chainTracker.Balls.Cast<Item>().ToList();
 
         public void Initialize(PathCreator pathCreator, BallChainDTO ballChainDto)
         {
             _pathCreator = pathCreator;
             _ballChainDto = ballChainDto;
-            
+
             _chainTracker = new ChainTracker();
-            
+
             _particleChainHandler = new ParticleChainHandler(_ballChainDto, _pathCreator, _chainTracker);
             _widgetBallChainProvider = new WidgetBallChainProvider(_widgetProvider, _pathCreator);
             _mouthChainHandler = new MouthChainHandler(_particleChainHandler, _chainTracker, _levelService);
             _winBallChainHandler = new WinBallChainHandler(_ballChainDto, _pathCreator, _particleChainHandler,
-                _widgetBallChainProvider, _chainTracker, _inputService, _timeService, _finishService, 
+                _widgetBallChainProvider, _chainTracker, _inputService, _timeService, _finishService,
                 _levelLocalProgressService, _levelService);
-            _loseBallChainHandler = new LoseBallChainHandler(_ballChainDto, _pathCreator,_chainTracker, _timeService, 
+            _loseBallChainHandler = new LoseBallChainHandler(_ballChainDto, _pathCreator, _chainTracker, _timeService,
                 _levelService, _inputService, _gameFactory, _finishService);
-            _attachingBallChainHandler = new AttachingBallChainHandler(_pathCreator, _ballChainDto, _chainTracker, 
+            _attachingBallChainHandler = new AttachingBallChainHandler(_pathCreator, _ballChainDto, _chainTracker,
                 _widgetBallChainProvider, _winBallChainHandler, _levelService, _levelLocalProgressService);
         }
-        
+
         public void Update()
         {
             MoveBalls();
@@ -96,7 +96,7 @@ namespace Code.Services.BallController
         {
             if (_pathCreator == null)
                 return;
-            
+
             _startBallSpawning?.Cancel();
             _startBallSpawning = new CancellationTokenSource();
 
@@ -105,18 +105,18 @@ namespace Code.Services.BallController
 
             BoostSpeedAsync(_startBallSpawning.Token).Forget();
             SpawnInitialBallsAsync(_startBallSpawning.Token).Forget();
-            
+
             _timeService.StartTimer();
         }
-        
+
         public void StopBallSpawning()
         {
             _startBallSpawning?.Cancel();
             _pathCreator = null;
-            
+
             _chainTracker.ClearBalls();
             _colorItems.Clear();
-            
+
             _countItems = 0;
             _chainTracker.ResetDistanceTravelled();
 
@@ -143,7 +143,7 @@ namespace Code.Services.BallController
                 var color = _colorItems.FirstOrDefault();
 
                 float spawnDistance = i * _ballChainDto.SpacingBalls;
-                Ball newBall = _ballProvider.GetBall(_pathCreator.path.GetPointAtDistance(spawnDistance), 
+                Ball newBall = _ballProvider.GetBall(_pathCreator.path.GetPointAtDistance(spawnDistance),
                     Quaternion.identity);
                 newBall.SetColor(color);
 
@@ -154,7 +154,7 @@ namespace Code.Services.BallController
                 await UniTask.Delay((int)(_ballChainDto.DurationSpawnBall * 1000), cancellationToken: token);
             }
         }
-        
+
         private async UniTaskVoid BoostSpeedAsync(CancellationToken token)
         {
             float elapsedTime = 0f;
@@ -162,7 +162,7 @@ namespace Code.Services.BallController
             float endSpeed = _ballChainDto.MoveSpeed;
 
             _ballChainDto.MoveSpeed = startSpeed;
-            
+
             while (elapsedTime < _ballChainDto.BoostDuration)
             {
                 elapsedTime += Time.deltaTime / 2;
@@ -172,7 +172,7 @@ namespace Code.Services.BallController
 
             _isBoosting = false;
         }
-        
+
         private void MoveBalls()
         {
             if (_chainTracker.Balls.Count == 0)
@@ -180,10 +180,10 @@ namespace Code.Services.BallController
 
             var currentSpeed = GetCurrentSpeed();
             _chainTracker.AddDistanceTravelled(currentSpeed * Time.deltaTime);
-            
+
             MoveFistBall();
             HandleRemoveBallNearEndOfPath(CurrentBalls[0]);
-            
+
             for (int i = 1; i < CurrentBalls.Count; i++)
             {
                 MoveBall(CurrentBalls[i], i);
@@ -200,37 +200,47 @@ namespace Code.Services.BallController
         {
             float targetDistance = Mathf.Max(_chainTracker.DistanceTravelled - (index * _ballChainDto.SpacingBalls), 0);
             Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance);
-            ball.transform.position = Vector3.Lerp(ball.transform.position, targetPosition, Time.deltaTime / _ballChainDto.DurationMovingOffset);
+            float currentSpeed = Time.deltaTime / _ballChainDto.DurationMovingOffset;
+            if (_loseBallChainHandler.IsLose)
+            {
+                targetPosition = _pathCreator.path.GetPointAtDistance(_pathCreator.path.length - 0.01f);
+                currentSpeed = Time.deltaTime / (_ballChainDto.DurationMovingOffset * (index / 100f));
+            }
+            ball.transform.position = Vector3.Lerp(ball.transform.position, targetPosition, currentSpeed);
         }
-        
+
         private void MoveFistBall()
         {
             float targetDistance = _chainTracker.DistanceTravelled;
             Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance);
-            CurrentBalls[0].transform.position = Vector3.Lerp(CurrentBalls[0].transform.position, targetPosition, Time.deltaTime / _ballChainDto.DurationMovingOffset);
+            if (_loseBallChainHandler.IsLose)
+            {
+                targetPosition = _pathCreator.path.GetPointAtDistance(_pathCreator.path.length - 0.01f);
+            }
+            CurrentBalls[0].transform.position = Vector3.Lerp(CurrentBalls[0].transform.position, targetPosition,
+                Time.deltaTime / _ballChainDto.DurationMovingOffset);
         }
-        
+
         private bool HandleRemoveBallNearEndOfPath(Ball ball)
         {
             var currentPosition = ball.transform.position;
-            
-            if (_pathCreator.path.GetClosestDistanceAlongPath(currentPosition) >= _pathCreator.path.length - 0.5f)
+
+            if (_pathCreator.path.GetClosestDistanceAlongPath(currentPosition) >= _pathCreator.path.length - 0.1f)
             {
                 _loseBallChainHandler.TryLose(ball.transform.position);
-                
-                _chainTracker.SubtractDistanceTravelled(_ballChainDto.SpacingBalls);
+
                 ball.Deactivate();
                 _chainTracker.RemoveBall(ball);
-                
                 return true;
             }
-
             return false;
         }
 
         private float GetCurrentSpeed()
         {
-            float currentSpeed = _isBoosting ? _ballChainDto.MoveSpeed * _ballChainDto.InitialSpeedMultiplier : _ballChainDto.MoveSpeed;
+            float currentSpeed = _isBoosting
+                ? _ballChainDto.MoveSpeed * _ballChainDto.InitialSpeedMultiplier
+                : _ballChainDto.MoveSpeed;
             return currentSpeed;
         }
 
