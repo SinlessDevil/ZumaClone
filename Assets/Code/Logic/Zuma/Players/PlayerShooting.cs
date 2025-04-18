@@ -16,30 +16,29 @@ namespace Code.Logic.Zuma.Players
     public class PlayerShooting : MonoBehaviour
     {
         private const float SwitchBallDistance = 0.5f;
-        
+
         [SerializeField] private Transform _spawnPointBall;
         [SerializeField] private MeshRenderer _spareBallIndicator;
-        
+
         private float _shootSpeed = 5f;
         private float _ballSpawnDuration = 0.25f;
-        
         private float _shootCooldown = 0.5f;
         private float _shootTimer = 0f;
-        
+
         private Ball _spareBall;
         private Ball _currentBall;
         private bool _canShoot = true;
 
         private Vector3 _savedStartPoint;
         private Vector3 _savedEndPoint;
-        
+
         private Coroutine _reloadCoroutine;
-        
+
         private Transform _rotationTransform;
         private PathCreator _pathCreator;
         private PlayerAnimator _playerAnimator;
         private BezierIntersection _bezierIntersection;
-        
+
         private IBallProvider _ballProvider;
         private IInputService _inputService;
         private IRandomService _randomService;
@@ -60,9 +59,9 @@ namespace Code.Logic.Zuma.Players
             _ballChainController = ballChainController;
             _uiFactory = uiFactory;
         }
-        
+
         public void Initialize(
-            Transform rotationTransform, 
+            Transform rotationTransform,
             PathCreator pathCreator,
             PlayerAnimator playerAnimator)
         {
@@ -70,7 +69,7 @@ namespace Code.Logic.Zuma.Players
             _pathCreator = pathCreator;
             _playerAnimator = playerAnimator;
             _bezierIntersection = new BezierIntersection(_pathCreator);
-            
+
             SubscribeEvents();
         }
 
@@ -85,24 +84,22 @@ namespace Code.Logic.Zuma.Players
             {
                 _shootTimer -= Time.deltaTime;
                 if (_shootTimer <= 0f)
-                {
                     _canShoot = true;
-                }
             }
         }
 
         public void Activate()
         {
             SetUpBall(transform);
-            PlayAnimationReloading(_currentBall, _spawnPointBall.position);
+            PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
             SetIndicatorSpareBall();
         }
-        
+
         private void SubscribeEvents()
         {
             _inputService.PointerUpEvent += OnHandleTouch;
         }
-        
+
         private void UnsubscribeEvents()
         {
             _inputService.PointerUpEvent -= OnHandleTouch;
@@ -113,12 +110,12 @@ namespace Code.Logic.Zuma.Players
             if (!_canShoot || _currentBall == null)
                 return;
 
-            if(!_uiFactory.GameHud.InputZona.IsActive)
+            if (!_uiFactory.GameHud.InputZona.IsActive)
                 return;
-            
+
             float distanceToTouch = _inputService.GetWorldDistanceTo(transform.position);
 
-            if (distanceToTouch < SwitchBallDistance) 
+            if (distanceToTouch < SwitchBallDistance)
             {
                 OnSwitchBall();
             }
@@ -127,48 +124,41 @@ namespace Code.Logic.Zuma.Players
                 OnShoot();
             }
         }
-        
+
         private void OnSwitchBall()
         {
             (_currentBall, _spareBall) = (_spareBall, _currentBall);
-            
-            PlayAnimationReloading(_currentBall, _spawnPointBall.position);
-            PlayAnimationReloading(_spareBall, transform.position);
+
+            PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
+            PlayAnimationReloading(_spareBall, Vector3.zero); // т.к. parent = player, можно просто 0
             SetIndicatorSpareBall();
         }
-        
+
         private void OnShoot()
         {
-            if (!_canShoot || _currentBall == null)
+            if (!_canShoot || _currentBall == null || _reloadCoroutine != null)
                 return;
 
-            if(_reloadCoroutine != null)
-                return;
-            
-            //Start cooldown shoot
             _canShoot = false;
             _shootTimer = _shootCooldown;
 
-            //Get direction
             Vector3 mouseWorldPosition = _inputService.TouchPositionToWorldPosition;
             Vector3 direction = mouseWorldPosition - _rotationTransform.position;
             direction = new Vector3(direction.x, 0, direction.z).normalized;
-            
-            //Get intersection Points
+
             var startPoint = transform.position;
             var endPoint = startPoint + direction * 100;
             var intersectionPoints = _bezierIntersection.GetIntersectionPoints(startPoint, endPoint);
             _savedStartPoint = startPoint;
             _savedEndPoint = endPoint;
-            
-            //Push ball
+
             Ball shotBall = _currentBall;
             shotBall.transform.SetParent(null);
             shotBall.BallMover.StartMoveToDirection(direction, _shootSpeed);
             shotBall.BallRotator.StartRotate();
             shotBall.BallIntersectionTracker.StartTracker(intersectionPoints);
             shotBall.SetInteractive(true);
-            
+
             _reloadCoroutine ??= StartCoroutine(WaitToReloadRoutine());
         }
 
@@ -178,37 +168,36 @@ namespace Code.Logic.Zuma.Players
             yield return new WaitUntil(() => _currentBall.IsInteractive == false);
             yield return new WaitForSeconds(0.3f);
             _playerAnimator.PlayOpenEyeAnimation();
-            
+
             _currentBall = _spareBall;
-            PlayAnimationReloading(_currentBall, _spawnPointBall.position);
+            PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
             SetUpBall(transform);
             SetIndicatorSpareBall();
-            
+
             _reloadCoroutine = null;
         }
-        
+
         private void SetUpBall(Transform parent)
         {
             if (_currentBall == null)
             {
-                var currentItemColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, null);
-                _currentBall = _ballProvider.GetBall(parent.position, Quaternion.identity);
-                _currentBall.SetColor(currentItemColor);
-                _currentBall.transform.SetParent(parent);
+                var currentColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, null);
+                _currentBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
+                _currentBall.SetColor(currentColor);
+                _currentBall.transform.SetParent(parent, false);
             }
-            
-            _spareBall = null;
-            var spareItemColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, null);
-            _spareBall = _ballProvider.GetBall(parent.position, Quaternion.identity);
-            _spareBall.SetColor(spareItemColor);
-            _spareBall.transform.SetParent(parent);
+
+            var spareColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, null);
+            _spareBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
+            _spareBall.SetColor(spareColor);
+            _spareBall.transform.SetParent(parent, false);
         }
 
-        private void PlayAnimationReloading(Ball ball, Vector3 position)
+        private void PlayAnimationReloading(Ball ball, Vector3 localTargetPos)
         {
             ball.BallRotator.StartRotate();
 
-            ball.transform.DOMove(position, _ballSpawnDuration)
+            ball.transform.DOLocalMove(localTargetPos, _ballSpawnDuration)
                 .SetEase(Ease.Linear)
                 .OnComplete(() =>
                 {
@@ -220,12 +209,12 @@ namespace Code.Logic.Zuma.Players
         {
             _spareBallIndicator.material.color = _spareBall.Color;
         }
-        
+
         private void OnDrawGizmos()
         {
-            if(_bezierIntersection != null)
+            if (_bezierIntersection != null)
                 _bezierIntersection.OnDrawIntersectionGizmos();
-            
+
             Gizmos.color = Color.red;
             Gizmos.DrawLine(_savedStartPoint, _savedEndPoint);
         }
