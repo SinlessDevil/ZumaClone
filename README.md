@@ -6,32 +6,54 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
 ---
 
 ## 📽️ Demo & Visuals
-
 ### 🎞️ Gameplay GIFs
-
-<p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_1.gif?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_2.gif?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_3.gif?raw=true" width="20%" height="20%" />
-</p>
-<p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_4.gif?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_5.gif?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/GIf_6.gif?raw=true" width="20%" height="20%" />
-</p>
-
+---
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_1.gif?raw=true" width="250"/>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_2.gif?raw=true" width="250"/>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_3.gif?raw=true" width="250"/>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_4.gif?raw=true" width="250"/>
+      <p style="font-weight: bold; margin-top: 6px;">🎁 Chest Anim</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_5.gif?raw=true" width="250"/>
+      <p style="font-weight: bold; margin-top: 6px;">🗑 Remove Items</p>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/GIf_6.gif?raw=true" width="250"/>
+      <p style="font-weight: bold; margin-top: 6px;">🧪 Cheat Panel / Expand Inventory</p>
+    </td>
+  </tr>
+</table>
+---
 ### 🖼️ Screenshots
-
-<p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_1.png?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_2.png?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_3.png?raw=true" width="20%" height="20%" />
-</p>
-<p align="center">
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_4.png?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_5.png?raw=true" width="20%" height="20%" />
-  <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true" width="20%" height="20%" />
-</p>
+---
+<table>
+  <tr>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_1.png?raw=true?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_2.png?raw=true?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_3.png?raw=true?raw=true" width="250"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_4.png?raw=true?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_5.png?raw=true?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true?raw=true" width="250"/></td>
+  </tr>
+</table>
+---
 
 ---
 
