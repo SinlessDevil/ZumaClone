@@ -5,7 +5,6 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
 
 ---
 
-## 📽️ Demo & Visuals
 ### 🎞️ Gameplay GIFs
 ---
 <table>
@@ -39,6 +38,7 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
   </tr>
 </table>
 ---
+
 ### 🖼️ Screenshots
 ---
 <table>
