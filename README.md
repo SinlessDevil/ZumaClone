@@ -37,7 +37,6 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
     </td>
   </tr>
 </table>
----
 
 ### 🖼️ Screenshots
 ---
@@ -53,9 +52,6 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
     <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true?raw=true" width="250"/></td>
   </tr>
 </table>
----
-
----
 
 ## ⚙️ Features
 
@@ -67,8 +63,6 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
 - Full support for Unity URP and modern asset workflows  
 - Clean architecture using Zenject and async handling via UniTask  
 - Powerful in-editor tooling with Odin Inspector
-
----
 
 ## 🧰 Tech Stack
 
