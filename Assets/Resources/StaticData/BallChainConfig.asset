@@ -27,4 +27,4 @@ MonoBehaviour:
   SetToSpawnWidget: 1.15
   TimeToSpawnWidget: 50
   PercentToDetectionLose: 20
-  BoostSpeedBallForLose: 4
+  BoostSpeedBallForLose: 0.05

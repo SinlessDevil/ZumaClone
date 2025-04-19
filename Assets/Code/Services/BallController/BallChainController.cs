@@ -198,25 +198,25 @@ namespace Code.Services.BallController
 
         private void MoveBall(Ball ball, int index)
         {
-            float targetDistance = Mathf.Max(_chainTracker.DistanceTravelled - (index * _ballChainDto.SpacingBalls), 0);
-            Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance);
+            float rawTargetDistance = _chainTracker.DistanceTravelled - (index * _ballChainDto.SpacingBalls);
+            float targetDistance = Mathf.Clamp(rawTargetDistance, 0f, _pathCreator.path.length - 0.1f);
             float currentSpeed = Time.deltaTime / _ballChainDto.DurationMovingOffset;
+            
             if (_loseBallChainHandler.IsLose)
             {
-                targetPosition = _pathCreator.path.GetPointAtDistance(_pathCreator.path.length - 0.01f);
-                currentSpeed = Time.deltaTime / (_ballChainDto.DurationMovingOffset * (index / 100f));
+                currentSpeed = Time.deltaTime / (_ballChainDto.DurationMovingOffset + index * 0.03f);
             }
-            ball.transform.position = Vector3.Lerp(ball.transform.position, targetPosition, currentSpeed);
+            
+            Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance, EndOfPathInstruction.Stop);
+            ball.transform.position = Vector3.Lerp(ball.transform.position, targetPosition,
+                currentSpeed);
+            
         }
 
         private void MoveFistBall()
         {
-            float targetDistance = _chainTracker.DistanceTravelled;
-            Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance);
-            if (_loseBallChainHandler.IsLose)
-            {
-                targetPosition = _pathCreator.path.GetPointAtDistance(_pathCreator.path.length - 0.01f);
-            }
+            float targetDistance = Mathf.Clamp(_chainTracker.DistanceTravelled, 0f, _pathCreator.path.length - 0.01f);
+            Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance, EndOfPathInstruction.Stop);
             CurrentBalls[0].transform.position = Vector3.Lerp(CurrentBalls[0].transform.position, targetPosition,
                 Time.deltaTime / _ballChainDto.DurationMovingOffset);
         }
