@@ -26,15 +26,15 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
   <tr>
     <td align="center">
       <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_4.gif?raw=true" width="250"/>
-      <p style="font-weight: bold; margin-top: 6px;">🎁 Chest Anim</p>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
     </td>
     <td align="center">
       <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_5.gif?raw=true" width="250"/>
-      <p style="font-weight: bold; margin-top: 6px;">🗑 Remove Items</p>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
     </td>
     <td align="center">
       <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/GIf_6.gif?raw=true" width="250"/>
-      <p style="font-weight: bold; margin-top: 6px;">🧪 Cheat Panel / Expand Inventory</p>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
     </td>
   </tr>
 </table>
