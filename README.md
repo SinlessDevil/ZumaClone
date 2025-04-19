@@ -5,7 +5,6 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
 
 ---
 
-## 📽️ Demo & Visuals
 ### 🎞️ Gameplay GIFs
 ---
 <table>
@@ -26,19 +25,19 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
   <tr>
     <td align="center">
       <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_4.gif?raw=true" width="250"/>
-      <p style="font-weight: bold; margin-top: 6px;">🎁 Chest Anim</p>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
     </td>
     <td align="center">
       <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/Gif_5.gif?raw=true" width="250"/>
-      <p style="font-weight: bold; margin-top: 6px;">🗑 Remove Items</p>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
     </td>
     <td align="center">
       <img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Gifs/GIf_6.gif?raw=true" width="250"/>
-      <p style="font-weight: bold; margin-top: 6px;">🧪 Cheat Panel / Expand Inventory</p>
+      <p style="font-weight: bold; margin-top: 6px;"></p>
     </td>
   </tr>
 </table>
----
+
 ### 🖼️ Screenshots
 ---
 <table>
@@ -53,9 +52,6 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
     <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true?raw=true" width="250"/></td>
   </tr>
 </table>
----
-
----
 
 ## ⚙️ Features
 
@@ -67,8 +63,6 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
 - Full support for Unity URP and modern asset workflows  
 - Clean architecture using Zenject and async handling via UniTask  
 - Powerful in-editor tooling with Odin Inspector
-
----
 
 ## 🧰 Tech Stack
 
