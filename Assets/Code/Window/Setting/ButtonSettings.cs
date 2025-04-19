@@ -7,7 +7,7 @@ using Zenject;
 
 namespace Code.Window.Setting
 {
-    public class ButtonSetting : MonoBehaviour
+    public class ButtonSettings : MonoBehaviour
     {
         [SerializeField] private Button _button;
         

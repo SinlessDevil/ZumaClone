@@ -160,6 +160,7 @@ PlayerSettings:
   androidMinAspectRatio: 1
   applicationIdentifier:
     Android: com.DefaultCompany.Zuma
+    Standalone: com.DefaultCompany.Zuma
   buildNumber:
     Bratwurst: 0
     Standalone: 0
