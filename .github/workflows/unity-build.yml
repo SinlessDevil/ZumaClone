@@ -36,7 +36,7 @@ jobs:
           buildPath: Artifacts/Android
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
           path: Artifacts
