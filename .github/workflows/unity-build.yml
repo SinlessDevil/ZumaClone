@@ -29,13 +29,13 @@ jobs:
           password: '${{ secrets.UNITY_PASSWORD }}'
 
       - name: Build Android
-        uses: game-ci/unity-builder@v2
+        uses: buildalon/activate-unity-license@v1
         with:
           targetPlatform: Android
           buildPath: Artifacts/Android
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
           path: Artifacts
