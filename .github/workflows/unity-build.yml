@@ -1,9 +1,9 @@
-name: Unity Build on #build commit
+name: Unity Build on
 
 on:
   push:
     branches:
-      - '**'  # следим за всеми ветками
+      - '**'
 
 jobs:
   build:
