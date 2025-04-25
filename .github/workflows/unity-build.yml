@@ -24,10 +24,9 @@ jobs:
         uses: game-ci/unity-setup@v2
         with:
           unityVersion: 2022.3.21f1
-          activation: manual
-          username: ${{ secrets.UNITY_USERNAME }}
-          password: ${{ secrets.UNITY_PASSWORD }}
-          license: ${{ secrets.UNITY_LICENSE }}
+          license: 'Personal'
+          username: '${{ secrets.UNITY_USERNAME }}'
+          password: '${{ secrets.UNITY_PASSWORD }}'
 
       - name: Build Android
         uses: game-ci/unity-builder@v2
