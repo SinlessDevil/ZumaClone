@@ -24,7 +24,7 @@ jobs:
       - name: Build Android
         uses: game-ci/unity-builder@v4
         with:
-          unityVersion: 2022.3.21f1
+          unityVersion: 2023.2.1f1
           targetPlatform: Android
         env:
           UNITY_USERNAME: ${{ secrets.UNITY_USERNAME }}
@@ -36,3 +36,4 @@ jobs:
         with:
           name: AndroidBuild
           path: Artifacts
+          
