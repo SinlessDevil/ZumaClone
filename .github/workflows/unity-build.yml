@@ -29,7 +29,6 @@ jobs:
         env:
           UNITY_USERNAME: ${{ secrets.UNITY_USERNAME }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_AUTHENTICATOR_KEY: ${{ secrets.UNITY_AUTHENTICATOR_KEY }}
 
       - name: Upload Build Artifact
