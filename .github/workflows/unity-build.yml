@@ -21,7 +21,7 @@ jobs:
             Library-${{ runner.os }}-
 
       - name: Setup Unity
-        uses: game-ci/unity-setup@v2
+        uses: game-ci/unity-setup@v3
         with:
           unityVersion: 2022.3.21f1
           username: '${{ secrets.UNITY_USERNAME }}'
