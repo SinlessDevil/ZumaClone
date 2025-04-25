@@ -26,9 +26,10 @@ jobs:
         with:
           unityVersion: 2022.3.21f1
           targetPlatform: Android
-          buildPath: Artifacts/Android
-          username: '${{ secrets.UNITY_USERNAME }}'
-          password: '${{ secrets.UNITY_PASSWORD }}'
+        env:
+          UNITY_USERNAME: ${{ secrets.UNITY_USERNAME }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_AUTHENTICATOR_KEY: ${{ secrets.UNITY_AUTHENTICATOR_KEY }}
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
