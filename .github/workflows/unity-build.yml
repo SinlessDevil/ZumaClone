@@ -21,7 +21,7 @@ jobs:
             Library-${{ runner.os }}-
 
       - name: Setup Unity
-        uses: game-ci/unity-setup@32ebf9fc35f65067f1c66203c321fb6d693c369c
+        uses: buildalon/activate-unity-license@v1
         with:
           unityVersion: 2022.3.21f1
           license: 'Personal'
