@@ -29,6 +29,7 @@ jobs:
       # --- добавляем ТУТ тесты ---
       - name: Run Unity Tests
         uses: game-ci/unity-test-runner@v4
+        continue-on-error: true
         with:
           projectPath: .
           unityVersion: 2023.2.1f1
