@@ -15,3 +15,10 @@ MonoBehaviour:
   IsAndroidBuild: 1
   IsIosBuild: 0
   Version: 1.0.0
+  UseCustomKeystore: 0
+  KeystoreName: 
+  KeystorePass: 
+  KeyaliasName: 
+  KeyaliasPass: 
+  UseAutomaticSigning: 1
+  AppleDeveloperTeamID: 
