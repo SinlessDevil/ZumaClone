@@ -241,6 +241,8 @@ Task("Send-Welcome-Message")
 Task("Run-Android-Tests")
     .Does(() =>
     {
+        EnsureDirectoryExists("./artifacts");
+    
         UnityEditor(
             new UnityEditorArguments()
             {
@@ -320,8 +322,14 @@ Task("Send-Erorr-Logs")
     string relativePath = "artifacts/unity.log";
     string path = System.IO.Path.Combine(CurrentDirectory, relativePath);
 
+    if (!System.IO.File.Exists(path))
+    {
+        Console.WriteLine($"[WARNING] Unity log file {path} not found. Skipping log sending.");
+        return;
+    }
+
     Console.WriteLine($"Start sending from {path}");
-    
+
     string caption = ParseUnityLogError(relativePath);
     Console.WriteLine(caption);
 
@@ -336,7 +344,6 @@ Task("Send-Erorr-Logs")
 
     throw new CakeException("Build end with error!");
 });
-
 
 Task("Share-Apk")
 .WithCriteria(() => IsAndroidBuild, "Android disabled in config")
