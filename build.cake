@@ -218,7 +218,7 @@ Task("Run-Android-Tests")
   
 //         if (!helloMessageId.Wait(timeSpan))
 //             throw new TimeoutException($"SendFile Timeout {timeSpan}");
-//         }
+         }
         catch (System.Exception e)
         {
             Console.WriteLine(e);
@@ -255,7 +255,7 @@ Task("Send-Erorr-Logs")
 .WithCriteria(() => isErrorHappend)
 .Does(() =>
 {
-//     string relativePath = "artifacts/unity.log";
+    string relativePath = "artifacts/unity.log";
     string path = System.IO.Path.Combine(CurrentDirectory, relativePath);
 
     Console.WriteLine($"Start sending from {path}");
@@ -489,8 +489,8 @@ Task("Build-All")
 Task("Cleanup")
     .Does(() => 
 {
-    if(serviceProvider != null)
-        serviceProvider.Dispose();
+    //if(serviceProvider != null)
+    //    serviceProvider.Dispose();
 });
 
 
