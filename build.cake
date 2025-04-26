@@ -649,8 +649,12 @@ void SetProjectProperty(KeyValuePair<string,string>[] properies, KeyValuePair<st
 
     Console.WriteLine($"Write {pathToSettings}");
 
-System.IO.File.WriteAllLines(pathToSettings, updatedLines);
+    if (System.IO.File.Exists(pathToSettings))
+    {
+        System.IO.File.SetAttributes(pathToSettings, FileAttributes.Normal);
+    }
 
+    System.IO.File.WriteAllLines(pathToSettings, updatedLines);
 }
 
 string GetProjectPropertyLine(string key)
