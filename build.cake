@@ -254,18 +254,18 @@ Task("Run-Android-Tests")
                     ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK",
                     BuildTarget = Android,
                     LogFile = logPath
-            },
+                },
                 new UnityEditorSettings
                 {
                     RealTimeLog = true
-            });
+                });
         }
         else
         {
             Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
         }
-        );
-    })
+    // ❌ Тут НЕТ закрытия `});` таски !!!
+    )
     .OnError(exception => 
     {
         isErrorHappend = true;
@@ -276,24 +276,8 @@ Task("Run-Android-Tests")
         try
         {
             testSummary = ParseTestResult(testResultPath);
-
             Console.WriteLine(testSummary);
-
-/*
-        Task<string> helloMessageId =
-           client.InvokeAsync(x 
-               => x.SendMessage(
-                 testSummary,
-                 RepoUrl()));
-*/
-
-        Console.WriteLine($"[CI][Test Summary] Would send message: {testSummary}");
-
-        TimeSpan timeSpan = new TimeSpan(0, 1, 0);
-  
-//         if (!helloMessageId.Wait(timeSpan))
-//             throw new TimeoutException($"SendFile Timeout {timeSpan}");
-         }
+        }
         catch (System.Exception e)
         {
             Console.WriteLine(e);
