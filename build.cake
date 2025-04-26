@@ -28,7 +28,7 @@ using System.Threading;
 //using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Globalization;
-
+using Cake.Common.Build;
 
 var target = Argument("target", "Build-All");
 var CurrentDirectory =  System.IO.Directory.GetCurrentDirectory();
@@ -243,16 +243,27 @@ Task("Run-Android-Tests")
     {
         EnsureDirectoryExists("./artifacts");
     
-        UnityEditor(
-            new UnityEditorArguments()
-            {
-                ProjectPath = PathToProject,
-                RunTests = false,
-                Quit = false,
-                TestPlatform = TestPlatform.editmode,
-                TestResults = testResultPath,
-                LogFile = logPath
-            }
+        if (!BuildSystem.GitHubActions.IsRunningOnGitHubActions)
+        {
+            UnityEditor(
+                new UnityEditorArguments
+                {
+                    ProjectPath = PathToProject,
+                    BatchMode = true,
+                    Quit = true,
+                    ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK",
+                    BuildTarget = Android,
+                    LogFile = logPath
+            },
+                new UnityEditorSettings
+                {
+                    RealTimeLog = true
+            });
+        }
+        else
+        {
+            Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
+        }
         );
     })
     .OnError(exception => 
@@ -290,31 +301,38 @@ Task("Run-Android-Tests")
     });
 
 Task("Build-APK")
-.WithCriteria(() => IsAndroidBuild, "Android disabled in config")
-.WithCriteria(() => !isErrorHappend, "Tests Fall")
+    .WithCriteria(() => IsAndroidBuild, "Android disabled in config")
+    .WithCriteria(() => !isErrorHappend, "Tests Fall")
     .Does(() => 
-{   
-    UnityEditor(
-        new UnityEditorArguments
+    {   
+        if (!BuildSystem.GitHubActions.IsRunningOnGitHubActions)
         {
-          ProjectPath = PathToProject,
-          BatchMode = true,
-          Quit = true,
-          ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK",
-          BuildTarget = Android,
-          LogFile = logPath
-     },
-     new UnityEditorSettings
-     {
-         RealTimeLog = true
-     });
-})
-.OnError(handler => 
-{
-    DisplayError(handler);
-    isErrorHappend = true;
-});
-
+            UnityEditor(
+                new UnityEditorArguments
+                {
+                    ProjectPath = PathToProject,
+                    BatchMode = true,
+                    Quit = true,
+                    ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK",
+                    BuildTarget = Android,
+                    LogFile = logPath
+                },
+                new UnityEditorSettings
+                {
+                    RealTimeLog = true
+                });
+        }
+        else
+        {
+            Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
+        }
+    })
+    .OnError(handler =>
+    {
+        DisplayError(handler);
+        isErrorHappend = true;
+    });
+    
 Task("Send-Erorr-Logs")
 .WithCriteria(() => isErrorHappend)
 .Does(() =>
@@ -372,29 +390,36 @@ Task("Share-Apk")
 });
 
 Task("Build-XCodeProject")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
+    .WithCriteria(() => IsIosBuild, "iOS disabled in config")
     .Does(() => 
-{   
-    UnityEditor(
-        new UnityEditorArguments
+    {   
+        if (!BuildSystem.GitHubActions.IsRunningOnGitHubActions)
         {
-          ProjectPath = PathToProject,
-          BatchMode = true,
-          Quit = true,
-          ExecuteMethod = "Plugins.CI.Editor.Builder.BuildXCodeProject",
-          BuildTarget = iOS,
-          LogFile = logPath
-     },
-     new UnityEditorSettings
-     {
-         RealTimeLog = true
-     });
-})
-.OnError(handler => 
-{
-    DisplayError(handler);
-    isErrorHappend = true;
-});
+            UnityEditor(
+                new UnityEditorArguments
+                {
+                    ProjectPath = PathToProject,
+                    BatchMode = true,
+                    Quit = true,
+                    ExecuteMethod = "Plugins.CI.Editor.Builder.BuildXCodeProject",
+                    BuildTarget = iOS,
+                    LogFile = logPath
+                },
+                new UnityEditorSettings
+                {
+                    RealTimeLog = true
+                });
+        }
+        else
+        {
+            Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
+        }
+    })
+    .OnError(handler => 
+    {
+        DisplayError(handler);
+        isErrorHappend = true;
+    });
 
 Task("Archivate-XCodeProject")
 .WithCriteria(() => IsIosBuild, "Ios disabled in config")
