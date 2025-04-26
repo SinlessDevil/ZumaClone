@@ -77,6 +77,7 @@ Task("Clean-Artifacts-Android")
         {
             try
             {
+                System.IO.File.SetAttributes(file.FullPath, FileAttributes.Normal);
                 DeleteFile(file);
                 Console.WriteLine($"[INFO] Deleted file: {file}");
             }
@@ -652,6 +653,10 @@ void SetProjectProperty(KeyValuePair<string,string>[] properies, KeyValuePair<st
     if (System.IO.File.Exists(pathToSettings))
     {
         System.IO.File.SetAttributes(pathToSettings, FileAttributes.Normal);
+        var tempPath = pathToSettings + ".temp";
+        System.IO.File.Copy(pathToSettings, tempPath, true);
+        System.IO.File.Delete(pathToSettings);
+        System.IO.File.Move(tempPath, pathToSettings);
     }
 
     System.IO.File.WriteAllLines(pathToSettings, updatedLines);
