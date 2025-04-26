@@ -264,7 +264,8 @@ Task("Run-Android-Tests")
         {
             Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
         }
-    })
+    // ❌ Тут НЕТ закрытия `});` таски !!!
+    )
     .OnError(exception => 
     {
         isErrorHappend = true;
