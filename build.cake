@@ -13,7 +13,7 @@
 #addin nuget:?package=Cake.Yaml&version=4.0.0
 #addin nuget:?package=YamlDotNet&version=6.1.2
 
-#reference "./bot/BotLib.Abstractions.dll"
+//#reference "./bot/BotLib.Abstractions.dll"
 
 #load "./BuilderDependencies/TestResultParser.cake"
 #load "./BuilderDependencies/UnityLogParser.cake"
@@ -22,10 +22,10 @@ using static Cake.Unity.Arguments.BuildTarget;
 using System.Runtime;
 using System.Diagnostics;
 using System.Threading;
-using BotLib.Abstractions;
-using JKang.IpcServiceFramework.Client;
-using JKang.IpcServiceFramework;
-using Microsoft.Extensions.DependencyInjection;
+//using BotLib.Abstractions;
+//using JKang.IpcServiceFramework.Client;
+//using JKang.IpcServiceFramework;
+//using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Globalization;
 
@@ -42,8 +42,8 @@ var commitHistory = "";
 var git =".git";
 string gardleProjectDirectory;
 
-IIpcClient<ITelegram> client;
-ServiceProvider serviceProvider;
+//IIpcClient<ITelegram> client;
+//ServiceProvider serviceProvider;
 
 var IsAndroidBuild = false;
 var IsIosBuild = false;
@@ -132,6 +132,7 @@ Task("Update-Project-Property-Ios")
     SetProjectProperty(properties, ignore);
 });
 
+/*
 Task("Connect-To-Bot")
     .Does(() => 
 {
@@ -150,7 +151,9 @@ Task("Connect-To-Bot")
 {
     DisplayError(exception);
 });
+*/
 
+/*
 Task("Send-Welcome-Message")
     .Does(() => 
 {
@@ -171,6 +174,7 @@ Task("Send-Welcome-Message")
 {
     DisplayError(exception);
 });
+*/
 
 Task("Run-Android-Tests")
     .Does(() =>
@@ -200,11 +204,15 @@ Task("Run-Android-Tests")
 
             Console.WriteLine(testSummary);
 
+/*
         Task<string> helloMessageId =
            client.InvokeAsync(x 
                => x.SendMessage(
                  testSummary,
                  RepoUrl()));
+*/
+
+        Console.WriteLine($"[CI][Test Summary] Would send message: {testSummary}");
 
         TimeSpan timeSpan = new TimeSpan(0, 1, 0);
   
@@ -255,12 +263,14 @@ Task("Send-Erorr-Logs")
     string caption = ParseUnityLogError(relativePath);
     Console.WriteLine(caption);
 
-    Task output = client.InvokeAsync(x => x.SendFile(path, "unity.log", caption, RepoUrl()));
+    //Task output = client.InvokeAsync(x => x.SendFile(path, "unity.log", caption, RepoUrl()));
+
+    Console.WriteLine($"[CI][Log] Would send log: '{path}' with caption: {caption}");
 
     TimeSpan timeSpan = new TimeSpan(0, 5, 0);
     
-    if (!output.Wait(timeSpan))
-        throw new TimeoutException($"SendFile Timeout {timeSpan}");
+    //if (!output.Wait(timeSpan))
+    //    throw new TimeoutException($"SendFile Timeout {timeSpan}");
 
     throw new CakeException("Build end with error!");
 });
@@ -278,12 +288,15 @@ Task("Share-Apk")
     {
         Console.WriteLine($"Start sending from {path}");
 
-        Task<string> output = client.InvokeAsync(x => x.SendFile(path, ApkName(System.IO.Path.GetExtension(path)), RepoUrl()));
+        //Task<string> output = client.InvokeAsync(x => x.SendFile(path, ApkName(System.IO.Path.GetExtension(path)), RepoUrl()));
+        
+        var fileName = ApkName(System.IO.Path.GetExtension(path));
+        Console.WriteLine($"[CI][APK] Would send file: '{path}' as '{fileName}' to repo: {RepoUrl()}");
 
         TimeSpan timeSpan = new TimeSpan(0, 10, 0);
     
-        if (!output.Wait(timeSpan))
-            throw new TimeoutException($"SendFile Timeout {timeSpan}");
+        //if (!output.Wait(timeSpan))
+        //    throw new TimeoutException($"SendFile Timeout {timeSpan}");
     }
 
     SaveLastCommitSha();
@@ -403,6 +416,7 @@ Task("Distribute-IPA")
     isErrorHappend = true;
 });
 
+/*
 Task("Send-Success-Message")
 .WithCriteria(() => IsIosBuild, "Ios disabled in config")
 .WithCriteria(() => !isErrorHappend, "Error")
@@ -425,6 +439,7 @@ Task("Send-Success-Message")
 {
     DisplayError(exception);
 });
+*/
 
 Task("Build-Android")
 .WithCriteria(() => IsAndroidBuild, "Android disabled in config")
@@ -432,8 +447,8 @@ Task("Build-Android")
 .IsDependentOn("Find-Project")
 .IsDependentOn("Build-Commit-History")
 .IsDependentOn("Update-Project-Property-Android")
-.IsDependentOn("Connect-To-Bot")
-.IsDependentOn("Send-Welcome-Message")
+//.IsDependentOn("Connect-To-Bot")
+//.IsDependentOn("Send-Welcome-Message")
 .IsDependentOn("Run-Android-Tests")
 .IsDependentOn("Build-APK")
 .IsDependentOn("Send-Erorr-Logs")
@@ -452,7 +467,7 @@ Task("Build-iOS")
 .IsDependentOn("Archivate-XCodeProject")
 .IsDependentOn("Export-Archive")
 .IsDependentOn("Distribute-IPA")
-.IsDependentOn("Send-Success-Message")
+//.IsDependentOn("Send-Success-Message")
 .Does(() =>
 {
 });
