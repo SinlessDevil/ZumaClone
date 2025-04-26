@@ -26,6 +26,20 @@ jobs:
       - name: Install Dependencies
         run: sudo apt-get install -y unzip
 
+      # --- добавляем ТУТ тесты ---
+      - name: Run Unity Tests
+        uses: game-ci/unity-test-runner@v4
+        with:
+          projectPath: .
+          unityVersion: 2023.2.1f1
+          testMode: EditMode
+          artifactsPath: artifacts/test-results
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      # ----------------------------
+
       - name: Run Cake Build
         run: dotnet cake build.cake --target=Build-All
 
