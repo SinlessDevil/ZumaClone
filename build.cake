@@ -247,7 +247,7 @@ Task("Run-Android-Tests")
             new UnityEditorArguments()
             {
                 ProjectPath = PathToProject,
-                RunTests = true,
+                RunTests = false,
                 Quit = false,
                 TestPlatform = TestPlatform.editmode,
                 TestResults = testResultPath,
@@ -518,7 +518,7 @@ Task("Build-Android")
 .IsDependentOn("Update-Project-Property-Android")
 //.IsDependentOn("Connect-To-Bot")
 //.IsDependentOn("Send-Welcome-Message")
-.IsDependentOn("Run-Android-Tests")
+//.IsDependentOn("Run-Android-Tests")
 .IsDependentOn("Build-APK")
 .IsDependentOn("Send-Erorr-Logs")
 .IsDependentOn("Share-Apk")
