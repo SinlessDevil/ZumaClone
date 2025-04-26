@@ -2,7 +2,7 @@ using System.Xml.Linq;
 
 public string ParseTestResult(string resultPath)
 {
-    if (!File.Exists(resultPath))
+    if (!System.IO.File.Exists(resultPath))
     {
         Console.WriteLine($"[WARNING] Test result file {resultPath} not found. Skipping parsing.");
         return "No test results found.";
