@@ -26,7 +26,6 @@ namespace Plugins.CI.Editor
         public static void OpenCiConfig()
         {
             CIConfig config = LoadCiConfig();
-
             Selection.activeObject = config;
             EditorGUIUtility.PingObject(config);
         }
