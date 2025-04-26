@@ -1,4 +1,4 @@
-name: Unity Build on
+name: CI Cake Build
 
 on:
   push:
@@ -13,27 +13,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cache Library
-        uses: actions/cache@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          path: Library
-          key: Library-${{ runner.os }}-${{ hashFiles('**/ProjectSettings/ProjectVersion.txt') }}
-          restore-keys: |
-            Library-${{ runner.os }}-
+          dotnet-version: 7.x
 
-      - name: Build Android
-        uses: game-ci/unity-builder@v4
-        with:
-          unityVersion: 2023.2.1f1
-          targetPlatform: Android
-        env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      - name: Restore .NET Tools
+        run: dotnet tool restore
 
-      - name: Upload Build Artifact
+      - name: Install Dependencies
+        run: sudo apt-get install -y unzip
+
+      - name: Run Cake Build
+        run: dotnet cake build.cake --target=Build-All
+
+      - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
-          path: build/Android/Android.apk
-          
+          path: artifacts/*.apk
