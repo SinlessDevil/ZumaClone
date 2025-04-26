@@ -101,6 +101,43 @@ Task("Clean-Artifacts-Android")
     }
 });
 
+Task("Clean-Artifacts-Ios")
+    .WithCriteria(() => IsIosBuild, "iOS disabled in config")
+    .Does(() =>
+{
+    string artifactsPath = "./artifacts";
+
+    if (DirectoryExists(artifactsPath))
+    {
+        Console.WriteLine($"[INFO] Cleaning artifacts directory for iOS: {artifactsPath}");
+
+        foreach (var file in GetFiles($"{artifactsPath}/**/*"))
+        {
+            try
+            {
+                DeleteFile(file);
+                Console.WriteLine($"[INFO] Deleted file: {file}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARNING] Failed to delete file: {file}. Reason: {ex.Message}");
+            }
+        }
+
+        foreach (var dir in GetDirectories($"{artifactsPath}/**/*").Reverse())
+        {
+            try
+            {
+                DeleteDirectory(dir, new DeleteDirectorySettings { Force = true, Recursive = true });
+                Console.WriteLine($"[INFO] Deleted directory: {dir}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARNING] Failed to delete directory: {dir}. Reason: {ex.Message}");
+            }
+        }
+    }
+});
 
 Task("Find-Project")
     .Does(() =>
