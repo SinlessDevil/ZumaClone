@@ -65,16 +65,40 @@ Task("Load-CI-Settings")
 
 Task("Clean-Artifacts-Android")
 .WithCriteria(() => IsAndroidBuild, "Android disabled in config")
-    .Does(() =>
+.Does(() =>
 {
-    CleanDirectory($"./artifacts");
-});
+    string artifactsPath = "./artifacts";
 
-Task("Clean-Artifacts-Ios")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
-    .Does(() =>
-{
-    CleanDirectory($"./artifacts");
+    if (DirectoryExists(artifactsPath))
+    {
+        Console.WriteLine($"[INFO] Cleaning artifacts directory: {artifactsPath}");
+
+        foreach (var file in GetFiles($"{artifactsPath}/**/*"))
+        {
+            try
+            {
+                DeleteFile(file);
+                Console.WriteLine($"[INFO] Deleted file: {file}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARNING] Failed to delete file: {file}. Reason: {ex.Message}");
+            }
+        }
+
+        foreach (var dir in GetDirectories($"{artifactsPath}/**/*").Reverse())
+        {
+            try
+            {
+                DeleteDirectory(dir, new DeleteDirectorySettings { Force = true, Recursive = true });
+                Console.WriteLine($"[INFO] Deleted directory: {dir}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARNING] Failed to delete directory: {dir}. Reason: {ex.Message}");
+            }
+        }
+    }
 });
 
 
