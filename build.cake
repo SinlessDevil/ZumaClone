@@ -526,7 +526,6 @@ Task("Build-Android")
 {
 });
 
-
 Task("Build-iOS")
 .WithCriteria(() => IsIosBuild, "Ios disabled in config")
 .IsDependentOn("Clean-Artifacts-Ios")
