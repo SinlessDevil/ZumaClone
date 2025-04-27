@@ -36,24 +36,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Build Unity Project (APK)
-        run: |
-          echo "Building Unity APK..."
-          unity-editor \
-            -batchmode \
-            -nographics \
-            -quit \
-            -projectPath . \
-            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev \
-            -logFile artifacts/unity.log || exit 1
-
-      - name: Setup Unity Editor (CLI support)
-        uses: game-ci/setup-unity@v2
-        with:
-          unityVersion: 2023.2.1f1
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run Cake Build (Post-processing, uploads etc)
+      - name: Run Cake Build (builds Unity, post-processing, uploads etc)
         run: dotnet cake build.cake --target=Build-All
 
       - name: Upload APK

@@ -847,10 +847,12 @@ void BotstrapGradleAndPrintToConsole(string version)
 
 void RunUnity(string args)
 {
-    Console.WriteLine($"Running unity-editor with args: {args}");
+    const string unityExecutable = "unity-editor";
+
+    Console.WriteLine($"Running Unity with args: {args}");
 
     var process = new Process();
-    process.StartInfo.FileName = "unity-editor";
+    process.StartInfo.FileName = unityExecutable;
     process.StartInfo.Arguments = args;
     process.StartInfo.UseShellExecute = false;
     process.StartInfo.RedirectStandardOutput = true;
@@ -875,7 +877,7 @@ void RunUnity(string args)
 
 void RunUnityMethod(string methodName, string logFilePath)
 {
-    //RunUnity($"-batchmode -nographics -quit -projectPath . -executeMethod {methodName} -logFile {logFilePath}");
+    RunUnity($"-batchmode -nographics -quit -projectPath . -executeMethod {methodName} -logFile {logFilePath}");
 }
 
 RunTarget(target);
