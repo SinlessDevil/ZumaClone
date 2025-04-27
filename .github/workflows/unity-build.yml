@@ -47,6 +47,12 @@ jobs:
             -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev \
             -logFile artifacts/unity.log || exit 1
 
+      - name: Setup Unity Editor (CLI support)
+        uses: game-ci/setup-unity@v2
+        with:
+          unityVersion: 2023.2.1f1
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run Cake Build (Post-processing, uploads etc)
         run: dotnet cake build.cake --target=Build-All
 
