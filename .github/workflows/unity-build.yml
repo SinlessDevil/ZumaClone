@@ -39,7 +39,7 @@ jobs:
       - name: Run Cake Build (Post-processing, uploads etc)
         run: dotnet cake build.cake --target=Build-All
         env:
-          UNITY_PATH: /opt/unity/editor/Unity
+          UNITY_PATH: /opt/Unity/Editor/Unity
 
       - name: Upload APK
         if: success()
