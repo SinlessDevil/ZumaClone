@@ -847,12 +847,17 @@ void BotstrapGradleAndPrintToConsole(string version)
 
 void RunUnity(string args)
 {
-    const string unityExecutable = "unity-editor";
+    var unityPath = EnvironmentVariable("UNITY_PATH");
 
-    Console.WriteLine($"Running Unity with args: {args}");
+    if (string.IsNullOrEmpty(unityPath))
+    {
+        throw new Exception("UNITY_PATH is not set!");
+    }
+
+    Console.WriteLine($"Running Unity at {unityPath} with args: {args}");
 
     var process = new Process();
-    process.StartInfo.FileName = unityExecutable;
+    process.StartInfo.FileName = unityPath;
     process.StartInfo.Arguments = args;
     process.StartInfo.UseShellExecute = false;
     process.StartInfo.RedirectStandardOutput = true;
