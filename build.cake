@@ -875,7 +875,7 @@ void RunUnity(string args)
 
 void RunUnityMethod(string methodName, string logFilePath)
 {
-    RunUnity($"-batchmode -nographics -quit -projectPath . -executeMethod {methodName} -logFile {logFilePath}");
+    //RunUnity($"-batchmode -nographics -quit -projectPath . -executeMethod {methodName} -logFile {logFilePath}");
 }
 
 RunTarget(target);

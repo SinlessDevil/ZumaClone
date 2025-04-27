@@ -10,9 +10,6 @@ jobs:
     if: contains(github.event.head_commit.message, '#build')
     runs-on: ubuntu-latest
 
-    env:
-      UNITY_PATH: /opt/unity/editor/Unity
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -24,13 +21,11 @@ jobs:
         with:
           dotnet-version: 7.x
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip
-
       - name: Restore .NET Tools
         run: dotnet tool restore
+
+      - name: Install Dependencies
+        run: sudo apt-get install -y unzip
 
       - name: Setup Unity
         uses: game-ci/unity-builder@v4
@@ -41,12 +36,23 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Run Cake Build
+      - name: Build Unity Project (APK)
+        run: |
+          echo "Building Unity APK..."
+          unity-editor \
+            -batchmode \
+            -nographics \
+            -quit \
+            -projectPath . \
+            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev \
+            -logFile artifacts/unity.log || exit 1
+
+      - name: Run Cake Build (Post-processing, uploads etc)
         run: dotnet cake build.cake --target=Build-All
 
       - name: Upload APK
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
-          path: artifacts/**/*.apk
+          path: artifacts/*.apk
