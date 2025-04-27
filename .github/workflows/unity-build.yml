@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -26,19 +27,25 @@ jobs:
       - name: Install Dependencies
         run: sudo apt-get install -y unzip
 
-      - name: Run Unity Tests
-        uses: game-ci/unity-test-runner@v4
-        continue-on-error: true
+      - name: Setup Unity
+        uses: game-ci/unity-setup@v2
         with:
-          projectPath: .
           unityVersion: 2023.2.1f1
-          testMode: EditMode
-          artifactsPath: artifacts/test-results
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          
+
+      - name: Run Unity Tests
+        run: |
+          echo "Running Unity tests..."
+          unity-editor \
+            -batchmode \
+            -projectPath . \
+            -runTests \
+            -testPlatform EditMode \
+            -logFile artifacts/test-results/editmode.log || true
+
       - name: Run Cake Build
         run: dotnet cake build.cake --target=Build-All
 

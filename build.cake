@@ -50,7 +50,7 @@ var IsIosBuild = false;
 int XCDistributionCode;
 
 Task("Load-CI-Settings")
-    .Does(() =>
+.Does(() =>
 {
     VerboseVerbosity();
 
@@ -150,7 +150,6 @@ Task("Build-Commit-History")
     .Does(() =>
 {
     //commitHistory = CommitHistory();
-    
     Console.WriteLine(LogMessage());
 });
 
@@ -242,28 +241,21 @@ Task("Run-Android-Tests")
     .Does(() =>
     {
         EnsureDirectoryExists("./artifacts");
-    
-        if (!BuildSystem.GitHubActions.IsRunningOnGitHubActions)
-        {
-            UnityEditor(
-                new UnityEditorArguments
-                {
-                    ProjectPath = PathToProject,
-                    BatchMode = true,
-                    Quit = true,
-                    ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK",
-                    BuildTarget = Android,
-                    LogFile = logPath
-                },
-                new UnityEditorSettings
-                {
-                    RealTimeLog = true
-                });
-        }
-        else
-        {
-            Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
-        }
+        
+        UnityEditor(
+            new UnityEditorArguments
+            {
+                ProjectPath = PathToProject,
+                BatchMode = true,
+                Quit = true,
+                ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev",
+                BuildTarget = Android,
+                LogFile = logPath
+            },
+            new UnityEditorSettings
+            {
+                RealTimeLog = true
+            });
     })
     .OnError(exception => 
     {
@@ -288,27 +280,20 @@ Task("Build-APK")
     .WithCriteria(() => !isErrorHappend, "Tests Fall")
     .Does(() => 
     {   
-        if (!BuildSystem.GitHubActions.IsRunningOnGitHubActions)
-        {
-            UnityEditor(
-                new UnityEditorArguments
-                {
-                    ProjectPath = PathToProject,
-                    BatchMode = true,
-                    Quit = true,
-                    ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK",
-                    BuildTarget = Android,
-                    LogFile = logPath
-                },
-                new UnityEditorSettings
-                {
-                    RealTimeLog = true
-                });
-        }
-        else
-        {
-            Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
-        }
+        UnityEditor(
+            new UnityEditorArguments
+            {
+                ProjectPath = PathToProject,
+                BatchMode = true,
+                Quit = true,
+                ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev",
+                BuildTarget = Android,
+                LogFile = logPath
+            },
+            new UnityEditorSettings
+            {
+                RealTimeLog = true
+            });
     })
     .OnError(handler =>
     {
@@ -376,27 +361,20 @@ Task("Build-XCodeProject")
     .WithCriteria(() => IsIosBuild, "iOS disabled in config")
     .Does(() => 
     {   
-        if (!BuildSystem.GitHubActions.IsRunningOnGitHubActions)
-        {
-            UnityEditor(
-                new UnityEditorArguments
-                {
-                    ProjectPath = PathToProject,
-                    BatchMode = true,
-                    Quit = true,
-                    ExecuteMethod = "Plugins.CI.Editor.Builder.BuildXCodeProject",
-                    BuildTarget = iOS,
-                    LogFile = logPath
-                },
-                new UnityEditorSettings
-                {
-                    RealTimeLog = true
-                });
-        }
-        else
-        {
-            Console.WriteLine("[CI] Skipping UnityEditor call on GitHub Actions, handled externally.");
-        }
+        UnityEditor(
+            new UnityEditorArguments
+            {
+                ProjectPath = PathToProject,
+                BatchMode = true,
+                Quit = true,
+                ExecuteMethod = "Plugins.CI.Editor.Builder.BuildXCodeProject_Dev",
+                BuildTarget = iOS,
+                LogFile = logPath
+            },
+            new UnityEditorSettings
+            {
+                RealTimeLog = true
+            });
     })
     .OnError(handler => 
     {
@@ -561,14 +539,12 @@ Task("Build-All")
 })
 .IsDependentOn("Cleanup");
 
-
 Task("Cleanup")
     .Does(() => 
 {
     //if(serviceProvider != null)
     //    serviceProvider.Dispose();
 });
-
 
 
 void DisplayError(Exception exception)
@@ -708,7 +684,6 @@ string UtcDateTime() =>
  string BranchName() => 
     GitBranchCurrent(".git").FriendlyName;
 
-
  string CommitHistory() 
  {
      string[] version = GetProjectPropertyValue("bundleVersion").Split('.');
@@ -813,6 +788,7 @@ int CommitsTodayHead()
 
     return RunGitCommand(command).Length;
 }
+
 int CommitsTodayTotal()
 {
     DateTime now = DateTime.UtcNow;
