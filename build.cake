@@ -242,20 +242,7 @@ Task("Run-Android-Tests")
     {
         EnsureDirectoryExists("./artifacts");
         
-        UnityEditor(
-            new UnityEditorArguments
-            {
-                ProjectPath = PathToProject,
-                BatchMode = true,
-                Quit = true,
-                ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev",
-                BuildTarget = Android,
-                LogFile = logPath
-            },
-            new UnityEditorSettings
-            {
-                RealTimeLog = true
-            });
+        RunUnity("-batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev -logFile artifacts/unity.log");
     })
     .OnError(exception => 
     {
@@ -280,20 +267,7 @@ Task("Build-APK")
     .WithCriteria(() => !isErrorHappend, "Tests Fall")
     .Does(() => 
     {   
-        UnityEditor(
-            new UnityEditorArguments
-            {
-                ProjectPath = PathToProject,
-                BatchMode = true,
-                Quit = true,
-                ExecuteMethod = "Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev",
-                BuildTarget = Android,
-                LogFile = logPath
-            },
-            new UnityEditorSettings
-            {
-                RealTimeLog = true
-            });
+        RunUnity("-batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev -logFile artifacts/unity.log");
     })
     .OnError(handler =>
     {
@@ -361,20 +335,7 @@ Task("Build-XCodeProject")
     .WithCriteria(() => IsIosBuild, "iOS disabled in config")
     .Does(() => 
     {   
-        UnityEditor(
-            new UnityEditorArguments
-            {
-                ProjectPath = PathToProject,
-                BatchMode = true,
-                Quit = true,
-                ExecuteMethod = "Plugins.CI.Editor.Builder.BuildXCodeProject_Dev",
-                BuildTarget = iOS,
-                LogFile = logPath
-            },
-            new UnityEditorSettings
-            {
-                RealTimeLog = true
-            });
+        RunUnity("-batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildXCodeProject_Dev -logFile artifacts/unity.log");
     })
     .OnError(handler => 
     {
@@ -882,6 +843,41 @@ void BotstrapGradleAndPrintToConsole(string version)
 {
     Console.WriteLine($"BootstrapGradle {version}");
     BootstrapGradle(version);
+}
+
+void RunUnity(string args)
+{
+    var unityPath = EnvironmentVariable("UNITY_PATH");
+
+    if (string.IsNullOrEmpty(unityPath))
+    {
+        throw new Exception("UNITY_PATH is not set!");
+    }
+
+    Console.WriteLine($"Running Unity at {unityPath} with args: {args}");
+
+    var process = new Process();
+    process.StartInfo.FileName = unityPath;
+    process.StartInfo.Arguments = args;
+    process.StartInfo.UseShellExecute = false;
+    process.StartInfo.RedirectStandardOutput = true;
+    process.StartInfo.RedirectStandardError = true;
+
+    process.Start();
+
+    string output = process.StandardOutput.ReadToEnd();
+    string error = process.StandardError.ReadToEnd();
+
+    process.WaitForExit();
+
+    Console.WriteLine(output);
+
+    if (process.ExitCode != 0)
+    {
+        Console.WriteLine("Unity exited with error:");
+        Console.WriteLine(error);
+        throw new Exception($"Unity exited with code {process.ExitCode}");
+    }
 }
 
 RunTarget(target);

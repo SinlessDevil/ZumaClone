@@ -10,6 +10,9 @@ jobs:
     if: contains(github.event.head_commit.message, '#build')
     runs-on: ubuntu-latest
 
+    env:
+      UNITY_PATH: /opt/unity/editor/Unity
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
