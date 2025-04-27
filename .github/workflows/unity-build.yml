@@ -36,8 +36,10 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Run Cake Build (builds Unity, post-processing, uploads etc)
+      - name: Run Cake Build (Post-processing, uploads etc)
         run: dotnet cake build.cake --target=Build-All
+        env:
+          UNITY_PATH: /opt/unity/editor/Unity
 
       - name: Upload APK
         if: success()
