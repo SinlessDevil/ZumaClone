@@ -38,7 +38,8 @@ jobs:
 
       - name: Build APK (Unity)
         run: |
-          /opt/Unity/Editor/Unity \
+          echo "Using Unity at $UNITY_EDITOR_PATH"
+          $UNITY_EDITOR_PATH/Unity \
             -batchmode \
             -nographics \
             -quit \
