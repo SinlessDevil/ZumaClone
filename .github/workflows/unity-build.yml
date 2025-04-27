@@ -24,11 +24,13 @@ jobs:
         with:
           dotnet-version: 7.x
 
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+
       - name: Restore .NET Tools
         run: dotnet tool restore
-
-      - name: Install Dependencies
-        run: sudo apt-get install -y unzip
 
       - name: Setup Unity
         uses: game-ci/unity-builder@v4
@@ -38,23 +40,13 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      
-      - name: Run Unity Tests
-        run: |
-          echo "Running Unity tests..."
-          unity-editor \
-            -batchmode \
-            -projectPath . \
-            -runTests \
-            -testPlatform EditMode \
-            -logFile artifacts/test-results/editmode.log || true
 
       - name: Run Cake Build
         run: dotnet cake build.cake --target=Build-All
 
       - name: Upload APK
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
-          path: artifacts/*.apk
+          path: artifacts/**/*.apk

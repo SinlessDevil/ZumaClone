@@ -241,8 +241,8 @@ Task("Run-Android-Tests")
     .Does(() =>
     {
         EnsureDirectoryExists("./artifacts");
-        
-        RunUnity("-batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev -logFile artifacts/unity.log");
+    
+        RunUnityMethod("Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev", "artifacts/unity.log");
     })
     .OnError(exception => 
     {
@@ -267,7 +267,7 @@ Task("Build-APK")
     .WithCriteria(() => !isErrorHappend, "Tests Fall")
     .Does(() => 
     {   
-        RunUnity("-batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev -logFile artifacts/unity.log");
+        RunUnityMethod("Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev", "artifacts/unity.log");
     })
     .OnError(handler =>
     {
@@ -335,7 +335,7 @@ Task("Build-XCodeProject")
     .WithCriteria(() => IsIosBuild, "iOS disabled in config")
     .Does(() => 
     {   
-        RunUnity("-batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildXCodeProject_Dev -logFile artifacts/unity.log");
+        RunUnityMethod("Plugins.CI.Editor.Builder.BuildXCodeProject_Dev", "artifacts/unity.log");
     })
     .OnError(handler => 
     {
@@ -878,6 +878,11 @@ void RunUnity(string args)
         Console.WriteLine(error);
         throw new Exception($"Unity exited with code {process.ExitCode}");
     }
+}
+
+void RunUnityMethod(string methodName, string logFilePath)
+{
+    RunUnity($"-batchmode -nographics -quit -projectPath . -executeMethod {methodName} -logFile {logFilePath}");
 }
 
 RunTarget(target);
