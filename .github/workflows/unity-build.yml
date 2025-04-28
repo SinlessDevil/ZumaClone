@@ -36,6 +36,14 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
+      - name: Set Unity Editor Path
+        run: echo "UNITY_EDITOR_PATH=/opt/unity/editor" >> $GITHUB_ENV
+
+      - name: Check Unity Path
+        run: |
+          echo "Checking if Unity exists at $UNITY_EDITOR_PATH/Unity"
+          ls -la $UNITY_EDITOR_PATH
+
       - name: Build APK (Unity)
         run: |
           echo "Using Unity at $UNITY_EDITOR_PATH"
