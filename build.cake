@@ -241,40 +241,31 @@ Task("Run-Android-Tests")
     .Does(() =>
     {
         EnsureDirectoryExists("./artifacts");
-    
-        RunUnityMethod("Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev", "artifacts/unity.log");
-    })
-    .OnError(exception => 
-    {
-        isErrorHappend = true;
-    })
-    .Finally(() =>
-    {
+
+        string logPath = "./artifacts/unity.log";
+
+        if (!System.IO.File.Exists(logPath))
+        {
+            Console.WriteLine("[WARNING] No unity.log file found. Skipping test result parsing.");
+            return;
+        }
+
         string testSummary = "";
+
         try
         {
             testSummary = ParseTestResult(testResultPath);
+            Console.WriteLine("[INFO] Test summary:");
             Console.WriteLine(testSummary);
         }
         catch (System.Exception e)
         {
+            Console.WriteLine("[ERROR] Failed to parse test results:");
             Console.WriteLine(e);
+            isErrorHappend = true;
         }
     });
 
-Task("Build-APK")
-    .WithCriteria(() => IsAndroidBuild, "Android disabled in config")
-    .WithCriteria(() => !isErrorHappend, "Tests Fall")
-    .Does(() => 
-    {   
-        RunUnityMethod("Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev", "artifacts/unity.log");
-    })
-    .OnError(handler =>
-    {
-        DisplayError(handler);
-        isErrorHappend = true;
-    });
-    
 Task("Send-Erorr-Logs")
 .WithCriteria(() => isErrorHappend)
 .Does(() =>
@@ -331,107 +322,6 @@ Task("Share-Apk")
     SaveLastCommitSha();
 });
 
-Task("Build-XCodeProject")
-    .WithCriteria(() => IsIosBuild, "iOS disabled in config")
-    .Does(() => 
-    {   
-        RunUnityMethod("Plugins.CI.Editor.Builder.BuildXCodeProject_Dev", "artifacts/unity.log");
-    })
-    .OnError(handler => 
-    {
-        DisplayError(handler);
-        isErrorHappend = true;
-    });
-
-Task("Archivate-XCodeProject")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
-    .Does(() => 
-{   
-    XCodeBuild(new XCodeBuildSettings(){
-        Project = "./artifacts/Game.apk/Unity-iPhone.xcodeproj",
-        Scheme = "Unity-iPhone",
-        Archive = true,
-        ArchivePath = "./artifacts/project",
-        //DerivedDataPath = "./artifacts",
-        Destination = new Dictionary<string, string>()
-        {
-            ["generic/platform"] = "iOS"
-        },        
-    });
-})
-.OnError(handler => 
-{
-    DisplayError(handler);
-    isErrorHappend = true;
-});
-
-Task("Export-Archive")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
-    .Does(() => 
-{   
-
-    StringBuilder builder = new StringBuilder();
-    builder.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    builder.Append("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"");
-    builder.Append("http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
-    builder.Append("<plist version=\"1.0\">");
-    builder.Append("<dict>");
-    builder.Append("<key>method</key>");
-    builder.Append("<string>app-store</string>");
-    builder.Append("<key>signingStyle</key>");
-    builder.Append("<string>automatic</string>");
-    builder.Append("</dict>");
-    builder.Append("</plist>");
-
-    System.IO.File.WriteAllText("./artifacts/exportOptions.plist", builder.ToString());
-
-    XCodeBuild(new XCodeBuildSettings()
-    {
-        Project = "./artifacts/Game.apk/Unity-iPhone.xcodeproj",
-        ArchivePath = "./artifacts/project.xcarchive",
-        ExportArchive = true,
-        ExportOptionsPlist = "./artifacts/exportOptions.plist",
-        ExportPath = "./artifacts",
-        BuildSettings = new Dictionary<string, string>
-        {
-            ["-allowProvisioningUpdates "] = ""
-        }
-    });
-})
-.OnError(handler => 
-{
-    DisplayError(handler);
-    isErrorHappend = true;
-});
-
-Task("Distribute-IPA")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
-    .Does(() => 
-{   
-    string ipaFilePath = System.IO.Directory.GetFiles("./artifacts", "*.ipa")[0];
-
-    string file = "xcrun";
-    string argument = $"altool --upload-app -f \"{ipaFilePath}\" -t iOS -u kglad67@gmail.com -p \"otgf-jqnl-jgtf-mtoo\"";
-
-    Console.Write(file);
-    Console.Write(" ");
-    Console.Write(argument+"\n");
-
-    XCDistributionCode = StartProcess(file, new ProcessSettings
-    {
-        RedirectStandardOutput = true,
-        Arguments = new ProcessArgumentBuilder().Append(argument)
-    });
-
-    Console.Write("Upload result ======> " + (XCDistributionCode == 0 ? "OK :)" : $"Erorr {XCDistributionCode}"));
-
-    })
-.OnError(handler => 
-{
-    DisplayError(handler);
-    isErrorHappend = true;
-});
-
 /*
 Task("Send-Success-Message")
 .WithCriteria(() => IsIosBuild, "Ios disabled in config")
@@ -466,7 +356,6 @@ Task("Build-Android")
 //.IsDependentOn("Connect-To-Bot")
 //.IsDependentOn("Send-Welcome-Message")
 //.IsDependentOn("Run-Android-Tests")
-.IsDependentOn("Build-APK")
 .IsDependentOn("Send-Erorr-Logs")
 .IsDependentOn("Share-Apk")
 .Does(() =>
@@ -478,10 +367,6 @@ Task("Build-iOS")
 .IsDependentOn("Clean-Artifacts-Ios")
 .IsDependentOn("Find-Project")
 .IsDependentOn("Update-Project-Property-Ios")
-.IsDependentOn("Build-XCodeProject")
-.IsDependentOn("Archivate-XCodeProject")
-.IsDependentOn("Export-Archive")
-.IsDependentOn("Distribute-IPA")
 //.IsDependentOn("Send-Success-Message")
 .Does(() =>
 {
@@ -506,7 +391,6 @@ Task("Cleanup")
     //if(serviceProvider != null)
     //    serviceProvider.Dispose();
 });
-
 
 void DisplayError(Exception exception)
 {
@@ -822,67 +706,6 @@ public static string ToRFC822DateUTC(this DateTime date)
     }
  
     return date.ToString("dd_MMM_yyyy_HH:mm:ss_" + timeZone.PadRight(5, '0'));
-}
-
-void TryCleanupGradleDirectory(string path)
-{
-    Console.WriteLine($"Try Cleanup {path}");
-
-      if(System.IO.Directory.Exists(path))
-      {
-        Console.WriteLine($"Cleanup {path}");
-        DeleteDirectory(path, new DeleteDirectorySettings
-        {
-            Force = true,
-            Recursive = true
-        });
-      }
-}
-
-void BotstrapGradleAndPrintToConsole(string version)
-{
-    Console.WriteLine($"BootstrapGradle {version}");
-    BootstrapGradle(version);
-}
-
-void RunUnity(string args)
-{
-    var unityPath = EnvironmentVariable("UNITY_PATH");
-
-    if (string.IsNullOrEmpty(unityPath))
-    {
-        throw new Exception("UNITY_PATH is not set!");
-    }
-
-    Console.WriteLine($"Running Unity at {unityPath} with args: {args}");
-
-    var process = new Process();
-    process.StartInfo.FileName = unityPath;
-    process.StartInfo.Arguments = args;
-    process.StartInfo.UseShellExecute = false;
-    process.StartInfo.RedirectStandardOutput = true;
-    process.StartInfo.RedirectStandardError = true;
-
-    process.Start();
-
-    string output = process.StandardOutput.ReadToEnd();
-    string error = process.StandardError.ReadToEnd();
-
-    process.WaitForExit();
-
-    Console.WriteLine(output);
-
-    if (process.ExitCode != 0)
-    {
-        Console.WriteLine("Unity exited with error:");
-        Console.WriteLine(error);
-        throw new Exception($"Unity exited with code {process.ExitCode}");
-    }
-}
-
-void RunUnityMethod(string methodName, string logFilePath)
-{
-    RunUnity($"-batchmode -nographics -quit -projectPath . -executeMethod {methodName} -logFile {logFilePath}");
 }
 
 RunTarget(target);

@@ -32,24 +32,25 @@ jobs:
       - name: Install unzip
         run: sudo apt-get install -y unzip
 
-      - name: Setup Unity License
+      - name: Unity - Build APK
         uses: game-ci/unity-builder@v4
         with:
           unityVersion: 2023.2.1f1
-          targetPlatform: StandaloneWindows64
+          targetPlatform: Android
+          buildMethod: Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+          projectPath: .
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Build project with Cake
+      - name: Build project with Cake (for tests, logs)
         run: |
           export UNITY_PATH=/opt/unity/editor/Unity
           dotnet tool restore
           dotnet cake build.cake --target=Build-All
         env:
           UNITY_PATH: /opt/unity/editor/Unity
-          BUILD_METHOD: Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
