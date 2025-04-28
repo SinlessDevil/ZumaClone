@@ -50,6 +50,7 @@ jobs:
         with:
           unityVersion: 2023.2.1f1
           targetPlatform: StandaloneWindows64
+          projectPath: .
 
       # =========================
       # 🚀 Build with Cake
