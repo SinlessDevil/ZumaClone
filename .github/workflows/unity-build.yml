@@ -44,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
-          path: build/**/*.apk
+          path: artifacts/*.apk
