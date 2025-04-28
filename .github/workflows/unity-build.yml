@@ -1,4 +1,4 @@
-name: Unity Build (Android) with Cake
+name: Unity Build with Cake (Android)
 
 on:
   push:
@@ -6,21 +6,11 @@ on:
       - '**'
 
 jobs:
-  build-android-cake:
+  build:
     if: contains(github.event.head_commit.message, '#build')
     runs-on: ubuntu-latest
 
-    env:
-      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      UNITY_PATH: /opt/unity/editor/Unity
-      BUILD_METHOD: Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
-
     steps:
-      # =====================
-      # 📦 Checkout & Setup
-      # =====================
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
@@ -31,7 +21,7 @@ jobs:
         with:
           dotnet-version: 7.x
 
-      - name: Cache Unity Library
+      - name: Cache Library
         uses: actions/cache@v4
         with:
           path: Library
@@ -42,25 +32,29 @@ jobs:
       - name: Install unzip
         run: sudo apt-get install -y unzip
 
-      # =========================
-      # 🛠️ Activate Unity License
-      # =========================
-      - name: Activate Unity License
-        uses: game-ci/unity-activate@v2
+      - name: Unity - Build APK
+        uses: game-ci/unity-builder@v4
         with:
           unityVersion: 2023.2.1f1
+          targetPlatform: Android
+          buildMethod: Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+          projectPath: .
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      # =========================
-      # 🚀 Build with Cake
-      # =========================
-      - name: Build project with Cake
+      - name: Build project with Cake (for tests, logs)
         run: |
+          export UNITY_PATH=/opt/unity/editor/Unity
           dotnet tool restore
           dotnet cake build.cake --target=Build-All
+        env:
+          UNITY_PATH: /opt/unity/editor/Unity
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
-      # =========================
-      # 📤 Upload Artifacts
-      # =========================
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
