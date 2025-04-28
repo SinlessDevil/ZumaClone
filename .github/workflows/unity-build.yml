@@ -28,9 +28,9 @@ jobs:
         run: sudo apt-get install -y unzip
 
       - name: Setup Unity
-        uses: kuler90/setup-unity@v1
+        uses: buildalon/setup-unity@v1
         with:
-          unityVersion: 2023.2.1f1
+          unity-version: 2023.2.1f1
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
