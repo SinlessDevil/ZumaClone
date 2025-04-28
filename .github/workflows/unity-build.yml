@@ -43,14 +43,12 @@ jobs:
         run: sudo apt-get install -y unzip
 
       # =========================
-      # 🛠️ Setup Unity License
+      # 🛠️ Activate Unity License
       # =========================
-      - name: Setup Unity
-        uses: game-ci/unity-builder@v4
+      - name: Activate Unity License
+        uses: game-ci/unity-activate@v2
         with:
           unityVersion: 2023.2.1f1
-          targetPlatform: StandaloneWindows64
-          projectPath: .
 
       # =========================
       # 🚀 Build with Cake
