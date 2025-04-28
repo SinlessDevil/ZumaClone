@@ -108,11 +108,27 @@ namespace Plugins.CI.Editor
         private static BuildReport Build(BuildPlayerOptions buildOptions) =>
             BuildPipeline.BuildPlayer(buildOptions);
 
-        private static string[] Scenes() =>
-            EditorBuildSettings.scenes
+        private static string[] Scenes()
+        {
+            var scenes = EditorBuildSettings.scenes
                 .Where(x => x.enabled)
                 .Select(x => x.path)
                 .ToArray();
+
+            if (scenes.Length == 0)
+            {
+                Debug.LogWarning("No scenes found in Build Settings. Using default scenes list for CI build.");
+
+                return new[]
+                {
+                    "Assets/Scenes/Initial.unity",
+                    "Assets/Scenes/Menu.unity",
+                    "Assets/Scenes/Game.unity"
+                };
+            }
+
+            return scenes;
+        }
 
         private static void SetPlayerSettingsIOS()
         {
