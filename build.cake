@@ -22,7 +22,6 @@ string  apkPath = "artifacts/Game.apk";
 string  androidProjectPath = "artifacts/AndroidProject";
 string  testResultPath = "artifacts/tests.xml";
 string  logPath = "./artifacts/unity.log";
-string  commitHistory = "";
 string  git =".git";
 
 bool IsAndroidBuild = false;
