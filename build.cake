@@ -347,6 +347,16 @@ Task("Send-Success-Message")
 });
 */
 
+Task("Send-Telegram-Message")
+    .Does(() =>
+{
+    Console.WriteLine("Sending Telegram message...");
+
+    StartProcess("powershell", new ProcessSettings {
+        Arguments = "-ExecutionPolicy Bypass -File ./send_telegram.ps1"
+    });
+});
+
 Task("Build-Android")
 .WithCriteria(() => IsAndroidBuild, "Android disabled in config")
 .IsDependentOn("Clean-Artifacts-Android")
@@ -377,6 +387,7 @@ Task("Build-All")
 .IsDependentOn("Load-CI-Settings")
 .IsDependentOn("Build-Android")
 .IsDependentOn("Build-iOS")
+.IsDependentOn("Send-Telegram-Message")
 .Does(() =>
 {
 })
