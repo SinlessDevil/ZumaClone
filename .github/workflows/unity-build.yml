@@ -32,19 +32,15 @@ jobs:
       - name: Install unzip
         run: sudo apt-get install -y unzip
 
-      - name: Install Unity Editor
-        uses: game-ci/setup-unity@v2 
+      - name: Setup Unity License
+        uses: game-ci/unity-builder@v4
         with:
           unityVersion: 2023.2.1f1
-
-      - name: Activate Unity
-        uses: game-ci/unity-activate@v2
-        with:
-          unityVersion: 2023.2.1f1
+          targetPlatform: StandaloneWindows64
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
       - name: Build project with Cake
         run: |
