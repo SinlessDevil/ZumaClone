@@ -21,8 +21,13 @@ jobs:
         with:
           dotnet-version: 7.x
 
-      - name: Install unzip
-        run: sudo apt-get install -y unzip
+      - name: Cache Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-
 
       - name: Check Files
         run: ls -la
