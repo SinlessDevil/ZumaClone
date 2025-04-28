@@ -43,6 +43,7 @@ jobs:
 
       - name: Build project with Cake
         run: |
+          export UNITY_PATH=/opt/unity/editor/Unity
           dotnet tool restore
           dotnet cake build.cake --target=Build-All
         env:
