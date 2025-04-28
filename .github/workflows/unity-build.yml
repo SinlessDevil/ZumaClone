@@ -10,7 +10,14 @@ jobs:
     if: contains(github.event.head_commit.message, '#build')
     runs-on: ubuntu-latest
 
+    env:
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_PATH: /opt/unity/editor/Unity
+
     steps:
+      # 📦 Checkout & Setup
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
@@ -21,7 +28,7 @@ jobs:
         with:
           dotnet-version: 7.x
 
-      - name: Cache Library
+      - name: Cache Unity Library
         uses: actions/cache@v4
         with:
           path: Library
@@ -32,6 +39,7 @@ jobs:
       - name: Install unzip
         run: sudo apt-get install -y unzip
 
+      # 🛠️ Build APK
       - name: Unity - Build APK
         uses: game-ci/unity-builder@v4
         with:
@@ -39,22 +47,14 @@ jobs:
           targetPlatform: Android
           buildMethod: Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
           projectPath: .
-        env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
+      # 🧪 Run Tests & Logs Parsing
       - name: Build project with Cake (for tests, logs)
         run: |
-          export UNITY_PATH=/opt/unity/editor/Unity
           dotnet tool restore
           dotnet cake build.cake --target=Build-All
-        env:
-          UNITY_PATH: /opt/unity/editor/Unity
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
+      # 📤 Upload APK Artifact
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
