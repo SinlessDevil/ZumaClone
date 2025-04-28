@@ -28,7 +28,11 @@ using System.Threading;
 //using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Globalization;
-using Cake.Common.Build;
+using Cake.Common;
+using Cake.Common.IO;
+using Cake.Core;
+using Cake.Core.IO;
+using Cake.Frosting;
 
 var target = Argument("target", "Build-All");
 var CurrentDirectory =  System.IO.Directory.GetCurrentDirectory();
@@ -352,8 +356,13 @@ Task("Send-Telegram-Message")
 {
     Console.WriteLine("Sending Telegram message...");
 
-    StartProcess("powershell", new ProcessSettings {
-        Arguments = "-ExecutionPolicy Bypass -File ./send_telegram.ps1"
+    var isWindows = EnvironmentHelper.IsRunningOnWindows();
+
+    var shell = isWindows ? "powershell.exe" : "pwsh";
+    var scriptPath = "./send_telegram.ps1";
+
+    StartProcess(shell, new ProcessSettings {
+        Arguments = $"-ExecutionPolicy Bypass -File {scriptPath}"
     });
 });
 
