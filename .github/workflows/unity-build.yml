@@ -1,4 +1,4 @@
-name: CI Cake Build
+name: Unity Build (Android)
 
 on:
   push:
@@ -21,47 +21,24 @@ jobs:
         with:
           dotnet-version: 7.x
 
-      - name: Restore .NET Tools
-        run: dotnet tool restore
-
-      - name: Install Dependencies
+      - name: Install unzip
         run: sudo apt-get install -y unzip
 
-      - name: Setup Unity
-        uses: buildalon/setup-unity@v1
+      - name: Unity - Build APK
+        uses: game-ci/unity-builder@v4
         with:
-          unity-version: 2023.2.1f1
+          unityVersion: 2023.2.1f1
+          targetPlatform: Android
+          buildMethod: Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+          projectPath: .
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Set Unity Editor Path
-        run: echo "UNITY_EDITOR_PATH=/opt/unity/editor" >> $GITHUB_ENV
-
-      - name: Check Unity Path
-        run: |
-          echo "Checking if Unity exists at $UNITY_EDITOR_PATH/Unity"
-          ls -la $UNITY_EDITOR_PATH
-
-      - name: Build APK (Unity)
-        run: |
-          echo "Using Unity at $UNITY_EDITOR_PATH"
-          $UNITY_EDITOR_PATH/Unity \
-            -batchmode \
-            -nographics \
-            -quit \
-            -projectPath . \
-            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev \
-            -logFile artifacts/unity.log
-
-      - name: Run Cake Build (Post-processing, uploads etc)
-        run: dotnet cake build.cake --target=Build-All
 
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
-          path: artifacts/*.apk
-          
+          path: build/**/*.apk
