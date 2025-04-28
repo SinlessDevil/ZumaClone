@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Code.Services.StaticData;
 using Code.StaticData;
@@ -110,26 +112,44 @@ namespace Plugins.CI.Editor
 
         private static string[] Scenes()
         {
-            var scenes = EditorBuildSettings.scenes
+            var scenesFromSettings = EditorBuildSettings.scenes
                 .Where(x => x.enabled)
                 .Select(x => x.path)
                 .ToArray();
 
-            if (scenes.Length == 0)
-            {
-                Debug.LogWarning("No scenes found in Build Settings. Using default scenes list for CI build.");
-
-                return new[]
-                {
-                    "Assets/Scenes/Initial.unity",
-                    "Assets/Scenes/Menu.unity",
-                    "Assets/Scenes/Game.unity"
-                };
-            }
-
-            return scenes;
+            if (scenesFromSettings.Length <= 0) 
+                return GetScenesInAssets().ToArray();
+            
+            Debug.Log("Using scenes from EditorBuildSettings.");
+            
+            return scenesFromSettings;
         }
 
+        private static List<string> GetScenesInAssets()
+        {
+            Debug.LogWarning("No scenes found in Build Settings. Searching Assets/Scenes/ for .unity files...");
+            List<string> allScenes = Directory.GetFiles("Assets/Scenes", "*.unity", SearchOption.AllDirectories)
+                .Select(path => path.Replace("\\", "/"))
+                .ToList();
+            if (allScenes.Count == 0)
+            {
+                Debug.LogError("No scenes found in Assets/Scenes/. Check project structure.");
+                throw new FileNotFoundException("No scenes found in Assets/Scenes/.");
+            }
+            string initialScene = allScenes.FirstOrDefault(scene => scene.Contains("/Initial.unity"));
+            if (initialScene == null)
+            {
+                Debug.LogError("Initial scene not found! CI build requires Assets/Scenes/Initial.unity.");
+                throw new FileNotFoundException("Initial scene not found in Assets/Scenes/.");
+            }
+
+            allScenes.Remove(initialScene);
+            List<string> orderedScenes = new List<string> { initialScene };
+            orderedScenes.AddRange(allScenes);
+            Debug.Log("Scenes to Build (Auto-generated): " + string.Join(", ", orderedScenes));
+            return orderedScenes;
+        }
+        
         private static void SetPlayerSettingsIOS()
         {
             var ciConfig = LoadCIConfig();
