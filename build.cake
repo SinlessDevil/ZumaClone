@@ -28,11 +28,7 @@ using System.Threading;
 //using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Globalization;
-using Cake.Common;
-using Cake.Common.IO;
-using Cake.Core;
-using Cake.Core.IO;
-using Cake.Frosting;
+using Cake.Common.Build;
 
 var target = Argument("target", "Build-All");
 var CurrentDirectory =  System.IO.Directory.GetCurrentDirectory();
