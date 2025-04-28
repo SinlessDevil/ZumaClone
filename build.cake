@@ -22,7 +22,7 @@ var apkPath = "artifacts/Game.apk";
 var androidProjectPath = "artifacts/AndroidProject";
 var testResultPath = "artifacts/tests.xml";
 var logPath = "./artifacts/unity.log";
-var commitHistory = "";
+var  = "";
 var git =".git";
 
 var IsAndroidBuild = false;
@@ -112,8 +112,8 @@ Task("Update-Project-Property-Android")
 });
 
 Task("Run-Android-Tests")
-    .Does(() =>
-    {
+.Does(() =>
+{
         EnsureDirectoryExists("./artifacts");
 
         string logPath = "./artifacts/unity.log";
@@ -210,7 +210,7 @@ Task("Run-CI-Pipeline")
 .Finally(() =>
 {
     Console.WriteLine("Cleanup finished.");
-})
+});
 
 void DisplayError(Exception exception)
 {
@@ -349,7 +349,7 @@ string ProductName() =>
 string BranchName() => 
     GitBranchCurrent(".git").FriendlyName;
 
-string CommitHistory() 
+string () 
  {
      string[] version = GetProjectPropertyValue("bundleVersion").Split('.');
      int commitsInLastBuild = int.Parse(version[3]);
