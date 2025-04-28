@@ -14,18 +14,18 @@ using System.IO;
 using System.Globalization;
 using Cake.Common.Build;
 
-var target = Argument("target", "Run-CI-Pipeline");
-var CurrentDirectory =  System.IO.Directory.GetCurrentDirectory();
-var PathToProject = string.Empty;
-var isErrorHappend = false;
-var apkPath = "artifacts/Game.apk";
-var androidProjectPath = "artifacts/AndroidProject";
-var testResultPath = "artifacts/tests.xml";
-var logPath = "./artifacts/unity.log";
-var  = "";
-var git =".git";
+string  target = Argument("target", "Run-CI-Pipeline");
+string  CurrentDirectory =  System.IO.Directory.GetCurrentDirectory();
+string  PathToProject = string.Empty;
+bool isErrorHappend = false;
+string  apkPath = "artifacts/Game.apk";
+string  androidProjectPath = "artifacts/AndroidProject";
+string  testResultPath = "artifacts/tests.xml";
+string  logPath = "./artifacts/unity.log";
+string  commitHistory = "";
+string  git =".git";
 
-var IsAndroidBuild = false;
+bool IsAndroidBuild = false;
 
 Task("Load-CI-Settings")
 .Does(() =>
@@ -349,7 +349,7 @@ string ProductName() =>
 string BranchName() => 
     GitBranchCurrent(".git").FriendlyName;
 
-string () 
+string CommitHistory() 
  {
      string[] version = GetProjectPropertyValue("bundleVersion").Split('.');
      int commitsInLastBuild = int.Parse(version[3]);
@@ -493,7 +493,7 @@ string RepoBranch() =>
     GitBranchCurrent(git).FriendlyName;
 
 string LogMessage() =>
-    $"{Platforms()}\n\r{ProductName()} is building from {BranchName()}\n\r{DiffMessage()}\n\rVersion: {Version()}\n\rBuild Code: {BuildCode()}";
+    $"Android\n\r{ProductName()} is building from {BranchName()}\n\r{DiffMessage()}\n\rVersion: {Version()}\n\rBuild Code: {BuildCode()}";
 
 public static string ToRFC822Date(this DateTime date)
 {
