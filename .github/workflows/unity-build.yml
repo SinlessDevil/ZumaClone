@@ -32,8 +32,13 @@ jobs:
       - name: Install unzip
         run: sudo apt-get install -y unzip
 
-      - name: Setup Unity
-        uses: game-ci/unity-builder@v4
+      - name: Install Unity Editor
+        uses: game-ci/setup-unity@v2 
+        with:
+          unityVersion: 2023.2.1f1
+
+      - name: Activate Unity
+        uses: game-ci/unity-activate@v2
         with:
           unityVersion: 2023.2.1f1
         env:
