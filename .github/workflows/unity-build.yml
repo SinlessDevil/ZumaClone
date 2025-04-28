@@ -52,7 +52,7 @@ jobs:
       - name: Build project with Cake (for tests, logs)
         run: |
           dotnet tool restore
-          dotnet cake build.cake --target=Build-All
+          dotnet cake build.cake --target=Run-CI-Pipeline
 
       # 📤 Upload APK Artifact
       - name: Upload APK

@@ -1,19 +1,7 @@
 #define NETSTANDARD2_0
 #addin nuget:?package=Cake.Unity&version=0.8.1
-#addin nuget:?package=JKang.IpcServiceFramework.Client&version=3.1.0
-#addin nuget:?package=JKang.IpcServiceFramework.Client.NamedPipe&version=3.1.0
-#addin nuget:?package=JKang.IpcServiceFramework.Client.Tcp&version=3.1.0
-#addin nuget:?package=JKang.IpcServiceFramework.Core&version=3.1.0
-#addin nuget:?package=Microsoft.Extensions.DependencyInjection&version=5.0.1
-#addin nuget:?package=Microsoft.Bcl.AsyncInterfaces&version=5.0.0
-#addin nuget:?package=Microsoft.Extensions.DependencyInjection.Abstractions&version=5.0.0
 #addin nuget:?package=Cake.Git&version=1.1.0
 #addin nuget:?package=Cake.Gradle&version=1.1.0
-#addin nuget:?package=Cake.XCode&version=5.0.0
-#addin nuget:?package=Cake.Yaml&version=4.0.0
-#addin nuget:?package=YamlDotNet&version=6.1.2
-
-//#reference "./bot/BotLib.Abstractions.dll"
 
 #load "./BuilderDependencies/TestResultParser.cake"
 #load "./BuilderDependencies/UnityLogParser.cake"
@@ -22,15 +10,11 @@ using static Cake.Unity.Arguments.BuildTarget;
 using System.Runtime;
 using System.Diagnostics;
 using System.Threading;
-//using BotLib.Abstractions;
-//using JKang.IpcServiceFramework.Client;
-//using JKang.IpcServiceFramework;
-//using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Globalization;
 using Cake.Common.Build;
 
-var target = Argument("target", "Build-All");
+var target = Argument("target", "Run-CI-Pipeline");
 var CurrentDirectory =  System.IO.Directory.GetCurrentDirectory();
 var PathToProject = string.Empty;
 var isErrorHappend = false;
@@ -40,14 +24,8 @@ var testResultPath = "artifacts/tests.xml";
 var logPath = "./artifacts/unity.log";
 var commitHistory = "";
 var git =".git";
-string gardleProjectDirectory;
-
-//IIpcClient<ITelegram> client;
-//ServiceProvider serviceProvider;
 
 var IsAndroidBuild = false;
-var IsIosBuild = false;
-int XCDistributionCode;
 
 Task("Load-CI-Settings")
 .Does(() =>
@@ -58,9 +36,8 @@ Task("Load-CI-Settings")
     string[] configLines = System.IO.File.ReadAllLines(pathToConfig);
 
     IsAndroidBuild = configLines.First(x => x.Contains("IsAndroidBuild")).Split(':')[1].Trim() == "1";
-    IsIosBuild = configLines.First(x => x.Contains("IsIosBuild")).Split(':')[1].Trim() == "1";
 
-    Console.WriteLine($"Android is {IsAndroidBuild}. Ios is {IsIosBuild}");
+    Console.WriteLine($"Android is {IsAndroidBuild}.");
 });
 
 Task("Clean-Artifacts-Android")
@@ -102,44 +79,6 @@ Task("Clean-Artifacts-Android")
     }
 });
 
-Task("Clean-Artifacts-Ios")
-    .WithCriteria(() => IsIosBuild, "iOS disabled in config")
-    .Does(() =>
-{
-    string artifactsPath = "./artifacts";
-
-    if (DirectoryExists(artifactsPath))
-    {
-        Console.WriteLine($"[INFO] Cleaning artifacts directory for iOS: {artifactsPath}");
-
-        foreach (var file in GetFiles($"{artifactsPath}/**/*"))
-        {
-            try
-            {
-                DeleteFile(file);
-                Console.WriteLine($"[INFO] Deleted file: {file}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[WARNING] Failed to delete file: {file}. Reason: {ex.Message}");
-            }
-        }
-
-        foreach (var dir in GetDirectories($"{artifactsPath}/**/*").Reverse())
-        {
-            try
-            {
-                DeleteDirectory(dir, new DeleteDirectorySettings { Force = true, Recursive = true });
-                Console.WriteLine($"[INFO] Deleted directory: {dir}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[WARNING] Failed to delete directory: {dir}. Reason: {ex.Message}");
-            }
-        }
-    }
-});
-
 Task("Find-Project")
     .Does(() =>
 {
@@ -149,7 +88,6 @@ Task("Find-Project")
 Task("Build-Commit-History")
     .Does(() =>
 {
-    //commitHistory = CommitHistory();
     Console.WriteLine(LogMessage());
 });
 
@@ -172,70 +110,6 @@ Task("Update-Project-Property-Android")
 
     SetProjectProperty(properties, ignore);
 });
-
-Task("Update-Project-Property-Ios")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
-    .Does(() =>
-{
-    KeyValuePair<string,string>[] properties = new KeyValuePair<string, string>[]
-    {
-        new KeyValuePair<string,string>("bundleVersion", $"{UtcDateTime()}"),
-        new KeyValuePair<string,string>("iPhone", $"{BuildCode()}"),
-        new KeyValuePair<string,string>("AndroidBundleVersionCode", $"{BuildCode()}"),
-    };
-
-    KeyValuePair<string,int>[] ignore = new KeyValuePair<string, int>[]
-    {
-        new KeyValuePair<string,int>("mobileMTRendering", 3),
-        new KeyValuePair<string,int>("applicationIdentifier", 2),
-    };
-
-    SetProjectProperty(properties, ignore);
-});
-
-/*
-Task("Connect-To-Bot")
-    .Does(() => 
-{
-    serviceProvider = new ServiceCollection()
-        .AddTcpIpcClient<ITelegram>("client1",System.Net.IPAddress.Loopback, 8081)
-        .BuildServiceProvider();
-
-    IIpcClientFactory<ITelegram> clientFactory = serviceProvider
-        .GetRequiredService<IIpcClientFactory<ITelegram>>();
-
-    client = clientFactory.CreateClient("client1");
-    
-    Console.WriteLine("Sucsessfuly connect to bot");
-})
-.OnError(exception => 
-{
-    DisplayError(exception);
-});
-*/
-
-/*
-Task("Send-Welcome-Message")
-    .Does(() => 
-{
-  Task<string> helloMessageId =
-     client.InvokeAsync(x 
-        => x.SendMessage(
-            LogMessage(),
-             RepoUrl()));
-
-  TimeSpan timeSpan = new TimeSpan(0, 1, 0);
-  
-  if (!helloMessageId.Wait(timeSpan))
-    throw new TimeoutException($"SendFile Timeout {timeSpan}");
-
-  Console.WriteLine("Hello message send");
-})
-.OnError(exception => 
-{
-    DisplayError(exception);
-});
-*/
 
 Task("Run-Android-Tests")
     .Does(() =>
@@ -266,7 +140,7 @@ Task("Run-Android-Tests")
         }
     });
 
-Task("Send-Erorr-Logs")
+Task("Send-Error-Logs")
 .WithCriteria(() => isErrorHappend)
 .Does(() =>
 {
@@ -284,14 +158,9 @@ Task("Send-Erorr-Logs")
     string caption = ParseUnityLogError(relativePath);
     Console.WriteLine(caption);
 
-    //Task output = client.InvokeAsync(x => x.SendFile(path, "unity.log", caption, RepoUrl()));
-
     Console.WriteLine($"[CI][Log] Would send log: '{path}' with caption: {caption}");
 
     TimeSpan timeSpan = new TimeSpan(0, 5, 0);
-    
-    //if (!output.Wait(timeSpan))
-    //    throw new TimeoutException($"SendFile Timeout {timeSpan}");
 
     throw new CakeException("Build end with error!");
 });
@@ -307,106 +176,41 @@ Task("Share-Apk")
     foreach(string path in System.IO.Directory.GetFiles(rootPath, "*.apk").Concat(System.IO.Directory.GetFiles(rootPath, "*.aab")).Concat(System.IO.Directory.GetFiles(rootPath, "*.obb")))
     {
         Console.WriteLine($"Start sending from {path}");
-
-        //Task<string> output = client.InvokeAsync(x => x.SendFile(path, ApkName(System.IO.Path.GetExtension(path)), RepoUrl()));
         
         var fileName = ApkName(System.IO.Path.GetExtension(path));
         Console.WriteLine($"[CI][APK] Would send file: '{path}' as '{fileName}' to repo: {RepoUrl()}");
 
         TimeSpan timeSpan = new TimeSpan(0, 10, 0);
-    
-        //if (!output.Wait(timeSpan))
-        //    throw new TimeoutException($"SendFile Timeout {timeSpan}");
     }
 
     SaveLastCommitSha();
 });
 
-/*
-Task("Send-Success-Message")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
-.WithCriteria(() => !isErrorHappend, "Error")
-    .Does(() => 
-{
-  Task<string> helloMessageId =
-     client.InvokeAsync(x 
-        => x.SendMessage(
-            "TestFlight Upload ===> " + (XCDistributionCode == 0 ? "OK :)" : $"Erorr {XCDistributionCode}"),
-             RepoUrl()));
-
-  TimeSpan timeSpan = new TimeSpan(0, 1, 0);
-  
-  if (!helloMessageId.Wait(timeSpan))
-    throw new TimeoutException($"SendFile Timeout {timeSpan}");
-
-  Console.WriteLine("Hello message send");
-})
-.OnError(exception => 
-{
-    DisplayError(exception);
-});
-*/
-
-Task("Send-Telegram-Message")
-    .Does(() =>
-{
-    Console.WriteLine("Sending Telegram message...");
-
-    var isWindows = EnvironmentHelper.IsRunningOnWindows();
-
-    var shell = isWindows ? "powershell.exe" : "pwsh";
-    var scriptPath = "./send_telegram.ps1";
-
-    StartProcess(shell, new ProcessSettings {
-        Arguments = $"-ExecutionPolicy Bypass -File {scriptPath}"
-    });
-});
-
-Task("Build-Android")
+Task("Prepare-Android-Build")
 .WithCriteria(() => IsAndroidBuild, "Android disabled in config")
 .IsDependentOn("Clean-Artifacts-Android")
 .IsDependentOn("Find-Project")
 .IsDependentOn("Build-Commit-History")
 .IsDependentOn("Update-Project-Property-Android")
-//.IsDependentOn("Connect-To-Bot")
-//.IsDependentOn("Send-Welcome-Message")
-//.IsDependentOn("Run-Android-Tests")
-.IsDependentOn("Send-Erorr-Logs")
+.IsDependentOn("Send-Error-Logs")
 .IsDependentOn("Share-Apk")
 .Does(() =>
 {
+    Console.WriteLine("Android build preparation finished.");
 });
 
-Task("Build-iOS")
-.WithCriteria(() => IsIosBuild, "Ios disabled in config")
-.IsDependentOn("Clean-Artifacts-Ios")
-.IsDependentOn("Find-Project")
-.IsDependentOn("Update-Project-Property-Ios")
-//.IsDependentOn("Send-Success-Message")
-.Does(() =>
-{
-});
-
-Task("Build-All")
+Task("Run-CI-Pipeline")
 .IsDependentOn("Find-Project")
 .IsDependentOn("Load-CI-Settings")
-.IsDependentOn("Build-Android")
-.IsDependentOn("Build-iOS")
-.IsDependentOn("Send-Telegram-Message")
+.IsDependentOn("Prepare-Android-Build")
 .Does(() =>
 {
+    Console.WriteLine("CI pipeline finished.");
 })
 .Finally(() =>
 {
+    Console.WriteLine("Cleanup finished.");
 })
-.IsDependentOn("Cleanup");
-
-Task("Cleanup")
-    .Does(() => 
-{
-    //if(serviceProvider != null)
-    //    serviceProvider.Dispose();
-});
 
 void DisplayError(Exception exception)
 {
@@ -531,36 +335,36 @@ string ApkName(string ext) =>
     $"{ProductName()}_{Version()}{ext}";
 
 string Version() =>
- $"{UtcDateTime()}:{BranchName()}-{CommitsTodayHead()}";
+$"{UtcDateTime()}:{BranchName()}-{CommitsTodayHead()}";
 
- string BuildCode() =>
+string BuildCode() =>
  $"{UtcDateTime()}.{CommitsTodayTotal()}";
 
 string UtcDateTime() =>
  $"{DateTime.UtcNow:yy.MM.dd}";
 
- string ProductName() =>
+string ProductName() =>
  GetProjectPropertyValue("productName").Replace(" ", "_");
 
- string BranchName() => 
+string BranchName() => 
     GitBranchCurrent(".git").FriendlyName;
 
- string CommitHistory() 
+string CommitHistory() 
  {
      string[] version = GetProjectPropertyValue("bundleVersion").Split('.');
-    int commitsInLastBuild = int.Parse(version[3]);
+     int commitsInLastBuild = int.Parse(version[3]);
 
      DateTime versionDateTime = DateTime.Parse($"20{version[0]}.{version[1]}.{version[2]}");
      DateTimeOffset lastBuildDate = new DateTimeOffset(new DateTime(versionDateTime.Year, versionDateTime.Month, versionDateTime.Day, 0, 0, 0));
-
-    List<GitCommit> newCommits = new List<GitCommit>();
+     
+     List<GitCommit> newCommits = new List<GitCommit>();
     
-    IEnumerable<GitCommit> commits = GitLog(git, 50).Where(x => x.Author.When.UtcDateTime > lastBuildDate);
+     IEnumerable<GitCommit> commits = GitLog(git, 50).Where(x => x.Author.When.UtcDateTime > lastBuildDate);
 
-    newCommits.AddRange(commits.Where(x => x.Author.When.UtcDateTime.Day != lastBuildDate.Day));
-    newCommits.AddRange(commits.Where(x => x.Author.When.UtcDateTime.Day == lastBuildDate.Day).Reverse().Skip(commitsInLastBuild).Reverse());
+     newCommits.AddRange(commits.Where(x => x.Author.When.UtcDateTime.Day != lastBuildDate.Day));
+     newCommits.AddRange(commits.Where(x => x.Author.When.UtcDateTime.Day == lastBuildDate.Day).Reverse().Skip(commitsInLastBuild).Reverse());
     
-    string history = "";
+     string history = "";
     
     foreach(var newCommit in newCommits)
     {
@@ -691,9 +495,6 @@ string RepoBranch() =>
 string LogMessage() =>
     $"{Platforms()}\n\r{ProductName()} is building from {BranchName()}\n\r{DiffMessage()}\n\rVersion: {Version()}\n\rBuild Code: {BuildCode()}";
 
-string Platforms() =>
-    (IsAndroidBuild ? "🤖" : "") + (IsIosBuild? "🍎" : "");
-
 public static string ToRFC822Date(this DateTime date)
 {
     CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -725,9 +526,3 @@ public static string ToRFC822DateUTC(this DateTime date)
 }
 
 RunTarget(target);
-
-class CIConfig
-{
-    public bool IsAndroidBuild;
-    public bool IsIosBuild;
-}
