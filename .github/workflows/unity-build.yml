@@ -20,15 +20,14 @@ jobs:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
       UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      UNITY_PATH: /opt/unity/Unity/Editor/Unity
 
     steps:
-      - name: Checkout Repository
+      - name: 🧾 Checkout Repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Cache Unity Library
+      - name: 💾 Cache Unity Library
         uses: actions/cache@v4
         with:
           path: Library
@@ -38,14 +37,17 @@ jobs:
 
       - name: 🛠️ Build APK via Unity Method
         run: |
-          $UNITY_PATH -batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+          /opt/unity/Unity/Editor/Unity \
+            -batchmode -nographics -quit \
+            -projectPath . \
+            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
 
-      - name: 🧁 Build project with Cake (tests, logs)
+      - name: 🧪 Run Cake pipeline (tests, logs)
         run: |
           dotnet tool restore
           dotnet cake build.cake --target=Run-CI-Pipeline
 
-      - name: 📤 Upload APK
+      - name: 📤 Upload APK Artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
