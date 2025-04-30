@@ -37,7 +37,7 @@ jobs:
 
       - name: 🛠️ Build APK via Unity Method
         run: |
-          /opt/unity/Unity/Editor/Unity \
+          /opt/unity/Unity/Unity \
             -batchmode -nographics -quit \
             -projectPath . \
             -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
