@@ -10,8 +10,11 @@ jobs:
     if: contains(github.event.head_commit.message, '#build')
     runs-on: ubuntu-latest
 
-    container:
-      image: ghcr.io/sinlessdevil/unity-ci-image:2023.2.1f1
+  container:
+    image: ghcr.io/sinlessdevil/unity-ci-image:2023.2.1f1
+    credentials:
+      username: ${{ secrets.USERNAME }}
+      password: ${{ secrets.CR_PAT }}
 
     env:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
