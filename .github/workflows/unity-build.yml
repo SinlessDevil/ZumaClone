@@ -36,14 +36,18 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: Build project with Cake (build, tests, logs)
+      - name: 🛠️ Build APK via Unity Method
+        run: |
+          $UNITY_PATH -batchmode -nographics -quit -projectPath . -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+
+      - name: 🧁 Build project with Cake (tests, logs)
         run: |
           dotnet tool restore
           dotnet cake build.cake --target=Run-CI-Pipeline
 
-      - name: Upload APK
+      - name: 📤 Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: AndroidBuild
-          path: Аrtifacts/*.apk
+          path: artifacts/*.apk
