@@ -35,6 +35,15 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
+      - name: 🪪 Activate Unity License
+        run: |
+          /opt/unity/Unity/Unity \
+            -batchmode -nographics -quit \
+            -logFile /dev/stdout \
+            -username "$UNITY_EMAIL" \
+            -password "$UNITY_PASSWORD" \
+            -serial "$UNITY_LICENSE"
+
       - name: 🛠️ Build APK via Unity Method
         run: |
           /opt/unity/Unity/Unity \
