@@ -41,6 +41,15 @@ jobs:
 
       - name: 🛠️ Build APK via Unity Method
         run: |
+          echo "🧭 Current path:"
+          pwd
+
+          echo "📁 Project contents:"
+          ls -la
+
+          echo "🧱 Assets folder check:"
+          ls -la ./Assets || echo "❌ No Assets folder"
+          
           echo "🔧 Starting Unity build..."
           /opt/unity/Unity/Unity \
             -batchmode -nographics \
