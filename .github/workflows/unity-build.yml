@@ -20,7 +20,6 @@ jobs:
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
       UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      UNITY_PATH: /opt/unity/Unity/Unity
 
     steps:
       - name: 🧾 Checkout Repository
@@ -36,17 +35,14 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: 🔑 Decode Unity License
+      - name: 🪪 Decode Unity License
         run: |
+          mkdir -p /root/.local/share/unity3d/Unity/
           echo "$UNITY_LICENSE" | base64 -d > /root/.local/share/unity3d/Unity/Unity_lic.ulf
-          ls -la /root/.local/share/unity3d/Unity
 
       - name: 🛠️ Build APK via Unity Method
         run: |
-          echo "UNITY_PATH=$UNITY_PATH"
-          ls -la $UNITY_PATH || echo "❌ Unity binary not found"
-
-          $UNITY_PATH \
+          /opt/unity/Unity/Unity \
             -batchmode -nographics -quit \
             -projectPath . \
             -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
