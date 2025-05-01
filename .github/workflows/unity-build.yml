@@ -1,4 +1,4 @@
-фname: Unity Build with Cake (Android)
+name: Unity Build with Cake (Android)
 
 on:
   push:
