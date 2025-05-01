@@ -35,15 +35,23 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: 🪪 Decode Unity License
+      - name: 🔑 Decode Unity License
         run: |
-          mkdir -p /root/.local/share/unity3d/Unity/
+          mkdir -p /root/.local/share/unity3d/Unity
           echo "$UNITY_LICENSE" | base64 -d > /root/.local/share/unity3d/Unity/Unity_lic.ulf
 
       - name: 🛠️ Build APK via Unity Method
         run: |
+          echo "Checking Unity executable:"
+          ls -la /opt/unity/Unity/Unity || echo "❌ Unity binary not found!"
+
+          echo "Checking license file:"
+          ls -la /root/.local/share/unity3d/Unity/Unity_lic.ulf || echo "❌ License not found!"
+
+          echo "🔧 Starting Unity build..."
           /opt/unity/Unity/Unity \
             -batchmode -nographics -quit \
+            -logFile - \
             -projectPath . \
             -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
 
