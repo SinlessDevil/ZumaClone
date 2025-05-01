@@ -1,4 +1,4 @@
-name: Unity Build with Cake (Android)
+фname: Unity Build with Cake (Android)
 
 on:
   push:
@@ -17,8 +17,6 @@ jobs:
         password: ${{ secrets.CR_PAT }}
 
     env:
-      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
     steps:
@@ -35,18 +33,19 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: 🪪 Activate Unity License
+      - name: 🔑 Decode Unity License
         run: |
-          /opt/unity/Unity/Unity \
-            -batchmode -nographics -quit \
-            -logFile /dev/stdout \
-            -username "$UNITY_EMAIL" \
-            -password "$UNITY_PASSWORD"
+          mkdir -p /root/.local/share/unity3d/Unity
+          echo "$UNITY_LICENSE" | base64 -d > /root/.local/share/unity3d/Unity/Unity_lic.ulf
+          echo "✅ License file written."
 
       - name: 🛠️ Build APK via Unity Method
         run: |
+          echo "🔧 Starting Unity build..."
           /opt/unity/Unity/Unity \
-            -batchmode -nographics -quit \
+            -batchmode -nographics \
+            -manualLicenseFile /root/.local/share/unity3d/Unity/Unity_lic.ulf \
+            -quit \
             -projectPath . \
             -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
 
