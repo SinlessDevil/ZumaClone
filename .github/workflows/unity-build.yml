@@ -35,30 +35,21 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: 🔑 Decode Unity License
+      - name: 🪪 Activate Unity License
         run: |
-          mkdir -p /root/.local/share/unity3d/Unity
-          echo "$UNITY_LICENSE" | base64 -d > /root/.local/share/unity3d/Unity/Unity_lic.ulf
+          /opt/unity/Unity/Unity \
+            -batchmode -nographics -quit \
+            -logFile /dev/stdout \
+            -username "$UNITY_EMAIL" \
+            -password "$UNITY_PASSWORD" \
+            -serial "$UNITY_LICENSE"
 
       - name: 🛠️ Build APK via Unity Method
         run: |
-          echo "Checking Unity executable:"
-          ls -la /opt/unity/Unity/Unity || echo "❌ Unity binary not found!"
-
-          echo "Checking license file:"
-          ls -la /root/.local/share/unity3d/Unity/Unity_lic.ulf || echo "❌ License not found!"
-
-          echo "🔧 Starting Unity build..."
           /opt/unity/Unity/Unity \
-           -batchmode -nographics \
-           -manualLicenseFile /root/.local/share/unity3d/Unity/Unity_lic.ulf \
-           -quit \
-           -logFile /root/build.log \
-           -projectPath . \
-           -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
-          
-          echo "------ UNITY LOG ------"
-          cat /root/build.log || echo "❌ No log found!"
+            -batchmode -nographics -quit \
+            -projectPath . \
+            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
 
       - name: 🧪 Run Cake pipeline (tests, logs)
         run: |
