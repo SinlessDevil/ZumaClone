@@ -17,7 +17,8 @@ jobs:
         password: ${{ secrets.CR_PAT }}
 
     env:
-      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
 
     steps:
       - name: 🧾 Checkout Repository
@@ -33,32 +34,28 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: 🔑 Decode Unity License
+      - name: ✅ Activate Unity License (Personal)
         run: |
-          mkdir -p /root/.local/share/unity3d/Unity
-          echo "$UNITY_LICENSE" | base64 -d > /root/.local/share/unity3d/Unity/Unity_lic.ulf
-          echo "✅ License file written."
+          echo "🧾 Accepting license and activating Unity..."
+          echo "Y" | /opt/unity/Unity/Unity \
+            -batchmode -nographics -quit \
+            -username "$UNITY_EMAIL" \
+            -password "$UNITY_PASSWORD" \
+            -logFile /root/activation.log || echo "❌ Activation failed"
+
+          echo "------ ACTIVATION LOG ------"
+          cat /root/activation.log || echo "❌ No activation log found"
 
       - name: 🛠️ Build APK via Unity Method
         run: |
-          echo "🧭 Current path:"
-          pwd
-
-          echo "📁 Project contents:"
-          ls -la
-
-          echo "🧱 Assets folder check:"
-          ls -la ./Assets || echo "❌ No Assets folder"
-          
           echo "🔧 Starting Unity build..."
           /opt/unity/Unity/Unity \
             -batchmode -nographics \
-            -manualLicenseFile /root/.local/share/unity3d/Unity/Unity_lic.ulf \
             -quit \
             -projectPath . \
-            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev \
             -logFile /root/unity.log || echo "❌ Unity crashed"
-      
+
           echo "------ UNITY LOG ------"
           cat /root/unity.log || echo "❌ Unity log not found"
 
