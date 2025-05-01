@@ -47,8 +47,8 @@ jobs:
             -manualLicenseFile /root/.local/share/unity3d/Unity/Unity_lic.ulf \
             -quit \
             -projectPath . \
-            -logFile /root/unity.log \
             -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+            -logFile /root/unity.log || echo "❌ Unity crashed"
       
           echo "------ UNITY LOG ------"
           cat /root/unity.log || echo "❌ Unity log not found"
