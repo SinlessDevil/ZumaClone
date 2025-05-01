@@ -41,8 +41,7 @@ jobs:
             -batchmode -nographics -quit \
             -logFile /dev/stdout \
             -username "$UNITY_EMAIL" \
-            -password "$UNITY_PASSWORD" \
-            -serial "$UNITY_LICENSE"
+            -password "$UNITY_PASSWORD"
 
       - name: 🛠️ Build APK via Unity Method
         run: |
