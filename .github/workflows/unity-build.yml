@@ -34,9 +34,8 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: ✅ Activate Unity License (Personal)
+      - name: 🪪 Activate Unity Personal License
         run: |
-          echo "🧾 Accepting license and activating Unity..."
           echo "Y" | /opt/unity/Unity/Unity \
             -batchmode -nographics -quit \
             -username "$UNITY_EMAIL" \
@@ -46,12 +45,11 @@ jobs:
           echo "------ ACTIVATION LOG ------"
           cat /root/activation.log || echo "❌ No activation log found"
 
-      - name: 🛠️ Build APK via Unity Method
+      - name: 🛠️ Build APK via Unity
         run: |
           echo "🔧 Starting Unity build..."
           /opt/unity/Unity/Unity \
-            -batchmode -nographics \
-            -quit \
+            -batchmode -nographics -quit \
             -projectPath . \
             -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev \
             -logFile /root/unity.log || echo "❌ Unity crashed"
