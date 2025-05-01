@@ -50,10 +50,12 @@ jobs:
 
           echo "🔧 Starting Unity build..."
           /opt/unity/Unity/Unity \
-            -batchmode -nographics -quit \
-            -logFile - \
-            -projectPath . \
-            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+           -batchmode -nographics \
+           -manualLicenseFile /root/.local/share/unity3d/Unity/Unity_lic.ulf \
+           -quit \
+           -logFile - \
+           -projectPath . \
+           -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
 
       - name: 🧪 Run Cake pipeline (tests, logs)
         run: |
