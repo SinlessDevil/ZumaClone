@@ -53,9 +53,12 @@ jobs:
            -batchmode -nographics \
            -manualLicenseFile /root/.local/share/unity3d/Unity/Unity_lic.ulf \
            -quit \
-           -logFile - \
+           -logFile /root/build.log \
            -projectPath . \
            -executeMethod Plugins.CI.Editor.Builder.BuildAndroidAPK_Dev
+          
+          echo "------ UNITY LOG ------"
+          cat /root/build.log || echo "❌ No log found!"
 
       - name: 🧪 Run Cake pipeline (tests, logs)
         run: |
