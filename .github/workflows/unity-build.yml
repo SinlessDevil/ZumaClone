@@ -17,8 +17,7 @@ jobs:
         password: ${{ secrets.CR_PAT }}
 
     env:
-      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
     steps:
       - name: 🧾 Checkout Repository
@@ -34,16 +33,11 @@ jobs:
           restore-keys: |
             Library-${{ runner.os }}-
 
-      - name: 🪪 Activate Unity Personal License
+      - name: 🪪 Activate Unity Pro License (.ulf)
         run: |
-          echo "Y" | /opt/unity/Unity/Unity \
-            -batchmode -nographics -quit \
-            -username "$UNITY_EMAIL" \
-            -password "$UNITY_PASSWORD" \
-            -logFile /root/activation.log || echo "❌ Activation failed"
-
-          echo "------ ACTIVATION LOG ------"
-          cat /root/activation.log || echo "❌ No activation log found"
+          mkdir -p /root/.local/share/unity3d/Unity
+          echo "${UNITY_LICENSE}" | base64 -d > /root/.local/share/unity3d/Unity/Unity_lic.ulf
+          echo "✅ License file written to /root/.local/share/unity3d/Unity/Unity_lic.ulf"
 
       - name: 🛠️ Build APK via Unity
         run: |
