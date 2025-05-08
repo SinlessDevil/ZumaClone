@@ -1,4 +1,4 @@
-# 🎯 ZumaClone
+# 🎯 Zuma Clone
 **ZumaClone** is a Unity-powered remake of the classic arcade *Zuma*.  
 It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-based movement, and full win/lose conditions.
 ### 🎞️ Gameplay GIFs
