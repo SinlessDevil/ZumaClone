@@ -1,8 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Code.Services.BallController;
 using Code.Services.Providers.Balls;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -10,18 +11,18 @@ namespace Code.Logic.Zuma.Balls
 {
     public class BallIntersectionTracker : MonoBehaviour
     {
-        private float _thresholdToPoint = 0.35f;
-        private float _bufferOutOfScreen = 0.1f;
-        
+        [SerializeField] private float thresholdToPoint = 0.35f;
+        [SerializeField] private float bufferOutOfScreen = 0.1f;
+
         private Ball _ball;
-        private Coroutine _intersectionTrackerCoroutine;
+        private CancellationTokenSource _cts;
         
         private IBallProvider _ballProvider;
         private IBallChainController _ballChainController;
 
         [Inject]
         private void Constructor(
-            IBallProvider ballProvider, 
+            IBallProvider ballProvider,
             IBallChainController ballChainController)
         {
             _ballProvider = ballProvider;
@@ -35,70 +36,73 @@ namespace Code.Logic.Zuma.Balls
 
         public void StartTracker(List<Vector3> intersectionPoints)
         {
-            _intersectionTrackerCoroutine ??= StartCoroutine(IntersectionTrackerRoutine(intersectionPoints));
+            StopTracker();
+            _cts = new CancellationTokenSource();
+            TrackIntersectionAsync(intersectionPoints, _cts.Token).Forget();
         }
 
         public void StopTracker()
         {
-            if (_intersectionTrackerCoroutine != null)
-            {
-                StopCoroutine(_intersectionTrackerCoroutine);
-                _intersectionTrackerCoroutine = null;
-            }
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
         }
 
-        private IEnumerator IntersectionTrackerRoutine(List<Vector3> intersectionPoints)
+        private async UniTaskVoid TrackIntersectionAsync(List<Vector3> points, CancellationToken token)
         {
-            intersectionPoints = intersectionPoints.OrderBy(point => Vector3.Distance(transform.position, point))
-                .ToList();
-            
-            if (intersectionPoints.Count == 0)
+            if (points == null || points.Count == 0)
             {
                 Debug.LogError("No intersection points found.");
-                while (true)
-                {
-                    if (IsOutOfScreen())
-                    {
-                        _ballProvider.ReturnBall(_ball);
-                        yield break;
-                    }
 
-                    yield return null;
-                }
+                await WaitUntilOutOfScreen(token);
+                _ballProvider.ReturnBall(_ball);
+                return;
             }
 
-            int currentIndex = 0;
+            var sortedPoints = GetSortedPoints(points);
 
-            while (true)
+            foreach (var targetPoint in sortedPoints)
             {
-                if (currentIndex < intersectionPoints.Count)
-                {
-                    Vector3 targetPoint = intersectionPoints[currentIndex];
-                    float distanceToPoint = Vector3.Distance(transform.position, targetPoint);
-
-                    if (distanceToPoint <= _thresholdToPoint)
-                    {
-                        currentIndex++;
-                        _ballChainController.TryAttachBall(_ball);
-                    }
-                }
+                await UniTask.WaitUntil(() =>
+                    Vector3.Distance(transform.position, targetPoint) <= thresholdToPoint ||
+                    IsOutOfScreen(), cancellationToken: token);
 
                 if (IsOutOfScreen())
                 {
-                    _ball.SetInteractive(false);
-                    _ballProvider.ReturnBall(_ball);
-                    yield break;
+                    HandleOutOfScreen();
+                    return;
                 }
 
-                yield return null;
+                _ballChainController.TryAttachBall(_ball);
             }
+            
+            await WaitUntilOutOfScreen(token);
+            HandleOutOfScreen();
         }
-        
+
+        private List<Vector3> GetSortedPoints(List<Vector3> points)
+        {
+            return points
+                .OrderBy(p => Vector3.Distance(transform.position, p))
+                .ToList();
+        }
+
+        private async UniTask WaitUntilOutOfScreen(CancellationToken token)
+        {
+            await UniTask.WaitUntil(IsOutOfScreen, cancellationToken: token);
+        }
+
+        private void HandleOutOfScreen()
+        {
+            _ball.SetInteractive(false);
+            _ballProvider.ReturnBall(_ball);
+        }
+
         private bool IsOutOfScreen()
         {
             Vector3 screenPoint = Camera.main.WorldToViewportPoint(transform.position);
-            return screenPoint.x < -_bufferOutOfScreen || screenPoint.x > 1 + _bufferOutOfScreen ||
-                   screenPoint.y < -_bufferOutOfScreen || screenPoint.y > 1 + _bufferOutOfScreen;
+            return screenPoint.x < -bufferOutOfScreen || screenPoint.x > 1 + bufferOutOfScreen ||
+                   screenPoint.y < -bufferOutOfScreen || screenPoint.y > 1 + bufferOutOfScreen;
         }
     }
 }
