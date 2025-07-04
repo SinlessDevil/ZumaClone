@@ -1,5 +1,4 @@
-using PathCreation;
-using PathCreation.Examples;
+using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Logic.Zuma.Level

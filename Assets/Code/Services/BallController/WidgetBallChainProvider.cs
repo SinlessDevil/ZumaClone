@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Code.Logic.Zuma.Balls;
 using Code.Services.Providers.Widgets;
-using PathCreation;
+using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Services.BallController

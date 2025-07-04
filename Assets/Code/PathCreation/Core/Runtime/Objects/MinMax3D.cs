@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 
-namespace PathCreation {
-    public class MinMax3D {
+namespace Code.PathCreation
+{
+    public class MinMax3D 
+    {
 
         public Vector3 Min { get; private set; }
         public Vector3 Max { get; private set; }

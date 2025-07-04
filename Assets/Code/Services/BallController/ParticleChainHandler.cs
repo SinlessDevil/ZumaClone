@@ -1,7 +1,7 @@
 using Code.Logic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using PathCreation;
+using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Services.BallController

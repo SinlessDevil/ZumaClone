@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace PathCreation.Examples 
+namespace Code.PathCreation 
 {
     public class RoadMeshCreator : PathSceneTool 
     {

@@ -8,7 +8,7 @@ using Code.Services.Input;
 using Code.Services.Providers.Balls;
 using Code.Services.Random;
 using DG.Tweening;
-using PathCreation;
+using Code.PathCreation;
 using UnityEngine;
 using Zenject;
 

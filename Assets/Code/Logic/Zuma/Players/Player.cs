@@ -1,4 +1,4 @@
-using PathCreation;
+using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Logic.Zuma.Players

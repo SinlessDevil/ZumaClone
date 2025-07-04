@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PathCreation.Utility;
 using UnityEngine;
 
-namespace PathCreation
+namespace Code.PathCreation
 {
     /// A bezier path is a path made by stitching together any number of (cubic) bezier curves.
     /// A single cubic bezier curve is defined by 4 points: anchor1, control1, control2, anchor2

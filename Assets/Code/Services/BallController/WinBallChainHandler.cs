@@ -3,8 +3,8 @@ using Code.Services.Input;
 using Code.Services.Levels;
 using Code.Services.LocalProgress;
 using Code.Services.Timer;
+using Code.PathCreation;
 using Cysharp.Threading.Tasks;
-using PathCreation;
 using UnityEngine;
 
 namespace Code.Services.BallController

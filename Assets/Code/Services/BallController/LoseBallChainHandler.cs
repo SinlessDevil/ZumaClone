@@ -4,7 +4,7 @@ using Code.Services.Input;
 using Code.Services.Levels;
 using Code.Services.Timer;
 using Cysharp.Threading.Tasks;
-using PathCreation;
+using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Services.BallController

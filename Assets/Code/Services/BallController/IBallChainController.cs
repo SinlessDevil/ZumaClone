@@ -3,7 +3,7 @@ using Code.Logic;
 using Code.Logic.Zuma;
 using Code.Logic.Zuma.Balls;
 using Cysharp.Threading.Tasks;
-using PathCreation;
+using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Services.BallController
