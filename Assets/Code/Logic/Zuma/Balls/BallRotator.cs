@@ -1,41 +1,46 @@
-using System.Collections;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace Code.Logic.Zuma.Balls
 {
     public class BallRotator : MonoBehaviour
     {
         [SerializeField] private Transform _rotationTransform;
-        
+
         private float _rotationSpeed = 360f;
-        
-        private Coroutine _rotationCoroutine;
+
+        private CancellationTokenSource _cts;
 
         public void StartRotate()
         {
-            _rotationCoroutine ??= StartCoroutine(RotateRoutine());
+            if (_cts != null) 
+                return;
+
+            _cts = new CancellationTokenSource();
+            RotateAsync(_cts.Token).Forget();
         }
 
         public void StopRotate()
         {
-            if (_rotationCoroutine != null)
-            {
-                StopCoroutine(_rotationCoroutine);
-                _rotationCoroutine = null;
-            }
+            if (_cts == null) 
+                return;
+
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = null;
         }
 
-        private IEnumerator RotateRoutine()
+        private async UniTaskVoid RotateAsync(CancellationToken token)
         {
             float currentRotationX = _rotationTransform.localEulerAngles.x;
 
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 currentRotationX += _rotationSpeed * Time.deltaTime;
                 _rotationTransform.localEulerAngles = new Vector3(currentRotationX, 0, 0);
-                yield return null;
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
     }
 }
-

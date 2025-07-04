@@ -1,33 +1,39 @@
-using System.Collections;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace Code.Logic.Zuma.Balls
 {
     public class BallMover : MonoBehaviour
     {
-        private Coroutine _moveCoroutine;
+        private CancellationTokenSource _cts;
 
         public void StartMoveToDirection(Vector3 direction, float speed)
         {
-            _moveCoroutine ??= StartCoroutine(MoveRoutine(direction, speed));
+            if (_cts != null) 
+                return;
+
+            _cts = new CancellationTokenSource();
+            MoveAsync(direction, speed, _cts.Token).Forget();
         }
 
         public void StopMove()
         {
-            if (_moveCoroutine != null)
-            {
-                StopCoroutine(_moveCoroutine);
-                _moveCoroutine = null;
-            }
+            if (_cts == null) 
+                return;
+
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = null;
         }
 
-        private IEnumerator MoveRoutine(Vector3 direction, float speed)
+        private async UniTaskVoid MoveAsync(Vector3 direction, float speed, 
+            CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 transform.position += direction * speed * Time.deltaTime;
-
-                yield return null;
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
     }

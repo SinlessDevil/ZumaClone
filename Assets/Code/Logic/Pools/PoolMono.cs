@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Code.Logic.Pools
@@ -47,14 +48,11 @@ namespace Code.Logic.Pools
 
         public bool HasFreeElement(out T element)
         {
-            foreach (var mono in _pool)
+            foreach (var mono in _pool.Where(mono => !mono.gameObject.activeInHierarchy))
             {
-                if (!mono.gameObject.activeInHierarchy)
-                {
-                    element = mono;
-                    mono.gameObject.SetActive(true);
-                    return true;
-                }
+                element = mono;
+                mono.gameObject.SetActive(true);
+                return true;
             }
 
             element = null;
@@ -68,12 +66,7 @@ namespace Code.Logic.Pools
                 return element;
             }
 
-            if (AutoExpand)
-            {
-                return CreateObject(true);
-            }
-
-            return null;
+            return AutoExpand ? CreateObject(true) : null;
         }
         
         public void ClearPool()

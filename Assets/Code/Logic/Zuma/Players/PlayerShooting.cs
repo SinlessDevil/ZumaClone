@@ -131,7 +131,7 @@ namespace Code.Logic.Zuma.Players
             (_currentBall, _spareBall) = (_spareBall, _currentBall);
 
             PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
-            PlayAnimationReloading(_spareBall, Vector3.zero); // т.к. parent = player, можно просто 0
+            PlayAnimationReloading(_spareBall, Vector3.zero);
             SetIndicatorSpareBall();
         }
 
