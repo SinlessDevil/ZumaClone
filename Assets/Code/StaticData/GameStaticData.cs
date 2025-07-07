@@ -20,6 +20,7 @@ namespace Code.StaticData
         public LogStackTrace LogStackTraceRelease = new LogStackTrace();
         [Space(10)] [Header("Debug")]
         public bool DebugMode = true;
+        public bool MakeBuild = true;
     }
 
     [Serializable]

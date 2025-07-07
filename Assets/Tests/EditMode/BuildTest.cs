@@ -8,11 +8,11 @@ namespace Tests.EditMode
     public class LevelDataValidationTests
     {
         [Test]
-        public void BuildCompiling()
+        public void GameConfigCompiling()
         {
-            BuildSettings().MakeBuild.Should().BeTrue();
+            GameConfigSettings().MakeBuild.Should().BeTrue();
         }
         
-        private static BuildSettings BuildSettings() => Resources.Load<BuildSettings>("StaticData/BuildSettings");
+        private static GameStaticData GameConfigSettings() => Resources.Load<GameStaticData>("StaticData/Balance/GameConfig");
     }
 }
