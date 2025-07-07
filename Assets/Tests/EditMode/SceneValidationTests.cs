@@ -69,7 +69,6 @@ namespace Tests.EditMode
 
 	    private static IEnumerable<string> AccumulateInvalidComponents(Scene scene, Predicate<MonoBehaviour> isInvalid)
 	    {
-		    //Debug.Log($"{scene.path} has {AllGameObjectIn(scene).Count()} gameObjects and {AllComponentsIn(scene).Count()} components and {AllComponentsIn(scene).Count(c => isInvalid(c))} invalid");
 		    return AllComponentsIn(scene)
 			    .Where(component => isInvalid(component))
 			    .GroupBy(component => $"{component.gameObject.name}({component.GetType().Name})")

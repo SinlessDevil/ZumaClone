@@ -3,7 +3,9 @@
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "Zenject",
+        "Game"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
