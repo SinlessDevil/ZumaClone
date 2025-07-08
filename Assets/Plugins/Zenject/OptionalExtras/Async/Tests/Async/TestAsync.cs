@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ namespace Zenject.Tests.Bindings
 {
     public class TestAsync : ZenjectIntegrationTestFixture
     {
-        [UnityTest]
+        [UnityTest, Ignore("Disabled via TestsToolWindow")]
         public IEnumerator TestSimpleMethod()
         {
             PreInstall();
@@ -37,7 +37,7 @@ namespace Zenject.Tests.Bindings
             Assert.Fail();
         }
         
-        [UnityTest]
+        [UnityTest, Ignore("Disabled via TestsToolWindow")]
         public IEnumerator TestUntypedInject()
         {
             PreInstall();
@@ -57,7 +57,7 @@ namespace Zenject.Tests.Bindings
         
 
         private IFoo awaitReturn;
-        [UnityTest]
+        [UnityTest, Ignore("Disabled via TestsToolWindow")]
         [Timeout(300)]
         public IEnumerator TestSimpleMethodAwaitable()
         {
@@ -82,7 +82,7 @@ namespace Zenject.Tests.Bindings
             Assert.Pass();
         }
 
-        [UnityTest]
+        [UnityTest, Ignore("Disabled via TestsToolWindow")]
         [Timeout(10500)]
         public IEnumerator TestPreloading()
         {
