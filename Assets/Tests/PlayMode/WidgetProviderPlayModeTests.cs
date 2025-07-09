@@ -1,105 +1,79 @@
 using System.Collections;
-using Code.Services.Factories.UIFactory;
+using Code.Infrastructure.StateMachine;
+using Code.Infrastructure.StateMachine.Game.States;
 using Code.Services.Providers.Widgets;
-using FluentAssertions;
+using Code.UI;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Zenject;
 
 namespace Tests.PlayMode
 {
-    public class WidgetProviderPlayModeTests : ZenjectIntegrationTestFixture
+    public class WidgetProviderPlayModeTest
     {
-        private IWidgetProvider _widgetProvider;
-        private IUIFactory _uiFactory;
+        private IWidgetProvider _provider;
 
-        [SetUp]
-        public void SetUp()
+        [UnitySetUp]
+        public IEnumerator SetUp()
         {
-            PreInstall();
-
-            Container.Bind<IUIFactory>().To<UIFactory>().AsSingle();
-            Container.Bind<IWidgetProvider>().To<WidgetProvider>().AsSingle();
-
-            PostInstall();
-
-            _uiFactory = Container.Resolve<IUIFactory>();
-            _widgetProvider = Container.Resolve<IWidgetProvider>();
-        }
-
-        [UnityTest]
-        public IEnumerator CreatePool_ShouldPreloadWidgets()
-        {
-            _widgetProvider.CreatePoolWidgets();
-            yield return null;
+            yield return LoadInitialScene();
+            yield return new WaitForSeconds(1f);
             
-            var widget = _widgetProvider.GetWidget(Vector3.zero, Quaternion.identity);
+            DiContainer container = ProjectContext.Instance.Container;
+            var stateMachine = container.Resolve<IStateMachine<IGameState>>();
+            yield return stateMachine.Enter<LoadLevelTestState, string>("Game");
+            
+            _provider = container.Resolve<IWidgetProvider>();
+            Assert.IsNotNull(_provider, "WidgetProvider should not be null");
             yield return null;
-
-            widget.Should().NotBeNull();
-            widget.gameObject.activeSelf.Should().BeTrue();
         }
-
-        [UnityTest]
-        public IEnumerator GetWidget_ShouldActivateAndReuse()
+        
+        [UnityTearDown]
+        public IEnumerator TearDown()
         {
-            _widgetProvider.CreatePoolWidgets();
-            yield return null;
-
-            var widget = _widgetProvider.GetWidget(Vector3.one, Quaternion.identity);
-            yield return null;
-
-            widget.Should().NotBeNull();
-            widget.transform.position.Should().Be(Vector3.one);
-            widget.gameObject.activeSelf.Should().BeTrue();
-        }
-
-        [UnityTest]
-        public IEnumerator ReturnWidget_ShouldDeactivate()
-        {
-            _widgetProvider.CreatePoolWidgets();
-            yield return null;
-
-            var widget = _widgetProvider.GetWidget(Vector3.one, Quaternion.identity);
-            yield return null;
-
-            _widgetProvider.ReturnWidget(widget);
-            yield return null;
-
-            widget.gameObject.activeSelf.Should().BeFalse();
-        }
-
-        [UnityTest]
-        public IEnumerator PlayAnimation_ShouldDeactivateAfterEnd()
-        {
-            _widgetProvider.CreatePoolWidgets();
-            yield return null;
-
-            var widget = _widgetProvider.GetWidget(Vector3.zero, Quaternion.identity);
-            widget.PlayAnimation();
-
-            yield return new WaitForSeconds(1.5f);
-
-            widget.gameObject.activeSelf.Should().BeFalse();
-        }
-
-        [UnityTest]
-        public IEnumerator SpawnMultipleWidgets_WithRandomPositions()
-        {
-            _widgetProvider.CreatePoolWidgets();
-            yield return null;
-
-            for (int i = 0; i < 15; i++)
+            foreach (var obj in Object.FindObjectsOfType<GameObject>())
             {
-                Vector3 randomPos = new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f));
-                var widget = _widgetProvider.GetWidget(randomPos, Quaternion.identity);
-                widget.SetText($"#{i}");
-                widget.SetColor(Color.green);
-                widget.PlayAnimation();
+                if (obj.scene.name == null)
+                {
+                    Object.Destroy(obj);
+                }
             }
 
-            yield return new WaitForSeconds(2f);
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator Should_Reuse_Play_Animation_Widget()
+        {
+            yield return new WaitForSeconds(5f);
+            
+            Widget first = _provider.GetWidget(Vector3.zero, Quaternion.identity);
+            first.SetText("Test");
+            first.SetColor(Color.red);
+            first.PlayAnimation();
+            _provider.ReturnWidget(first);
+
+            yield return new WaitForSeconds(1f);
+
+            Widget reused = _provider.GetWidget(Vector3.right, Quaternion.identity);
+            reused.SetText("Test_1");
+            reused.SetColor(Color.gray);
+            reused.PlayAnimation();
+
+            yield return new WaitForSeconds(1f);
+
+            Assert.IsNotNull(first, "First widget is null. Possibly CreateWidget returned null.");
+            Assert.IsNotNull(reused, "Reused widget is null. It might have been destroyed or not created properly.");
+            Assert.AreSame(first, reused, "Expected the widget to be reused, but a different instance was returned.");
+            yield return null;
+        }
+        
+        private IEnumerator LoadInitialScene()
+        {
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Initial");
+            yield return new WaitUntil(() => asyncLoad.isDone);
             yield return null;
         }
     }

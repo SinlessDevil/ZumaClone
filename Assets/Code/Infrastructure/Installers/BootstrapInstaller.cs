@@ -110,6 +110,7 @@ namespace Code.Infrastructure.Installers
             Container.Bind<PreLoadGameState>().AsSingle();
             Container.Bind<LoadMenuState>().AsSingle();
             Container.Bind<LoadLevelState>().AsSingle();
+            Container.Bind<LoadLevelTestState>().AsSingle();
             Container.Bind<GameLoopState>().AsSingle();
         }
 
