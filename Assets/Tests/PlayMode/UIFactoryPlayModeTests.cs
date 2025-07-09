@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections;
 using Code.Services.BallController;
 using Code.Services.Factories.UIFactory;
 using Code.Services.StaticData;
@@ -35,7 +35,7 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public System.Collections.IEnumerator CreateGameHud_ShouldReturnHud()
+        public IEnumerator CreateGameHud_ShouldReturnHud()
         {
             var hud = _uiFactory.CreateGameHud();
             yield return null;
@@ -44,7 +44,7 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public System.Collections.IEnumerator CreateMenuHud_ShouldReturnHud()
+        public IEnumerator CreateMenuHud_ShouldReturnHud()
         {
             var hud = _uiFactory.CreateMenuHud();
             yield return null;
@@ -53,7 +53,7 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public System.Collections.IEnumerator CreateWidget_ShouldReturnWidget()
+        public IEnumerator CreateWidget_ShouldReturnWidget()
         {
             var widget = _uiFactory.CreateWidget(Vector3.zero, Quaternion.identity);
             yield return null;
@@ -62,7 +62,7 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public System.Collections.IEnumerator CreateStartLevelInfoDisplayer_ShouldWork()
+        public IEnumerator CreateStartLevelInfoDisplayer_ShouldWork()
         {
             _uiFactory.CreateUiRoot();
             var displayer = _uiFactory.CreateStartLevelInfoDisplayer();
@@ -71,7 +71,7 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public System.Collections.IEnumerator CrateWindow_ReturnsRectTransform()
+        public IEnumerator CrateWindow_ReturnsRectTransform()
         {
             _uiFactory.CreateUiRoot();
             var rect = _uiFactory.CrateWindow(WindowTypeId.Setting);
@@ -88,24 +88,17 @@ namespace Tests.PlayMode
         public List<ChapterStaticData> Chapters { get; }
         public BallChainStaticData BallChainConfig { get; }
 
-        public void LoadData()
-        {
-            throw new System.NotImplementedException();
-        }
+        public void LoadData() { }
 
         public WindowConfig ForWindow(WindowTypeId typeId)
         {
-            var go = new GameObject("WindowMock");
+            GameObject go = new GameObject("WindowMock");
             go.AddComponent<RectTransform>();
             return new WindowConfig { Prefab = go };
         }
 
         public ChapterStaticData ForChapter(int chapterId) => null;
-        public BallChainDTO GetBallChainDTO()
-        {
-            throw new System.NotImplementedException();
-        }
-
+        public BallChainDTO GetBallChainDTO() { return null; }
         public LevelStaticData ForLevel(int chapterId, int levelId) => null;
     }
 }
