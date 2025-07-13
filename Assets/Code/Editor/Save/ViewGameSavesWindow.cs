@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
-using Code.Infrastructure.Services.PersistenceProgress.Player;
+using Code.Services.PersistenceProgress.Player;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Serialization;
 using Sirenix.Utilities.Editor;
@@ -58,7 +58,8 @@ namespace Code.Editor
             DrawFoldoutSection(ref showXml, "XML File Preview", XmlFilePath, XmlMessage, DecodedXmlData, ref scrollXml, Refresh, DeleteXml);
         }
 
-        private void DrawFoldoutSection(ref bool foldout, string title, string path, string message, string data, ref Vector2 scroll, Action refresh, Action delete)
+        private void DrawFoldoutSection(ref bool foldout, string title, string path, string message, string data, 
+            ref Vector2 scroll, Action refresh, Action delete)
         {
             foldout = SirenixEditorGUI.Foldout(foldout, title);
             if (!foldout) 
@@ -114,7 +115,7 @@ namespace Code.Editor
                 {
                     string base64 = PlayerPrefs.GetString(PlayerPrefsKey);
                     byte[] data = Convert.FromBase64String(base64);
-                    var deserialized = Sirenix.Serialization.SerializationUtility.DeserializeValue<PlayerData>(data, DataFormat.JSON);
+                    PlayerData deserialized = Sirenix.Serialization.SerializationUtility.DeserializeValue<PlayerData>(data, DataFormat.JSON);
                     string json = Encoding.UTF8.GetString(Sirenix.Serialization.SerializationUtility.SerializeValue(deserialized, DataFormat.JSON));
                     DecodedPrefsData = json;
                     PrefsMessage = string.Empty;
@@ -179,33 +180,33 @@ namespace Code.Editor
 
         private void DeletePlayerPrefs()
         {
-            if (PlayerPrefs.HasKey(PlayerPrefsKey))
-            {
-                PlayerPrefs.DeleteKey(PlayerPrefsKey);
-                PlayerPrefs.Save();
-                Debug.Log("PlayerPrefs file deleted.");
-                Refresh();
-            }
+            if (!PlayerPrefs.HasKey(PlayerPrefsKey)) 
+                return;
+            
+            PlayerPrefs.DeleteKey(PlayerPrefsKey);
+            PlayerPrefs.Save();
+            Debug.Log("PlayerPrefs file deleted.");
+            Refresh();
         }
 
         private void DeleteJson()
         {
-            if (File.Exists(JsonFilePath))
-            {
-                File.Delete(JsonFilePath);
-                Debug.Log("JSON file deleted.");
-                Refresh();
-            }
+            if (!File.Exists(JsonFilePath))
+                return;
+            
+            File.Delete(JsonFilePath);
+            Debug.Log("JSON file deleted.");
+            Refresh();
         }
 
         private void DeleteXml()
         {
-            if (File.Exists(XmlFilePath))
-            {
-                File.Delete(XmlFilePath);
-                Debug.Log("XML file deleted.");
-                Refresh();
-            }
+            if (!File.Exists(XmlFilePath)) 
+                return;
+            
+            File.Delete(XmlFilePath);
+            Debug.Log("XML file deleted.");
+            Refresh();
         }
 
         private string GetPlayerPrefsPath()
@@ -215,7 +216,7 @@ namespace Code.Editor
 #elif UNITY_EDITOR_OSX
             return $"~/Library/Preferences/unity.{Application.companyName}.{Application.productName}.plist";
 #else
-            return "📦 Platform not supported for PlayerPrefs path preview.";
+            return "Platform not supported for PlayerPrefs path preview.";
 #endif
         }
     }

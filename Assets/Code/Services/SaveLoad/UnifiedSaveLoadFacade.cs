@@ -1,8 +1,8 @@
 using System;
-using Code.Infrastructure.Services.PersistenceProgress;
-using Code.Infrastructure.Services.PersistenceProgress.Player;
+using Code.Services.PersistenceProgress;
+using Code.Services.PersistenceProgress.Player;
 
-namespace Code.Infrastructure.Services.SaveLoad
+namespace Code.Services.SaveLoad
 {
     public class UnifiedSaveLoadFacade : ISaveLoadFacade
     {
@@ -20,27 +20,27 @@ namespace Code.Infrastructure.Services.SaveLoad
             _xmlService = new XmlSaveLoadService(_progressService);
         }
 
-        public void SaveProgress(SaveMethod method)
+        public void SaveProgress(SaveMethodType methodType)
         {
-            Save(method, _progressService.PlayerData);
+            Save(methodType, _progressService.PlayerData);
         }
         
-        public void Save(SaveMethod method, PlayerData data)
+        public void Save(SaveMethodType methodType, PlayerData data)
         {
-            GetService(method).Save(data);
+            GetService(methodType).Save(data);
         }
 
-        public PlayerData Load(SaveMethod method)
+        public PlayerData Load(SaveMethodType methodType)
         {
-            return GetService(method).Load();
+            return GetService(methodType).Load();
         }
         
-        private ISaveLoadService GetService(SaveMethod method) => method switch
+        private ISaveLoadService GetService(SaveMethodType methodType) => methodType switch
         {
-            SaveMethod.PlayerPrefs => _prefsService,
-            SaveMethod.Json => _jsonService,
-            SaveMethod.Xml => _xmlService,
-            _ => throw new Exception("Unknown save method.")
+            SaveMethodType.PlayerPrefs => _prefsService,
+            SaveMethodType.Json => _jsonService,
+            SaveMethodType.Xml => _xmlService,
+            _ => throw new Exception("Unknown save methodType.")
         };
     }
 }

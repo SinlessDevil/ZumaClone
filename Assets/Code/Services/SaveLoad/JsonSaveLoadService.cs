@@ -1,11 +1,11 @@
 using System;
 using System.IO;
-using Code.Infrastructure.Services.PersistenceProgress;
-using Code.Infrastructure.Services.PersistenceProgress.Player;
+using Code.Services.PersistenceProgress;
+using Code.Services.PersistenceProgress.Player;
 using Sirenix.Serialization;
 using UnityEngine;
 
-namespace Code.Infrastructure.Services.SaveLoad
+namespace Code.Services.SaveLoad
 {
     public class JsonSaveLoadService : ISaveLoadService
     {
@@ -28,11 +28,11 @@ namespace Code.Infrastructure.Services.SaveLoad
                 byte[] data = SerializationUtility.SerializeValue(playerData, DataFormat.JSON);
                 File.WriteAllBytes(FilePath, data);
 
-                Debug.Log($"💾 JSON Save complete at: {FilePath}");
+                Debug.Log($"JSON Save complete at: {FilePath}");
             }
             catch (Exception e)
             {
-                Debug.LogError($"❌ Failed to save JSON: {e.Message}");
+                Debug.LogError($"Failed to save JSON: {e.Message}");
             }
         }
 
@@ -42,7 +42,7 @@ namespace Code.Infrastructure.Services.SaveLoad
             {
                 if (!File.Exists(FilePath))
                 {
-                    Debug.LogWarning($"📂 JSON file not found at: {FilePath}");
+                    Debug.LogWarning($"JSON file not found at: {FilePath}");
                     return null;
                 }
 
@@ -51,7 +51,7 @@ namespace Code.Infrastructure.Services.SaveLoad
             }
             catch (Exception e)
             {
-                Debug.LogError($"❌ Failed to load JSON: {e.Message}");
+                Debug.LogError($"Failed to load JSON: {e.Message}");
                 return null;
             }
         }

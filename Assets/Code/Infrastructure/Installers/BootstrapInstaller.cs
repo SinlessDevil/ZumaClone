@@ -68,7 +68,7 @@ namespace Code.Infrastructure.Installers
             Container.BindInterfacesTo<InputService>().AsSingle();
             Container.BindInterfacesTo<PersistenceProgressService>().AsSingle();
             Container.BindInterfacesTo<RandomService>().AsSingle();
-            Container.BindInterfacesTo<SaveLoadService>().AsSingle();
+            Container.BindInterfacesTo<UnifiedSaveLoadFacade>().AsSingle();
             Container.BindInterfacesTo<BallProvider>().AsSingle();
             Container.BindInterfacesTo<WidgetProvider>().AsSingle();
             Container.BindInterfacesTo<LevelService>().AsSingle();

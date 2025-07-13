@@ -1,9 +1,9 @@
 using System;
 
-namespace Code.Infrastructure.Services.SaveLoad
+namespace Code.Services.SaveLoad
 {
     [Serializable]
-    public enum SaveMethod
+    public enum SaveMethodType
     {
         PlayerPrefs,
         Json,

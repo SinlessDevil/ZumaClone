@@ -1,10 +1,10 @@
 ﻿using System;
-using Code.Infrastructure.Services.PersistenceProgress;
-using Code.Infrastructure.Services.PersistenceProgress.Player;
+using Code.Services.PersistenceProgress;
+using Code.Services.PersistenceProgress.Player;
 using Sirenix.Serialization;
 using UnityEngine;
 
-namespace Code.Infrastructure.Services.SaveLoad
+namespace Code.Services.SaveLoad
 {
     public class PrefsSaveLoadService : ISaveLoadService
     {
@@ -25,7 +25,7 @@ namespace Code.Infrastructure.Services.SaveLoad
             string base64String = Convert.ToBase64String(serializedValue);
             PlayerPrefs.SetString(key: PlayerDataKey, base64String);
             PlayerPrefs.Save();
-            Debug.Log($"💾 PlayerData saved to PlayerPrefs: {PlayerDataKey}");
+            Debug.Log($"PlayerData saved to PlayerPrefs: {PlayerDataKey}");
         }
 
         public PlayerData Load()

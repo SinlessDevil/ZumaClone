@@ -1,11 +1,11 @@
 using System;
 using System.IO;
 using System.Xml.Serialization;
-using Code.Infrastructure.Services.PersistenceProgress;
-using Code.Infrastructure.Services.PersistenceProgress.Player;
+using Code.Services.PersistenceProgress;
+using Code.Services.PersistenceProgress.Player;
 using UnityEngine;
 
-namespace Code.Infrastructure.Services.SaveLoad
+namespace Code.Services.SaveLoad
 {
     public class XmlSaveLoadService : ISaveLoadService
     {
@@ -32,11 +32,11 @@ namespace Code.Infrastructure.Services.SaveLoad
                 XmlSerializer serializer = new XmlSerializer(typeof(PlayerData));
                 using FileStream stream = new FileStream(_savePath, FileMode.Create);
                 serializer.Serialize(stream, playerData);
-                Debug.Log($"💾 XML Save complete at: {_savePath}");
+                Debug.Log($"XML Save complete at: {_savePath}");
             }
             catch (Exception e)
             {
-                Debug.LogError($"❌ Failed to save XML: {e.Message}");
+                Debug.LogError($"Failed to save XML: {e.Message}");
             }
         }
 
@@ -46,19 +46,19 @@ namespace Code.Infrastructure.Services.SaveLoad
             {
                 if (!File.Exists(_savePath))
                 {
-                    Debug.LogWarning("⚠️ XML save file not found.");
+                    Debug.LogWarning("⚠XML save file not found.");
                     return null;
                 }
 
                 XmlSerializer serializer = new XmlSerializer(typeof(PlayerData));
                 using FileStream stream = new FileStream(_savePath, FileMode.Open);
                 var data = (PlayerData)serializer.Deserialize(stream);
-                Debug.Log("✅ XML Load complete.");
+                Debug.Log("XML Load complete.");
                 return data;
             }
             catch (Exception e)
             {
-                Debug.LogError($"❌ Failed to load XML: {e.Message}");
+                Debug.LogError($"Failed to load XML: {e.Message}");
                 return null;
             }
         }
