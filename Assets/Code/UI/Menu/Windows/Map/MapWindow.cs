@@ -30,7 +30,7 @@ namespace Code.UI.Menu.Windows.Map
 
         private ILevelService _levelService;
         private IUIFactory _uiFactory;
-        private ISaveLoadService _saveLoadService;
+        private ISaveLoadFacade _saveLoadFacade;
         private IStateMachine<IGameState> _stateMachine;
         private IStaticDataService _staticData;
         private ISoundService _soundService;
@@ -39,7 +39,7 @@ namespace Code.UI.Menu.Windows.Map
         public void Constructor(
             ILevelService levelService,
             IUIFactory uiFactory,
-            ISaveLoadService saveLoadService,
+            ISaveLoadFacade saveLoadFacade,
             IStateMachine<IGameState> stateMachine,
             IStaticDataService staticData,
             IPersistenceProgressService persistenceProgressService,
@@ -47,7 +47,7 @@ namespace Code.UI.Menu.Windows.Map
         {
             _levelService = levelService;
             _uiFactory = uiFactory;
-            _saveLoadService = saveLoadService;
+            _saveLoadFacade = saveLoadFacade;
             _stateMachine = stateMachine;
             _staticData = staticData;
             _soundService = soundService;
@@ -197,7 +197,7 @@ namespace Code.UI.Menu.Windows.Map
             _soundService.ButtonClick();
             
             _levelService.SetUpCurrentLevel(levelNumber, chapterId);
-            _saveLoadService.SaveProgress();
+            _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);
 
             _stateMachine.Enter<LoadLevelState, string>(_staticData.GameConfig.GameScene);
         }

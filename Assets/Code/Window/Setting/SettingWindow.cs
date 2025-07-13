@@ -32,7 +32,7 @@ namespace Code.Window.Setting
         
         private PlayerSettings _playerSettings;
 
-        private ISaveLoadService _saveLoadService;
+        private ISaveLoadFacade _saveLoadFacade;
         private ISoundService _soundService;
         private ITimeService _timeService;
         private IStaticDataService _staticDataService;
@@ -41,14 +41,14 @@ namespace Code.Window.Setting
         [Inject]
         public void Constructor(
             IPersistenceProgressService progressService, 
-            ISaveLoadService saveLoadService,
+            ISaveLoadFacade saveLoadFacade,
             ISoundService soundService, 
             ITimeService timeService,
             IStaticDataService staticDataService,
             IStateMachine<IGameState> gameStateMachine)
         {
             _soundService = soundService;
-            _saveLoadService = saveLoadService;
+            _saveLoadFacade = saveLoadFacade;
             _timeService = timeService;
             _staticDataService = staticDataService;
             _gameStateMachine = gameStateMachine;
@@ -108,7 +108,7 @@ namespace Code.Window.Setting
             setting = !setting;
             UpdateWindow();
             
-            _saveLoadService.SaveProgress();
+            _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);
         }
 
         public void UpdateWindow()

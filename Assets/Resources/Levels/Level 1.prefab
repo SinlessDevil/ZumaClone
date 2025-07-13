@@ -45138,9 +45138,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4483584055411646839, guid: a495758cb10071549956fb3ba8a55f87, type: 3}
+      propertyPath: pathCreator
+      value: 
+      objectReference: {fileID: 8052812836336350627}
+    - target: {fileID: 4483584055411646839, guid: a495758cb10071549956fb3ba8a55f87, type: 3}
       propertyPath: roadMaterial
       value: 
       objectReference: {fileID: 2100000, guid: 5cc8cbc40070c6b49b075f25f753098d, type: 2}
+    - target: {fileID: 4483584055411646839, guid: a495758cb10071549956fb3ba8a55f87, type: 3}
+      propertyPath: undersideMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: ba65be692d5e46b4ab828d84ca5fad32, type: 2}
+    - target: {fileID: 4631465835182491295, guid: a495758cb10071549956fb3ba8a55f87, type: 3}
+      propertyPath: initialized
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4631465835182491295, guid: a495758cb10071549956fb3ba8a55f87, type: 3}
       propertyPath: editorData.tabIndex
       value: 0
