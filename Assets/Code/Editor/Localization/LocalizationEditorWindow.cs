@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditor;
-using UnityEngine;
+using Code.Localization.Code;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
-using Code.Localization.Code;
 using TMPro;
+using UnityEditor;
+using UnityEngine;
 
-namespace Localization.Editor
+namespace Code.Editor.Localization
 {
     public class LocalizationEditorWindow : OdinEditorWindow
     {
