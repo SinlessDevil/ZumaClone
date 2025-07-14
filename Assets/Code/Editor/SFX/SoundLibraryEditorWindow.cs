@@ -14,11 +14,11 @@ namespace Code.Editor.SFX
 {
     public class SoundLibraryEditorWindow : OdinEditorWindow
     {
-        private const string SoundPath = "Assets/Code/Infrastructure/AudioVibrationFX/Services/Sound/";
-        private const string MusicPath = "Assets/Code/Infrastructure/AudioVibrationFX/Services/Music/";
+        private const string SoundPath = "Assets/Code/Infrastructure/SFX/Services/Sound/";
+        private const string MusicPath = "Assets/Code/Infrastructure/SFX/Services/Music/";
         
-        private const string NameSpaceSound = "namespace Code.Infrastructure.AudioVibrationFX.Services.Sound";
-        private const string NameSpaceMusic = "namespace Code.Infrastructure.AudioVibrationFX.Services.Music";
+        private const string NameSpaceSound = "namespace Code.Infrastructure.SFX.Services.Sound";
+        private const string NameSpaceMusic = "namespace Code.Infrastructure.SFX.Services.Music";
         
         [MenuItem("Tools/AudioVibrationKit/Sound Library")]
         private static void OpenWindow()

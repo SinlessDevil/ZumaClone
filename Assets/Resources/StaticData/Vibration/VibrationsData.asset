@@ -1,0 +1,228 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69fa8f94762e4e51b0a18f0d155ad568, type: 3}
+  m_Name: VibrationsData
+  m_EditorClassIdentifier: 
+  Vibrations:
+  - Name: SuccessPreset
+    Mode: 0
+    HapticType: 1
+    ConstantIntensity: 1
+    ConstantDuration: 0.3
+    EmphasisIntensity: 1
+    EmphasisSharpness: 1
+    Curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    CurveDuration: 1
+    VibrationType: 0
+  - Name: ConstantBuzz
+    Mode: 1
+    HapticType: 0
+    ConstantIntensity: 0.8
+    ConstantDuration: 0.5
+    EmphasisIntensity: 1
+    EmphasisSharpness: 1
+    Curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    CurveDuration: 1
+    VibrationType: 1
+  - Name: HitPulse
+    Mode: 2
+    HapticType: 0
+    ConstantIntensity: 1
+    ConstantDuration: 0.3
+    EmphasisIntensity: 1
+    EmphasisSharpness: 0.8
+    Curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    CurveDuration: 1
+    VibrationType: 2
+  - Name: WaveVibration
+    Mode: 3
+    HapticType: 0
+    ConstantIntensity: 1
+    ConstantDuration: 0.3
+    EmphasisIntensity: 1
+    EmphasisSharpness: 1
+    Curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.011249542
+        value: 1.0082397
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.101308644
+        value: 0.20436513
+        inSlope: 1.268575
+        outSlope: 1.268575
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.06988677
+      - serializedVersion: 3
+        time: 0.20652622
+        value: 0.9995744
+        inSlope: 0.61928433
+        outSlope: 0.61928433
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.2654296
+        value: 0.27165973
+        inSlope: 0.3830254
+        outSlope: 0.3830254
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.68353903
+      - serializedVersion: 3
+        time: 0.35995805
+        value: 0.9699327
+        inSlope: 0.95603234
+        outSlope: 0.95603234
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.43725574
+        value: 0.09100562
+        inSlope: 1.9912322
+        outSlope: 1.9912322
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.51926094
+        value: 0.973758
+        inSlope: 0.3557896
+        outSlope: 0.3557896
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.6291977
+        value: 0.32173944
+        inSlope: -0.1908581
+        outSlope: -0.1908581
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.25494772
+      - serializedVersion: 3
+        time: 0.7241551
+        value: 0.9715866
+        inSlope: 0.5107236
+        outSlope: 0.5107236
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.8162629
+        value: 0.20636648
+        inSlope: 0.040506415
+        outSlope: 0.040506415
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    CurveDuration: 1
+    VibrationType: 3
