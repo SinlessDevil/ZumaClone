@@ -14,8 +14,8 @@ namespace Code.Editor.SFX
     public class VibrationLibraryEditorWindow : OdinEditorWindow
     {
         private const string VibrationDataPath = "StaticData/Vibration/VibrationsData";
-        private const string EnumOutputPath = "Assets/Code/Infrastructure/SFX/Services/Vibration/VibrationType.cs";
-        private const string NameSpaceVibration = "namespace Code.Infrastructure.SFX.Services.Vibration";
+        private const string EnumOutputPath = "Assets/Code/Services/SFX/Vibration/VibrationType.cs";
+        private const string NameSpaceVibration = "namespace Code.Services.SFX.Vibration";
         
         [MenuItem("Tools/AudioVibrationKit/Vibration Library")]
         private static void OpenWindow()

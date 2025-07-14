@@ -7,6 +7,7 @@ using Code.Services.Levels;
 using Code.Services.PersistenceProgress;
 using Code.Services.SaveLoad;
 using Code.Services.SFX;
+using Code.Services.SFX.Sound;
 using Code.Services.StaticData;
 using Code.StaticData.Levels;
 using DG.Tweening;
@@ -88,7 +89,7 @@ namespace Code.UI.Menu.Windows.Map
 
         private void OnSwipeChapter(TypeSwipe typeSwipe)
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             
             switch (typeSwipe)
             {
@@ -194,7 +195,7 @@ namespace Code.UI.Menu.Windows.Map
 
         private void OnLoadLevel(int levelNumber, int chapterId)
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             
             _levelService.SetUpCurrentLevel(levelNumber, chapterId);
             _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);

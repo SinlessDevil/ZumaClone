@@ -6,8 +6,5 @@ namespace Code.Services.SFX.Music
     public enum MusicType
     {
         Unknown = -1,
-        Music = 0,
-        Music_1 = 1,
-        Music_2 = 2,
     }
 }

@@ -5,6 +5,7 @@ using Code.Services.PersistenceProgress;
 using Code.Services.PersistenceProgress.Player;
 using Code.Services.SaveLoad;
 using Code.Services.SFX;
+using Code.Services.SFX.Sound;
 using Code.Services.StaticData;
 using Code.Services.Timer;
 using DG.Tweening;
@@ -79,7 +80,7 @@ namespace Code.Window.Setting
 
         private void OnHideWindow()
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             _timeService.SimpleMode();
             
             Destroy(this.gameObject);
@@ -87,7 +88,7 @@ namespace Code.Window.Setting
         
         private void OnQuitToMenu()
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             _timeService.SimpleMode();
             
             _gameStateMachine.Enter<LoadMenuState, string>(_staticDataService.GameConfig.MenuScene);
@@ -95,7 +96,7 @@ namespace Code.Window.Setting
         
         private void OnRestartLevel()
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             _timeService.SimpleMode();
             
             _gameStateMachine.Enter<LoadLevelState, string>(_staticDataService.GameConfig.GameScene);
@@ -103,7 +104,7 @@ namespace Code.Window.Setting
 
         private void UpdateSetting(ref bool setting)
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             
             setting = !setting;
             UpdateWindow();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Code.Services.SFX;
+using Code.Services.SFX.Sound;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -109,7 +110,7 @@ namespace Code.UI.Menu.Windows.Map
         
         private void OnLoadLevel()
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             
             LoadLevelEvent?.Invoke(_currentLevel, _currentChapter);
         }

@@ -1,4 +1,5 @@
 using Code.Services.SFX;
+using Code.Services.SFX.Sound;
 using Code.Services.Timer;
 using Code.Services.Window;
 using UnityEngine;
@@ -33,7 +34,7 @@ namespace Code.Window.Setting
 
         private void OpenPauseWindow()
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             _timeService.Pause();
 
             var prefab = _windowService.Open(WindowTypeId.Setting);

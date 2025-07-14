@@ -2,6 +2,7 @@ using Code.Infrastructure.StateMachine;
 using Code.Infrastructure.StateMachine.Game.States;
 using Code.Services.Levels;
 using Code.Services.SFX;
+using Code.Services.SFX.Sound;
 using Code.Services.StaticData;
 using Zenject;
 
@@ -49,14 +50,14 @@ namespace Code.Window.Finish.Win
         
         protected override void OnLoadLevelButtonClick()
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             
             _gameStateMachine.Enter<LoadLevelState, string>(_staticDataService.GameConfig.GameScene);
         }
 
         protected override void OnExitToMenuButtonClick()
         {
-            _soundService.ButtonClick();
+            //_soundService.ButtonClick();
             
             _gameStateMachine.Enter<LoadMenuState, string>(_staticDataService.GameConfig.MenuScene);
         }
