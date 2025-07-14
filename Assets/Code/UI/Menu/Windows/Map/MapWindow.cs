@@ -89,7 +89,7 @@ namespace Code.UI.Menu.Windows.Map
 
         private void OnSwipeChapter(TypeSwipe typeSwipe)
         {
-            //_soundService.ButtonClick();
+            _soundService.PlaySound(Sound2DType.Click);
             
             switch (typeSwipe)
             {
@@ -136,14 +136,14 @@ namespace Code.UI.Menu.Windows.Map
 
             ClearLevelPool();
 
-            var currentChapter = _chapters[_currentChapterIndex];
+            ChapterStaticData currentChapter = _chapters[_currentChapterIndex];
             
             foreach (var level in currentChapter.Levels)
             {
-                var levelIndex = currentChapter.Levels.IndexOf(level) + 1;
-                var chapterIndex = _currentChapterIndex + 1;
+                int levelIndex = currentChapter.Levels.IndexOf(level) + 1;
+                int chapterIndex = _currentChapterIndex + 1;
 
-                var levelItem = GetPooledItemLevel();
+                ItemLevel levelItem = GetPooledItemLevel();
                 levelItem.Initialize(levelIndex, chapterIndex);
 
                 if (_levelService.IsLevelCurrent(chapterIndex, levelIndex))
@@ -172,7 +172,7 @@ namespace Code.UI.Menu.Windows.Map
 
         private void SetNameChapter()
         {
-            var currentChapter = _currentChapterIndex + 1;
+            int currentChapter = _currentChapterIndex + 1;
             _chapterName.text = "Chapter " + currentChapter;
         }
 
@@ -180,11 +180,11 @@ namespace Code.UI.Menu.Windows.Map
         {
             foreach (var item in _levelPool)
             {
-                if (!item.gameObject.activeSelf)
-                {
-                    item.gameObject.SetActive(true);
-                    return item;
-                }
+                if (item.gameObject.activeSelf) 
+                    continue;
+                
+                item.gameObject.SetActive(true);
+                return item;
             }
 
             var newItem = _uiFactory.CreateItemLevel(_gridLayoutGroup.transform);
@@ -195,7 +195,7 @@ namespace Code.UI.Menu.Windows.Map
 
         private void OnLoadLevel(int levelNumber, int chapterId)
         {
-            //_soundService.ButtonClick();
+            _soundService.PlaySound(Sound2DType.Click);
             
             _levelService.SetUpCurrentLevel(levelNumber, chapterId);
             _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);

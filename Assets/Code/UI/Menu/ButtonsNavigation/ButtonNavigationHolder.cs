@@ -80,7 +80,7 @@ namespace Code.UI.Menu.ButtonsNavigation
         
         private void OnOpenedWindow(TypeWindow typeWindow)
         {
-            //_soundService.ButtonClick();
+            _soundService.PlaySound(Sound2DType.Click);
             
             SetUpButtonState(typeWindow);
             

@@ -4,7 +4,6 @@ using Code.Infrastructure.StateMachine.Game.States;
 using Code.Services.PersistenceProgress;
 using Code.Services.PersistenceProgress.Player;
 using Code.Services.SaveLoad;
-using Code.Services.SFX;
 using Code.Services.SFX.Sound;
 using Code.Services.StaticData;
 using Code.Services.Timer;
@@ -80,7 +79,7 @@ namespace Code.Window.Setting
 
         private void OnHideWindow()
         {
-            //_soundService.ButtonClick();
+            _soundService.PlaySound(Sound2DType.Click);
             _timeService.SimpleMode();
             
             Destroy(this.gameObject);
@@ -88,7 +87,7 @@ namespace Code.Window.Setting
         
         private void OnQuitToMenu()
         {
-            //_soundService.ButtonClick();
+            _soundService.PlaySound(Sound2DType.Click);
             _timeService.SimpleMode();
             
             _gameStateMachine.Enter<LoadMenuState, string>(_staticDataService.GameConfig.MenuScene);
@@ -96,7 +95,7 @@ namespace Code.Window.Setting
         
         private void OnRestartLevel()
         {
-            //_soundService.ButtonClick();
+            _soundService.PlaySound(Sound2DType.Click);
             _timeService.SimpleMode();
             
             _gameStateMachine.Enter<LoadLevelState, string>(_staticDataService.GameConfig.GameScene);
@@ -104,7 +103,7 @@ namespace Code.Window.Setting
 
         private void UpdateSetting(ref bool setting)
         {
-            //_soundService.ButtonClick();
+            _soundService.PlaySound(Sound2DType.Click);
             
             setting = !setting;
             UpdateWindow();
