@@ -30,11 +30,8 @@ namespace Code.Services.SaveLoad
             GetService(methodType).Save(data);
         }
 
-        public PlayerData Load(SaveMethodType methodType)
-        {
-            return GetService(methodType).Load();
-        }
-        
+        public PlayerData Load(SaveMethodType methodType) => GetService(methodType).Load();
+
         private ISaveLoadService GetService(SaveMethodType methodType) => methodType switch
         {
             SaveMethodType.PlayerPrefs => _prefsService,
