@@ -1,0 +1,7 @@
+eng=Englisch
+ru=Russisch
+uk=Ukrainisch
+pla=Spielen
+go=Spielende
+ex=Beenden
+so=Töne

@@ -1,0 +1,7 @@
+eng=Angielski
+ru=Rosyjski
+uk=Ukraiński
+pla=Grać
+go=Koniec
+ex=Wyjście
+so=Dźwięki
