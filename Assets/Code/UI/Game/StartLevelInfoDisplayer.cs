@@ -1,5 +1,5 @@
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Code.UI.Game
 {
@@ -8,7 +8,7 @@ namespace Code.UI.Game
         private const string TriggerPlay = "Play";
         
         [SerializeField] private Animator _animator;
-        [SerializeField] private Text _textLevelName;
+        [SerializeField] private TMP_Text _textLevelName;
         
         public bool IsActive { get; private set; }
         

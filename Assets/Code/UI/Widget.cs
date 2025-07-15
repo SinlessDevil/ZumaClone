@@ -1,12 +1,12 @@
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Code.UI
 {
     public class Widget : MonoBehaviour
     {
-        [SerializeField] private Text _text;
+        [SerializeField] private TMP_Text _text;
         [SerializeField] private CanvasGroup _canvasGroup;
         
         private float _moveUpDuration = 0.5f;

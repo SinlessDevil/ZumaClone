@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Code.UI;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +10,8 @@ namespace Code.Window.Finish
 {
     public abstract class FinishWindow : MonoBehaviour
     {
-        [SerializeField] protected Text _textTime;
-        [SerializeField] protected Text _textScore;
+        [SerializeField] protected TMP_Text _textTime;
+        [SerializeField] protected TMP_Text _textScore;
         [SerializeField] protected Button _buttonLoadLevel;
         [SerializeField] protected Button _buttonExitToMenu;
         [Space(10)] [Header("Addition Components")]
@@ -63,18 +64,34 @@ namespace Code.Window.Finish
             sequence.AppendInterval(0.2f);
             sequence.Append(_headerContainer.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce));
             sequence.AppendInterval(0.2f);
-            sequence.Append(_textScore.DOText(_score, 0.25f).SetEase(Ease.Linear));
-            sequence.Append(_textTime.DOText(_time, 0.25f).SetEase(Ease.Linear));
+            
+            int parsedScore = int.TryParse(_score, out var s) ? s : 0;
+            int currentScore = 0;
+            sequence.Append(DOTween.To(() => currentScore, x =>
+            {
+                currentScore = x;
+                _textScore.text = currentScore.ToString();
+            }, parsedScore, 0.25f).SetEase(Ease.Linear));
+            
+            float parsedTime = float.TryParse(_time, out var t) ? t : 0f;
+            float currentTime = 0;
+            sequence.Append(DOTween.To(() => currentTime, x =>
+            {
+                currentTime = x;
+                _textTime.text = currentTime.ToString("F1");
+            }, parsedTime, 0.25f).SetEase(Ease.Linear));
+
             sequence.AppendInterval(0.2f);
             sequence.Append(_buttonLoadLevel.transform.DOScale(1, 0.5f).SetEase(Ease.OutBounce));
             sequence.Join(_buttonExitToMenu.transform.DOScale(1, 0.5f).SetEase(Ease.OutBounce));
+
             sequence.OnComplete(() =>
             {
-                _buttonScalers.ForEach(x=> x.SetupScaleOrigin());
+                _buttonScalers.ForEach(x => x.SetupScaleOrigin());
+                onFinished?.Invoke();
             });
-            
-            sequence.OnComplete(() => onFinished?.Invoke());
         }
+
         
         protected abstract void OnLoadLevelButtonClick();
         protected abstract void OnExitToMenuButtonClick();

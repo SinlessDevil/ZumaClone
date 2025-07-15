@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Code.Services.SFX.Sound;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -10,7 +11,7 @@ namespace Code.UI.Menu.Windows.Map
     public class ItemLevel : MonoBehaviour
     {
         [SerializeField] private Image _mainImage;
-        [SerializeField] private List<Text> _texts;
+        [SerializeField] private List<TMP_Text> _texts;
         [SerializeField] private Button _button;
         [Space(10)]
         [SerializeField] private GameObject _panelCompleted;
