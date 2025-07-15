@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Code.Infrastructure
 {
@@ -8,12 +10,13 @@ namespace Code.Infrastructure
     {
         private const float Delay = 1.75f;
         private const float AnimationDuration = 0.65f;
-        
+        private const float TextUpdateInterval = 0.15f;
+
         [SerializeField] private RectTransform _right;
         [SerializeField] private RectTransform _left;
-        [SerializeField] private Text _loadingText;
+        [SerializeField] private TMP_Text _loadingText;
 
-        private Coroutine _loadingTextCoroutine;
+        private CancellationTokenSource _textAnimationCts;
 
         private void Awake()
         {
@@ -32,35 +35,35 @@ namespace Code.Infrastructure
 
         public void Hide()
         {
-            StartCoroutine(AnimationOpen());
+            AnimationOpenAsync().Forget();
             StartLoadingTextAnimation();
         }
 
-        private IEnumerator AnimationOpen()
+        private async UniTaskVoid AnimationOpenAsync()
         {
-            yield return new WaitForSeconds(Delay);
-            
+            await UniTask.Delay(TimeSpan.FromSeconds(Delay), cancellationToken: this.GetCancellationTokenOnDestroy());
+
             float screenWidth = Screen.width;
             float elapsedTime = 0f;
 
             Vector2 leftStart = _left.anchoredPosition;
-            Vector2 leftTarget = new Vector2(-screenWidth / 2, leftStart.y);
-            
+            Vector2 leftTarget = new Vector2(-screenWidth / 2f, leftStart.y);
+
             Vector2 rightStart = _right.anchoredPosition;
-            Vector2 rightTarget = new Vector2(screenWidth / 2, rightStart.y);
+            Vector2 rightTarget = new Vector2(screenWidth / 2f, rightStart.y);
 
             while (elapsedTime < AnimationDuration)
             {
                 elapsedTime += Time.deltaTime;
-                float t = elapsedTime / AnimationDuration;
+                float t = Mathf.Clamp01(elapsedTime / AnimationDuration);
                 _left.anchoredPosition = Vector2.Lerp(leftStart, leftTarget, t);
                 _right.anchoredPosition = Vector2.Lerp(rightStart, rightTarget, t);
-                yield return null;
+                await UniTask.Yield(PlayerLoopTiming.Update);
             }
 
             _left.anchoredPosition = leftTarget;
             _right.anchoredPosition = rightTarget;
-            
+
             StopLoadingTextAnimation();
             gameObject.SetActive(false);
             IsActive = false;
@@ -68,28 +71,37 @@ namespace Code.Infrastructure
 
         private void StartLoadingTextAnimation()
         {
-            _loadingTextCoroutine = StartCoroutine(LoadingTextEffect());
+            StopLoadingTextAnimation();
+            _textAnimationCts = new CancellationTokenSource();
+            AnimateLoadingTextAsync(_textAnimationCts.Token).Forget();
         }
 
         private void StopLoadingTextAnimation()
         {
-            if (_loadingTextCoroutine != null)
-                StopCoroutine(_loadingTextCoroutine);
+            if (_textAnimationCts != null && !_textAnimationCts.IsCancellationRequested)
+                _textAnimationCts.Cancel();
+            _textAnimationCts?.Dispose();
+            _textAnimationCts = null;
         }
 
-        private IEnumerator LoadingTextEffect()
+        private async UniTaskVoid AnimateLoadingTextAsync(CancellationToken token)
         {
             string baseText = "Loading";
-            while (true)
+            string[] dots = { "", ".", "..", "..." };
+            int index = 0;
+
+            try
             {
-                _loadingText.text = baseText + "";
-                yield return new WaitForSeconds(0.15f);
-                _loadingText.text = baseText + ".";
-                yield return new WaitForSeconds(0.15f);
-                _loadingText.text = baseText + "..";
-                yield return new WaitForSeconds(0.15f);
-                _loadingText.text = baseText + "...";
-                yield return new WaitForSeconds(0.15f);
+                while (!token.IsCancellationRequested)
+                {
+                    _loadingText.text = baseText + dots[index];
+                    index = (index + 1) % dots.Length;
+                    await UniTask.Delay(TimeSpan.FromSeconds(TextUpdateInterval), cancellationToken: token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                
             }
         }
     }

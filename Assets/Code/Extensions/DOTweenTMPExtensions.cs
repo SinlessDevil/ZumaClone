@@ -6,7 +6,8 @@ namespace Code.Extensions
 {
     public static class DOTweenTMPExtensions
     {
-        public static Tweener DOTextCounter(this TMP_Text target, int fromValue, int toValue, float duration, bool addThousandsSeparator = false)
+        public static Tweener DOTextCounter(this TMP_Text target, int fromValue, int toValue, float duration, 
+            bool addThousandsSeparator = false)
         {
             int currentValue = fromValue;
             return DOTween.To(() => currentValue, x =>
