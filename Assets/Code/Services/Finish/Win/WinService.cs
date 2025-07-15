@@ -1,11 +1,13 @@
 using Code.Services.Levels;
 using Code.Services.LocalProgress;
 using Code.Services.PersistenceProgress;
+using Code.Services.PersistenceProgress.Player;
 using Code.Services.SaveLoad;
 using Code.Services.Timer;
 using Code.Services.Window;
 using Code.Window;
 using Code.Window.Finish.Win;
+using UnityEngine;
 
 namespace Code.Services.Finish.Win
 {
@@ -40,20 +42,20 @@ namespace Code.Services.Finish.Win
             
             CompleteTutor();
 
-            var recordTime = GetRecordText();
-            var scoreText = GetScoreText();
+            (string, string) recordTime = GetRecordText();
+            string scoreText = GetScoreText();
 
             SetRecordText();
             
             SaveProgress();
             
-            var window = _windowService.Open(WindowTypeId.Win);
-            var winWindow = window.GetComponent<WinWindow>();
-            winWindow.SetTime(recordTime);
+            RectTransform window = _windowService.Open(WindowTypeId.Win);
+            WinWindow winWindow = window.GetComponent<WinWindow>();
+            winWindow.SetTime(recordTime.Item1 + recordTime.Item2);
             winWindow.SetScore(scoreText);
             winWindow.Initialize();
             winWindow.ResetWindow();
-            winWindow.OpenWindow(null);
+            winWindow.OpenWindow(null, _levelLocalProgressService.Score, _timeService.GetElapsedTime());
         }
 
         public void BonusWin()
@@ -62,8 +64,8 @@ namespace Code.Services.Finish.Win
             
             CompleteTutor();
 
-            var recordTime = GetRecordText();
-            var scoreText = GetScoreText();
+            (string, string) recordTime = GetRecordText();
+            string scoreText = GetScoreText();
 
             SetRecordText();
             
@@ -71,11 +73,11 @@ namespace Code.Services.Finish.Win
             
             var window = _windowService.Open(WindowTypeId.Bonus);
             var bonusWindow = window.GetComponent<BonusWindow>();
-            bonusWindow.SetTime(recordTime);
+            bonusWindow.SetTime(recordTime.Item1 + recordTime.Item2);
             bonusWindow.SetScore(scoreText);
             bonusWindow.Initialize();
             bonusWindow.ResetWindow();
-            bonusWindow.OpenWindow(null);
+            bonusWindow.OpenWindow(null, _levelLocalProgressService.Score, _timeService.GetElapsedTime());
         }
         
         private void CompleteLevel()
@@ -90,51 +92,43 @@ namespace Code.Services.Finish.Win
 
         private void SetRecordText()
         {
-            var currentRecordTime = GetCurrentRecordTime();
-            var currentTime = _timeService.GetElapsedTime();
-            var currentLevelContainer = _levelService.GetCurrentLevelContainer();
+            float currentRecordTime = GetCurrentRecordTime();
+            float currentTime = _timeService.GetElapsedTime();
+            LevelContainer currentLevelContainer = _levelService.GetCurrentLevelContainer();
             
             if(currentRecordTime == 0)
-            { 
                 return;   
-            }
+
+            if (!(currentTime > currentRecordTime)) 
+                return;
             
-            if (currentTime > currentRecordTime)
-            {
-                var existingLevel = _persistenceProgressService.PlayerData.PlayerLevelData.LevelsComleted.Find(level => level == currentLevelContainer);
-                existingLevel.Time = currentTime;
-            }
+            LevelContainer existingLevel = _persistenceProgressService.PlayerData.PlayerLevelData.LevelsComleted.Find(level => level == currentLevelContainer);
+            existingLevel.Time = currentTime;
         }
 
         private float GetCurrentRecordTime()
         {
-            var currentLevelContainer = _levelService.GetCurrentLevelContainer();
+            LevelContainer currentLevelContainer = _levelService.GetCurrentLevelContainer();
+            
             if(currentLevelContainer == null)
-            {
                 return 0;
-            }
             
             return currentLevelContainer.Time;
         }
 
-        private string GetRecordText()
+        private (string, string) GetRecordText()
         {
-            var currentRecordTime = GetCurrentRecordTime();
-            var currentTime = _timeService.GetElapsedTime();
+            float currentRecordTime = GetCurrentRecordTime();
+            float currentTime = _timeService.GetElapsedTime();
             
             if(currentRecordTime == 0 || currentTime > currentRecordTime)
-            {
-                return "New Record! Time: " + _timeService.GetFormattedElapsedTime();
-            }
+                return ("New Record! Time: ", _timeService.GetFormattedElapsedTime());
 
-            return "Record: " + _timeService.GetFormattedElapsedTime();
-        }
-
-        private string GetScoreText()
-        {
-            return "Score: " + _levelLocalProgressService.Score;
+            return ("Record: ", _timeService.GetFormattedElapsedTime());
         }
         
+        private string GetScoreText() => "Score: " + _levelLocalProgressService.Score;
+
         private void SaveProgress()
         {
             _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);

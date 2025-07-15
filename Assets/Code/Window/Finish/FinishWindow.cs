@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Code.Extensions;
 using Code.UI;
 using DG.Tweening;
 using TMPro;
@@ -54,8 +55,8 @@ namespace Code.Window.Finish
             _buttonLoadLevel.transform.localScale = Vector3.zero;
             _buttonExitToMenu.transform.localScale = Vector3.zero;
         }
-        
-        public virtual void OpenWindow(Action onFinished)
+
+        public virtual void OpenWindow(Action onFinished, int score, float time)
         {
             Sequence sequence = DOTween.Sequence();
 
@@ -64,23 +65,8 @@ namespace Code.Window.Finish
             sequence.AppendInterval(0.2f);
             sequence.Append(_headerContainer.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce));
             sequence.AppendInterval(0.2f);
-            
-            int parsedScore = int.TryParse(_score, out var s) ? s : 0;
-            int currentScore = 0;
-            sequence.Append(DOTween.To(() => currentScore, x =>
-            {
-                currentScore = x;
-                _textScore.text = currentScore.ToString();
-            }, parsedScore, 0.25f).SetEase(Ease.Linear));
-            
-            float parsedTime = float.TryParse(_time, out var t) ? t : 0f;
-            float currentTime = 0;
-            sequence.Append(DOTween.To(() => currentTime, x =>
-            {
-                currentTime = x;
-                _textTime.text = currentTime.ToString("F1");
-            }, parsedTime, 0.25f).SetEase(Ease.Linear));
-
+            sequence.Append(_textScore.DOTextCounter(0, score, 0.25f, addThousandsSeparator: true).SetEase(Ease.Linear));
+            sequence.Append(_textTime.DOTimeCounter(0f, time, 0.25f).SetEase(Ease.Linear));
             sequence.AppendInterval(0.2f);
             sequence.Append(_buttonLoadLevel.transform.DOScale(1, 0.5f).SetEase(Ease.OutBounce));
             sequence.Join(_buttonExitToMenu.transform.DOScale(1, 0.5f).SetEase(Ease.OutBounce));

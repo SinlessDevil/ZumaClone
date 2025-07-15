@@ -1,17 +1,19 @@
 using Code.Services.Levels;
 using Code.Services.LocalProgress;
+using Code.Services.PersistenceProgress.Player;
 using Code.Services.Timer;
 using Code.Services.Window;
 using Code.Window;
 using Code.Window.Finish.Lose;
+using UnityEngine;
 
 namespace Code.Services.Finish.Lose
 {
     public class LoseService : ILoseService
     {
-        private IWindowService _windowService;
-        private ILevelService _levelService;
-        private ITimeService _timeService;
+        private readonly IWindowService _windowService;
+        private readonly ILevelService _levelService;
+        private readonly ITimeService _timeService;
         private readonly ILevelLocalProgressService _levelLocalProgressService;
 
         public LoseService(
@@ -28,46 +30,39 @@ namespace Code.Services.Finish.Lose
         
         public void Lose()
         {
-            var recordTime = GetRecordText();
-            var scoreText = GetScoreText();
+            (string, string) recordTime = GetRecordText();
+            string scoreText = GetScoreText();
             
-            var window = _windowService.Open(WindowTypeId.Lose);
-            var loseWindow = window.GetComponent<LoseWindow>();
-            loseWindow.SetTime(recordTime);
+            RectTransform window = _windowService.Open(WindowTypeId.Lose);
+            
+            LoseWindow loseWindow = window.GetComponent<LoseWindow>();
+            loseWindow.SetTime(recordTime.Item1 + recordTime.Item2);
             loseWindow.SetScore(scoreText);
             loseWindow.Initialize();
             loseWindow.ResetWindow();
-            loseWindow.OpenWindow(null);
+            loseWindow.OpenWindow(null, _levelLocalProgressService.Score, _timeService.GetElapsedTime());
         }
         
         private float GetCurrentRecordTime()
         {
-            var currentLevelContainer = _levelService.GetCurrentLevelContainer();
+            LevelContainer currentLevelContainer = _levelService.GetCurrentLevelContainer();
             if(currentLevelContainer == null)
-            {
                 return 0;
-            }
             
             return currentLevelContainer.Time;
         }
 
-        private string GetRecordText()
+        private (string, string) GetRecordText()
         {
-            var currentRecordTime = GetCurrentRecordTime();
-            var currentTime = _timeService.GetElapsedTime();
+            float currentRecordTime = GetCurrentRecordTime();
+            float currentTime = _timeService.GetElapsedTime();
             
             if(currentRecordTime == 0 || currentTime > currentRecordTime)
-            {
-                return "New Record! Time: " + _timeService.GetFormattedElapsedTime();
-            }
+                return ("New Record! Time: ", _timeService.GetFormattedElapsedTime());
 
-            return "Record: " + _timeService.GetFormattedElapsedTime();
+            return ("Record: ", _timeService.GetFormattedElapsedTime());
         }
         
-        private string GetScoreText()
-        {
-            return "Score: " + _levelLocalProgressService.Score;
-        }
-
+        private string GetScoreText() => "Score: " + _levelLocalProgressService.Score;
     }
 }

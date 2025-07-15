@@ -11,6 +11,7 @@ using Code.Services.SFX.Sound;
 using Code.Services.StaticData;
 using Code.StaticData.Levels;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -19,7 +20,7 @@ namespace Code.UI.Menu.Windows.Map
 {
     public class MapWindow : BaseWindow
     {
-        [SerializeField] private Text _chapterName;
+        [SerializeField] private TMP_Text _chapterName;
         [SerializeField] private GridLayoutGroup _gridLayoutGroup;
         [SerializeField] private List<ButtonSwipeChapter> _buttonsSwipeChapter;
         [SerializeField] private List<CanvasGroup> _canvasGroups;
