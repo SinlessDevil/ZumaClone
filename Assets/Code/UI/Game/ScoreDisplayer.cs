@@ -1,14 +1,14 @@
 using Code.Services.LocalProgress;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Zenject;
 
 namespace Code.UI.Game
 {
     public class ScoreDisplayer : MonoBehaviour
     {
-        [SerializeField] private Text _levelText;
+        [SerializeField] private TMP_Text _levelText;
 
         private int _currentScore = 0;
         

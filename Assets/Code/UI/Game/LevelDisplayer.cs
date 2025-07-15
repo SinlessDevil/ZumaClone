@@ -1,13 +1,13 @@
 using Code.Services.Levels;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Zenject;
 
 namespace Code.UI.Game
 {
     public class LevelDisplayer : MonoBehaviour
     {
-        [SerializeField] private Text _levelText;
+        [SerializeField] private TMP_Text _levelText;
 
         private ILevelService _levelService;
         
@@ -21,9 +21,10 @@ namespace Code.UI.Game
         {
             _levelText.text = "";
             
-            var nameLevel = _levelService.GetCurrentLevelStaticData().LevelName;
-            var numberLevel = _levelService.GetCurrentChapter() + "-" + _levelService.GetCurrentLevel();
-            var level = nameLevel + " " + numberLevel;
+            string nameLevel = _levelService.GetCurrentLevelStaticData().LevelName;
+            string numberLevel = _levelService.GetCurrentChapter() + "-" + _levelService.GetCurrentLevel();
+            string level = nameLevel + " " + numberLevel;
+            
             SetLevelText(level);
         }
         
