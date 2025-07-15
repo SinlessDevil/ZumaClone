@@ -7,7 +7,10 @@ namespace Code.Editor
 {
     public class TextToTMPConverterEditorWindow : EditorWindow
     {
-        private GameObject targetRoot;
+        private GameObject _targetRoot;
+
+        private TMP_FontAsset _tmpFont;
+        private Font _unityFont;
 
         [MenuItem("Tools/Text <-> TMP Converter")]
         public static void ShowWindow()
@@ -18,39 +21,59 @@ namespace Code.Editor
         private void OnGUI()
         {
             GUILayout.Label("Select Prefab or GameObject to Convert", EditorStyles.boldLabel);
+            
+            DrawObjectFieldPrefab();
 
-            DrawObjectField();
+            GUILayout.Space(10);
+
+            DrawFillFontTextToTMP_Pro();
 
             DrawButtonConvertTextToTMP_Pro();
 
-            DrawButtonConvertTMP_ProToText();
+            GUILayout.Space(10);
+
+            DrawFillFontTMP_ProToText();
+
+            DrawButtonConventTMP_ProToText();
         }
 
-        private void DrawObjectField()
+        private void DrawFillFontTextToTMP_Pro()
         {
-            targetRoot = (GameObject)EditorGUILayout.ObjectField("Target Root", targetRoot, typeof(GameObject), true);
-        }
-
-        private void DrawButtonConvertTMP_ProToText()
-        {
-            if (!GUILayout.Button("Convert TextMeshPro -> Text")) 
-                return;
-            
-            if (targetRoot != null)
-                ConvertTMPToText(targetRoot);
-            else
-                Debug.LogWarning("Please assign a target GameObject");
+            GUILayout.Label("Text ➜ TextMeshProUGUI", EditorStyles.boldLabel);
+            _tmpFont = (TMP_FontAsset)EditorGUILayout.ObjectField("TMP Font", _tmpFont, typeof(TMP_FontAsset), false);
         }
 
         private void DrawButtonConvertTextToTMP_Pro()
         {
-            if (!GUILayout.Button("Convert Text -> TextMeshPro")) 
-                return;
-            
-            if (targetRoot != null)
-                ConvertTextToTMP(targetRoot);
-            else
-                Debug.LogWarning("Please assign a target GameObject");
+            if (GUILayout.Button("Convert Text -> TextMeshPro"))
+            {
+                if (_targetRoot == null)
+                    Debug.LogWarning("Please assign a target GameObject");
+                else
+                    ConvertTextToTMP(_targetRoot);
+            }
+        }
+
+        private void DrawFillFontTMP_ProToText()
+        {
+            GUILayout.Label("TextMeshProUGUI ➜ Text", EditorStyles.boldLabel);
+            _unityFont = (Font)EditorGUILayout.ObjectField("Unity Font", _unityFont, typeof(Font), false);
+        }
+
+        private void DrawButtonConventTMP_ProToText()
+        {
+            if (GUILayout.Button("Convert TextMeshPro -> Text"))
+            {
+                if (_targetRoot == null)
+                    Debug.LogWarning("Please assign a target GameObject");
+                else
+                    ConvertTMPToText(_targetRoot);
+            }
+        }
+
+        private void DrawObjectFieldPrefab()
+        {
+            _targetRoot = (GameObject)EditorGUILayout.ObjectField("Target Root", _targetRoot, typeof(GameObject), true);
         }
 
         private void ConvertTextToTMP(GameObject root)
@@ -67,11 +90,14 @@ namespace Code.Editor
                 GameObject go = oldText.gameObject;
                 DestroyImmediate(oldText);
 
-                var tmp = go.AddComponent<TextMeshProUGUI>();
+                TextMeshProUGUI tmp = go.AddComponent<TextMeshProUGUI>();
                 tmp.text = textValue;
                 tmp.fontSize = fontSize;
                 tmp.color = color;
                 tmp.alignment = ConvertAlignment(alignment);
+
+                if (_tmpFont != null)
+                    tmp.font = _tmpFont;
             }
         }
 
@@ -85,14 +111,17 @@ namespace Code.Editor
                 Color color = oldTMP.color;
                 TextAlignmentOptions alignment = oldTMP.alignment;
 
-                GameObject gameObject = oldTMP.gameObject;
+                GameObject go = oldTMP.gameObject;
                 DestroyImmediate(oldTMP);
 
-                Text text = gameObject.AddComponent<Text>();
+                Text text = go.AddComponent<Text>();
                 text.text = textValue;
                 text.fontSize = Mathf.RoundToInt(fontSize);
                 text.color = color;
                 text.alignment = ConvertAlignment(alignment);
+
+                if (_unityFont != null)
+                    text.font = _unityFont;
             }
         }
 
