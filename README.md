@@ -34,19 +34,21 @@ It features dynamic shooting mechanics, match-3 ball destruction, smooth spline-
   </tr>
 </table>
 
+<!--
 ### 🖼️ Screenshots
 <table>
   <tr>
-    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_1.png?raw=true?raw=true" width="250"/></td>
-    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_2.png?raw=true?raw=true" width="250"/></td>
-    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_3.png?raw=true?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_1.png?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_2.png?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_3.png?raw=true" width="250"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_4.png?raw=true?raw=true" width="250"/></td>
-    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_5.png?raw=true?raw=true" width="250"/></td>
-    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_4.png?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_5.png?raw=true" width="250"/></td>
+    <td><img src="https://github.com/SinlessDevil/ZumaClone/blob/main/Images/Image_6.png?raw=true" width="250"/></td>
   </tr>
 </table>
+-->
 
 ### ⚙️ Features
 - Shoot balls and switch between them mid-game  
