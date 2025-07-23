@@ -11,7 +11,9 @@ namespace Code.Infrastructure
         private const float Delay = 1.75f;
         private const float AnimationDuration = 0.65f;
         private const float TextUpdateInterval = 0.15f;
-
+        private const string BaseText = "Loading";
+        private readonly string[] DotsText = { "", ".", "..", "..." };
+        
         [SerializeField] private RectTransform _right;
         [SerializeField] private RectTransform _left;
         [SerializeField] private TMP_Text _loadingText;
@@ -80,22 +82,21 @@ namespace Code.Infrastructure
         {
             if (_textAnimationCts != null && !_textAnimationCts.IsCancellationRequested)
                 _textAnimationCts.Cancel();
+            
             _textAnimationCts?.Dispose();
             _textAnimationCts = null;
         }
 
         private async UniTaskVoid AnimateLoadingTextAsync(CancellationToken token)
         {
-            string baseText = "Loading";
-            string[] dots = { "", ".", "..", "..." };
             int index = 0;
 
             try
             {
                 while (!token.IsCancellationRequested)
                 {
-                    _loadingText.text = baseText + dots[index];
-                    index = (index + 1) % dots.Length;
+                    _loadingText.text = BaseText + DotsText[index];
+                    index = (index + 1) % DotsText.Length;
                     await UniTask.Delay(TimeSpan.FromSeconds(TextUpdateInterval), cancellationToken: token);
                 }
             }
