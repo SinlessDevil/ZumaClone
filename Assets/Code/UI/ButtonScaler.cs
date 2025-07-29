@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -47,20 +48,32 @@ namespace Code.UI
         private async UniTaskVoid ScaleButtonAsync(Vector3 targetScale, float duration, CancellationToken token)
         {
             float time = 0f;
+            if (_image == null) 
+                return;
+
             Vector3 startScale = _image.transform.localScale;
 
-            while (time < duration)
+            try
             {
-                if (token.IsCancellationRequested) 
-                    return;
+                while (time < duration && !token.IsCancellationRequested)
+                {
+                    if (this == null || _image == null)
+                        return;
 
-                float t = time / duration;
-                _image.transform.localScale = Vector3.Lerp(startScale, targetScale, t);
-                time += Time.unscaledDeltaTime;
-                await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    float t = time / duration;
+                    _image.transform.localScale = Vector3.Lerp(startScale, targetScale, t);
+                    time += Time.unscaledDeltaTime;
+                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+                }
+
+                if (this != null && _image != null)
+                    _image.transform.localScale = targetScale;
             }
-
-            _image.transform.localScale = targetScale;
+            catch (OperationCanceledException)
+            {
+                
+            }
         }
+
     }
 }
