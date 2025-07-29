@@ -1,4 +1,3 @@
-using System;
 using Code.Infrastructure.StateMachine;
 using Code.Infrastructure.StateMachine.Game.States;
 using Code.Services.PersistenceProgress;
@@ -56,6 +55,37 @@ namespace Code.Window.Setting
             _playerSettings = progressService.PlayerData.PlayerSettings;
         }
 
+        public void Initialize(TypeSettingWindow settingWindow)
+        {
+            switch (settingWindow)
+            {
+                case TypeSettingWindow.GameHud:
+                    _continueButton.gameObject.SetActive(true);
+                    _quitToMenuButton.gameObject.SetActive(true);
+                    _restartLevelButton.gameObject.SetActive(true);
+                    break;
+                case TypeSettingWindow.MenuHud:
+                    _continueButton.gameObject.SetActive(true);
+                    _quitToMenuButton.gameObject.SetActive(false);
+                    _restartLevelButton.gameObject.SetActive(false);
+                    break;
+            }
+        }
+        
+        public void UpdateWindow()
+        {
+            UpdateColor();
+            UpdateRectTransform();
+        }
+        
+        public void ResetButtonScale()
+        {
+            foreach (Button button in _buttons)
+            {
+                button.transform.localScale = Vector3.one;
+            }
+        }
+        
         private void OnEnable()
         {
             _toggleMusic.Button.onClick.AddListener(() => UpdateSetting(ref _playerSettings.Music));
@@ -110,12 +140,7 @@ namespace Code.Window.Setting
             
             _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);
         }
-
-        public void UpdateWindow()
-        {
-            UpdateColor();
-            UpdateRectTransform();
-        }
+        
         private void UpdateColor()
         {
             _toggleMusic.Image.DOColor(SelectColor(_playerSettings.Music), AnimationDuration)
@@ -125,6 +150,7 @@ namespace Code.Window.Setting
             _toggleVibrations.Image.DOColor(SelectColor(_playerSettings.Vibration), AnimationDuration)
                 .SetUpdate(true);
         }
+        
         private void UpdateRectTransform()
         {
             _toggleMusic.Image.rectTransform.DOAnchorPosX(SelectPositionX(_playerSettings.Music), AnimationDuration)
@@ -137,20 +163,5 @@ namespace Code.Window.Setting
         
         private Color SelectColor(bool value) => value ? _enabledColor : _disabledColor;
         private float SelectPositionX(bool value) => value ? 50f : -50f;
-
-        public void ResetButtonScale()
-        {
-            foreach (var button in _buttons)
-            {
-                button.transform.localScale = Vector3.one;
-            }
-        }
-    }
-
-    [Serializable]
-    public class ToggleContainer
-    {
-        public Button Button;
-        public Image Image;
     }
 }

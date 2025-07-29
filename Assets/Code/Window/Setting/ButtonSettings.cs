@@ -10,6 +10,7 @@ namespace Code.Window.Setting
     public class ButtonSettings : MonoBehaviour
     {
         [SerializeField] private Button _button;
+        [SerializeField] private TypeSettingWindow _typeSettingWindow = TypeSettingWindow.GameHud;
         
         private SettingWindow _settingWindow;
 
@@ -38,7 +39,7 @@ namespace Code.Window.Setting
 
             RectTransform prefab = _windowService.Open(WindowTypeId.Setting);
             _settingWindow = prefab.GetComponent<SettingWindow>();
-            
+            _settingWindow.Initialize(_typeSettingWindow);
             _settingWindow.UpdateWindow();
             _settingWindow.ResetButtonScale();
         }
