@@ -100,6 +100,7 @@ GameObject:
   - component: {fileID: 7826049560118132045}
   - component: {fileID: 9180430819056489450}
   - component: {fileID: 4118257383757710740}
+  - component: {fileID: 1717875673744227748}
   m_Layer: 5
   m_Name: Text_Level
   m_TagString: Untagged
@@ -255,6 +256,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1717875673744227748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4222552083303673303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836a40dddfacaeb4384366e730750713, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: lvl
+  _text: {fileID: 4118257383757710740}
+  _isDynamic: 0
 --- !u!1 &6513318366027416730
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,6 +284,7 @@ GameObject:
   - component: {fileID: 1788779953280374244}
   - component: {fileID: 6386562547093340507}
   - component: {fileID: 1522766140776697759}
+  - component: {fileID: 8589884702934886548}
   m_Layer: 5
   m_Name: Text_When_Spirals_Attack
   m_TagString: Untagged
@@ -423,6 +440,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8589884702934886548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6513318366027416730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836a40dddfacaeb4384366e730750713, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: whensprialsattack
+  _text: {fileID: 1522766140776697759}
+  _isDynamic: 0
 --- !u!1 &8493853487496672387
 GameObject:
   m_ObjectHideFlags: 0

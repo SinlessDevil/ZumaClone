@@ -197,7 +197,8 @@ namespace Code.Editor.Localization
                 LocalizeBase[] localizers = prefab.GetComponentsInChildren<LocalizeBase>(true);
                 foreach (LocalizeBase localizer in localizers)
                 {
-                    if (localizer.gameObject.name != entry.GameObjectName) continue;
+                    if (localizer.gameObject.name != entry.GameObjectName) 
+                        continue;
 
                     string oldKey = localizer.localizationKey;
                     string newKey = entry.LocalizationKey;
@@ -237,13 +238,13 @@ namespace Code.Editor.Localization
             int addedCount = 0;
 
             GameObject[] allPrefabs = Resources.LoadAll<GameObject>("");
-            foreach (var prefab in allPrefabs)
+            foreach (GameObject prefab in allPrefabs)
             {
                 if (prefab == null) 
                     continue;
 
                 string path = AssetDatabase.GetAssetPath(prefab);
-                if (string.IsNullOrEmpty(path)) 
+                if (string.IsNullOrEmpty(path) || !path.EndsWith(".prefab"))
                     continue;
 
                 GameObject root = PrefabUtility.LoadPrefabContents(path);

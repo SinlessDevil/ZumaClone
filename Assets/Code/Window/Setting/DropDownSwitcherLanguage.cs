@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using Zenject;
 
-namespace Code.Localization.Code.UI
+namespace Code.Window.Setting
 {
     public class DropDownLanguageSwitcher : MonoBehaviour
     {

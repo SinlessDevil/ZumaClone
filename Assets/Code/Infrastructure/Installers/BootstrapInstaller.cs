@@ -1,6 +1,7 @@
 using Code.Infrastructure.StateMachine;
 using Code.Infrastructure.StateMachine.Game;
 using Code.Infrastructure.StateMachine.Game.States;
+using Code.Localization.Code.Services.LocalizeLanguageService;
 using Code.Services.BallController;
 using Code.Services.Factories.Game;
 using Code.Services.Factories.UIFactory;
@@ -60,9 +61,8 @@ namespace Code.Infrastructure.Installers
         private void BindServices()
         {
             BindStaticDataService();
+            BindFactory();
             
-            Container.BindInterfacesTo<UIFactory>().AsSingle();
-            Container.BindInterfacesTo<GameFactory>().AsSingle();
             Container.BindInterfacesTo<WindowService>().AsSingle();
             Container.BindInterfacesTo<InputService>().AsSingle();
             Container.BindInterfacesTo<PersistenceProgressService>().AsSingle();
@@ -71,13 +71,25 @@ namespace Code.Infrastructure.Installers
             Container.BindInterfacesTo<BallProvider>().AsSingle();
             Container.BindInterfacesTo<WidgetProvider>().AsSingle();
             Container.BindInterfacesTo<LevelService>().AsSingle();
+            Container.BindInterfacesTo<BallChainController>().AsSingle();
+            Container.BindInterfacesTo<LevelLocalProgressService>().AsSingle();
+            
+            BindFinishServices();
+            BindAudioVibration();
+            BindLocalizeLanguage();
+        }
+
+        private void BindFactory()
+        {
+            Container.BindInterfacesTo<UIFactory>().AsSingle();
+            Container.BindInterfacesTo<GameFactory>().AsSingle();
+        }
+
+        private void BindFinishServices()
+        {
             Container.BindInterfacesTo<FinishService>().AsSingle();
             Container.BindInterfacesTo<WinService>().AsSingle();
             Container.BindInterfacesTo<LoseService>().AsSingle();
-            Container.BindInterfacesTo<BallChainController>().AsSingle();
-            Container.BindInterfacesTo<LevelLocalProgressService>().AsSingle();
-
-            BindAudioVibration();
         }
 
         private void BindAudioVibration()
@@ -85,6 +97,11 @@ namespace Code.Infrastructure.Installers
             Container.Bind<ISoundService>().To<SoundService>().AsSingle();
             Container.Bind<IMusicService>().To<MusicService>().AsSingle();
             Container.Bind<IVibrationService>().To<VibrationService>().AsSingle();
+        }
+
+        private void BindLocalizeLanguage()
+        {
+            Container.BindInterfacesTo<LocalizeLanguageService>().AsSingle();
         }
         
         private void BindGameStateMachine()

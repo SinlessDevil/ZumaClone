@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using Code.Localization.Code.Services.LocalizeLanguageService;
 
 namespace Code.Localization.Code
 {
@@ -8,18 +7,18 @@ namespace Code.Localization.Code
     public class TMP_Localizer : LocalizeBase
     {
         [SerializeField] private TMP_Text _text;
-        
-        private ILocalizeLanguageService _localizeLanguageService;
+        [SerializeField] private bool _isDynamic = false;
 
         private void OnValidate()
         {
-            if(_text == null)
+            if(_text == null) 
                 _text = GetComponent<TMP_Text>();
         }
         
-        public void Start()
+        private void Start()
         {
-            UpdateLocale();
+            if(!_isDynamic) 
+                UpdateLocale();
         }
         
         public override void UpdateLocale()
@@ -30,7 +29,7 @@ namespace Code.Localization.Code
                 return;
             }
 
-            if (!System.String.IsNullOrEmpty(localizationKey) &&
+            if (!System.String.IsNullOrEmpty(localizationKey) && 
                 Locale.currentLanguageStrings.ContainsKey(localizationKey))
             {
                 _text.text = Locale.currentLanguageStrings[localizationKey].Replace(@"\n", "" + '\n');   

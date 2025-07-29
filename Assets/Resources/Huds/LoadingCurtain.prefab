@@ -448,6 +448,7 @@ GameObject:
   - component: {fileID: 8245301671873328852}
   - component: {fileID: 1221078767789420150}
   - component: {fileID: 7500382623053582182}
+  - component: {fileID: 270943357754278478}
   m_Layer: 5
   m_Name: Text_Loading
   m_TagString: Untagged
@@ -603,3 +604,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &270943357754278478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5851812557447389215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836a40dddfacaeb4384366e730750713, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: loading
+  _text: {fileID: 7500382623053582182}
+  _isDynamic: 0
