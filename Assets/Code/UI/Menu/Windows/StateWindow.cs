@@ -33,14 +33,14 @@ namespace Code.UI.Menu.Windows
 
         private void BindWindowsToStates()
         {
-            var stateToWindowMap = new Dictionary<Type, Type>
+            Dictionary<Type, Type> stateToWindowMap = new Dictionary<Type, Type>
             {
                 { typeof(MapWindowState), typeof(MapWindow) },
                 { typeof(ShopWindowState), typeof(ShopWindow) },
                 { typeof(MetaWindowState), typeof(MetaWindow) },
             };
 
-            foreach (var entry in _behaviorsMap)
+            foreach (KeyValuePair<Type, IWindowState> entry in _behaviorsMap)
             {
                 Type stateType = entry.Key;
                 IWindowState stateInstance = entry.Value;

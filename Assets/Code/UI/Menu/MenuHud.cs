@@ -20,13 +20,13 @@ namespace Code.UI.Menu
 
         private void InitEventSystem()
         {
-            var eventSystem = FindObjectOfType<EventSystem>();
-            if (eventSystem == null)
-            {
-                var gameObjectEventSystem = new GameObject("EventSystem");
-                gameObjectEventSystem.AddComponent<EventSystem>();
-                gameObjectEventSystem.AddComponent<StandaloneInputModule>();
-            }
+            EventSystem eventSystem = FindObjectOfType<EventSystem>();
+            if (eventSystem != null)
+                return;
+            
+            GameObject gameObjectEventSystem = new GameObject("EventSystem");
+            gameObjectEventSystem.AddComponent<EventSystem>();
+            gameObjectEventSystem.AddComponent<StandaloneInputModule>();
         }
     }
 }

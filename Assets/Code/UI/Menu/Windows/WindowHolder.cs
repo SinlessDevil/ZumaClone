@@ -35,25 +35,11 @@ namespace Code.UI.Menu.Windows
             OnSwipeWindow(typeWindow);
         }
 
-        private void HideWindows()
-        {
-            _windows.ForEach(window => window.gameObject.SetActive(false));
-        }
+        private void HideWindows() => _windows.ForEach(window => window.gameObject.SetActive(false));
+        private void InitWindows() => _windows.ForEach(window => window.Initialize());
 
-        private void InitWindows()
-        {
-            _windows.ForEach(window => window.Initialize());
-        }
-        
-        private void SubscribeEvents()
-        {
-            _buttonNavigationHolder.OpenedWindowEvent += OnSwipeWindow;
-        }
-        
-        private void UnsubscribeEvents()
-        {
-            _buttonNavigationHolder.OpenedWindowEvent -= OnSwipeWindow;
-        }
+        private void SubscribeEvents() => _buttonNavigationHolder.OpenedWindowEvent += OnSwipeWindow;
+        private void UnsubscribeEvents() => _buttonNavigationHolder.OpenedWindowEvent -= OnSwipeWindow;
 
         private void OnSwipeWindow(TypeWindow typeWindow)
         {

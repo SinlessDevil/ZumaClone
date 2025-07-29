@@ -6,10 +6,10 @@ using Code.Services.Factories.UIFactory;
 using Code.Services.Levels;
 using Code.Services.PersistenceProgress;
 using Code.Services.SaveLoad;
-using Code.Services.SFX;
 using Code.Services.SFX.Sound;
 using Code.Services.StaticData;
 using Code.StaticData.Levels;
+using Code.UI.Menu.Windows.Map.Navigator;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -36,6 +36,8 @@ namespace Code.UI.Menu.Windows.Map
         private IStateMachine<IGameState> _stateMachine;
         private IStaticDataService _staticData;
         private ISoundService _soundService;
+
+        private IChapterNavigator _chapterNavigator;
         
         [Inject]
         public void Constructor(
@@ -62,6 +64,8 @@ namespace Code.UI.Menu.Windows.Map
 
         public override void Initialize()
         {
+            _chapterNavigator = new ChapterNavigator(_levelService);
+            
             foreach (var buttonSwipeChapter in _buttonsSwipeChapter)
             {
                 buttonSwipeChapter.Initialize();
@@ -94,11 +98,11 @@ namespace Code.UI.Menu.Windows.Map
             
             switch (typeSwipe)
             {
-                case TypeSwipe.Left when _currentChapterIndex > 0:
-                    _currentChapterIndex--;
+                case TypeSwipe.Left:
+                    _chapterNavigator.SwipeLeft();
                     break;
-                case TypeSwipe.Right when _currentChapterIndex < _chapters.Count - 1:
-                    _currentChapterIndex++;
+                case TypeSwipe.Right:
+                    _chapterNavigator.SwipeRight();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(typeSwipe), typeSwipe, null);
@@ -214,8 +218,8 @@ namespace Code.UI.Menu.Windows.Map
 
         private void UpdateSwipeButtons()
         {
-            _buttonsSwipeChapter[0].gameObject.SetActive(_currentChapterIndex > 0);
-            _buttonsSwipeChapter[1].gameObject.SetActive(_currentChapterIndex < _chapters.Count - 1);
+            _buttonsSwipeChapter[0].gameObject.SetActive(_chapterNavigator.CanSwipeLeft);
+            _buttonsSwipeChapter[1].gameObject.SetActive(_chapterNavigator.CanSwipeRight);
         }
 
         private void EnableButton()
