@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 836a40dddfacaeb4384366e730750713, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localizationKey: 
+  localizationKey: meta
   _text: {fileID: 2464022196661443394}
   _isDynamic: 0
 --- !u!1 &987902381745220488
@@ -1309,7 +1309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 836a40dddfacaeb4384366e730750713, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localizationKey: 
+  localizationKey: shop
   _text: {fileID: 2935323825864321829}
   _isDynamic: 0
 --- !u!1 &4836324753286047583

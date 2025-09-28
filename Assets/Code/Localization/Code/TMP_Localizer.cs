@@ -21,6 +21,8 @@ namespace Code.Localization.Code
                 UpdateLocale();
         }
         
+        public string Key => _text.text;
+        
         public override void UpdateLocale()
         {
             if (!_text)
