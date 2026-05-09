@@ -60,7 +60,7 @@ namespace MoreMountains.NiceVibrations
 
         protected virtual void HitWall()
         {
-            float intensity = _rigidBody.velocity.magnitude / 100f;
+            float intensity = _rigidBody.linearVelocity.magnitude / 100f;
             MMVibrationManager.TransientHaptic(intensity, 0.7f, true, this);
             TransientAudioSource.volume = intensity;
             StartCoroutine(LogoShaker.Shake(0.2f));

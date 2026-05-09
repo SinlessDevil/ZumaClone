@@ -120,7 +120,7 @@ namespace ToonyColorsPro
 						else
 						{
 							//Draw regular property
-							if (visible && (p.flags & (MaterialProperty.PropFlags.PerRendererData | MaterialProperty.PropFlags.HideInInspector)) == MaterialProperty.PropFlags.None)
+							if (visible && (p.propertyFlags & (ShaderPropertyFlags.PerRendererData | ShaderPropertyFlags.HideInInspector)) == ShaderPropertyFlags.None)
 							{
 								_materialEditor.ShaderProperty(p, p.displayName);
 							}

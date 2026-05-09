@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 using UnityEngine.TestTools;
+using TestMode = UnityEditor.TestTools.TestRunner.Api.TestMode;
 
 namespace Code.Editor.Tests
 {

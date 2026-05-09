@@ -15,7 +15,7 @@ namespace SRDebugger.Services
         public static Type GetProfilerServiceType()
         {
 #if UNITY_2018_1_OR_NEWER
-            if(GraphicsSettings.renderPipelineAsset != null)
+            if(GraphicsSettings.defaultRenderPipeline != null)
             {
                 return typeof(SRPProfilerService);
             }
