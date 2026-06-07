@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.svermeulen.extenject": {
+      "version": "9.2.0-stcf3",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

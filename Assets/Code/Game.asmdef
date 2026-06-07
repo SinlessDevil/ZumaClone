@@ -2,7 +2,7 @@
     "name": "Game",
     "rootNamespace": "",
     "references": [
-        "GUID:0d8beb7f090555447a6cf5ce9e54dbb4",
+        "Zenject",
         "GUID:bcc75752368a72b4aba4043ea13b2a1a",
         "GUID:05dbf8cd246c9274c8a78a65142e5f8a",
         "GUID:865b414a121ed594e91db2e09f65d38c",

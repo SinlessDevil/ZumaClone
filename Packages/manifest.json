@@ -1,5 +1,15 @@
 {
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.svermeulen.extenject"
+      ]
+    }
+  ],
   "dependencies": {
+    "com.svermeulen.extenject": "9.2.0-stcf3",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "2.0.12",
     "com.unity.collab-proxy": "2.12.4",
