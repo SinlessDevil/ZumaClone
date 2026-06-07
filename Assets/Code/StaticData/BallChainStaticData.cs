@@ -12,6 +12,7 @@ namespace Code.StaticData
         public float DurationMovingOffset = 0.2f;
         public float ChainSpringStrength = 25f;
         public float ChainGapSpringStrength = 4f;
+        public float CatchupSpeedMultiplier = 2.5f;
         [Space(10)] [Header("Attach Balls Settings")]
         public float CollisionThreshold = 1f;
         public int MatchingCount = 3;

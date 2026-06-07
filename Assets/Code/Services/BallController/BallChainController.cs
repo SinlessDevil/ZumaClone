@@ -20,8 +20,6 @@ namespace Code.Services.BallController
 {
     public class BallChainController : IBallChainController
     {
-        private bool _isBoosting = true;
-
         private List<Color> _colorItems = new();
         private int _countItems = 0;
 
@@ -29,7 +27,9 @@ namespace Code.Services.BallController
         private PathCreator _pathCreator;
         private BallChainDTO _ballChainDto;
 
-        private ChainTracker _chainTracker;
+        private readonly List<ChainSegment> _segments = new();
+        private ChainState _chainState;
+
         private ParticleChainHandler _particleChainHandler;
         private WidgetBallChainProvider _widgetBallChainProvider;
         private MouthChainHandler _mouthChainHandler;
@@ -66,36 +66,39 @@ namespace Code.Services.BallController
             _timeService = timeService;
         }
 
-        public List<Item> ActiveItems => _chainTracker.Balls.Cast<Item>().ToList();
+        public List<Item> ActiveItems => _segments.SelectMany(s => s.Balls).Cast<Item>().ToList();
 
         public void Initialize(PathCreator pathCreator, BallChainDTO ballChainDto)
         {
             _pathCreator = pathCreator;
             _ballChainDto = ballChainDto;
 
-            _chainTracker = new ChainTracker();
+            _chainState = new ChainState(_segments);
 
-            _particleChainHandler = new ParticleChainHandler(_ballChainDto, _pathCreator, _chainTracker);
+            _particleChainHandler = new ParticleChainHandler(_ballChainDto, _pathCreator, _chainState);
             _widgetBallChainProvider = new WidgetBallChainProvider(_widgetProvider, _pathCreator);
-            _mouthChainHandler = new MouthChainHandler(_particleChainHandler, _chainTracker, _levelService);
+            _mouthChainHandler = new MouthChainHandler(_particleChainHandler, _chainState, _levelService);
             _winBallChainHandler = new WinBallChainHandler(_ballChainDto, _pathCreator, _particleChainHandler,
-                _widgetBallChainProvider, _chainTracker, _inputService, _timeService, _finishService,
+                _widgetBallChainProvider, _chainState, _inputService, _timeService, _finishService,
                 _levelLocalProgressService, _levelService);
-            _loseBallChainHandler = new LoseBallChainHandler(_ballChainDto, _pathCreator, _chainTracker, _timeService,
-                _levelService, _inputService, _gameFactory, _finishService);
-            _attachingBallChainHandler = new AttachingBallChainHandler(_pathCreator, _ballChainDto, _chainTracker,
+            _loseBallChainHandler = new LoseBallChainHandler(_ballChainDto, _pathCreator, _chainState,
+                _timeService, _levelService, _inputService, _gameFactory, _finishService);
+            _attachingBallChainHandler = new AttachingBallChainHandler(_pathCreator, _ballChainDto, _segments,
                 _widgetBallChainProvider, _winBallChainHandler, _levelService, _levelLocalProgressService);
         }
 
         public void Update()
         {
-            MoveBalls();
+            UpdateSegments();
+            CheckMerges();
+            CheckLoss();
+            if (!_loseBallChainHandler.IsLose)
+                _mouthChainHandler.TryUpdateMouthProgress((float)_ballChainDto.PercentToDetectionLose / 100);
         }
 
         public void StartBallSpawning(List<Color> colorItems)
         {
-            if (_pathCreator == null)
-                return;
+            if (_pathCreator == null) return;
 
             _startBallSpawning?.Cancel();
             _startBallSpawning = new CancellationTokenSource();
@@ -114,13 +117,12 @@ namespace Code.Services.BallController
             _startBallSpawning?.Cancel();
             _pathCreator = null;
 
-            _chainTracker.ClearBalls();
+            foreach (var seg in _segments)
+                seg.Clear();
+            _segments.Clear();
+
             _colorItems.Clear();
-
             _countItems = 0;
-            _chainTracker.ResetDistanceTravelled();
-
-            _isBoosting = true;
         }
 
         public void TryAttachBall(Ball newBall)
@@ -133,27 +135,75 @@ namespace Code.Services.BallController
             await _particleChainHandler.MoveParticleAlongPathAsync(particle);
         }
 
+        private void UpdateSegments()
+        {
+            foreach (var seg in _segments)
+                seg.Update(Time.deltaTime);
+        }
+
+        private void CheckMerges()
+        {
+            for (int i = 0; i < _segments.Count - 1; i++)
+            {
+                var front = _segments[i];
+                var back = _segments[i + 1];
+
+                // Back head has reached front tail position
+                if (back.HeadLogicalDistance >= front.TailLogicalDistance - _ballChainDto.SpacingBalls)
+                {
+                    back.IsCatchingUp = false;
+                    back.CurrentSpeed = back.BaseSpeed;
+
+                    int junctionIdx = front.Count - 1;
+                    front.MergeBack(back);
+                    _segments.RemoveAt(i + 1);
+                    front.ReIndexBalls();
+
+                    _attachingBallChainHandler.CheckMatchAtJunction(front, junctionIdx);
+                    i--;
+                }
+            }
+        }
+
+        private void CheckLoss()
+        {
+            if (_segments.Count == 0) return;
+
+            var front = _segments[0];
+            while (front.Count > 0 && front.HeadLogicalDistance >= _pathCreator.path.length)
+            {
+                _loseBallChainHandler.TryLose(front.GetBall(0).transform.position);
+                front.GetBall(0).Deactivate();
+                front.RemoveBallAt(0);
+                front.SetHeadLogicalDistance(front.HeadLogicalDistance - _ballChainDto.SpacingBalls);
+            }
+
+            if (front.Count == 0)
+                _segments.RemoveAt(0);
+        }
+
         private async UniTaskVoid SpawnInitialBallsAsync(CancellationToken token)
         {
+            var segment = new ChainSegment(_pathCreator, _ballChainDto.SpacingBalls,
+                _ballChainDto.MoveSpeed, _ballChainDto.ChainSpringStrength, _ballChainDto.ChainGapSpringStrength);
+            _segments.Add(segment);
+
             for (int i = 0; i < _countItems; i++)
             {
-                if (token.IsCancellationRequested)
-                    return;
+                if (token.IsCancellationRequested) return;
 
                 Color color = _colorItems.FirstOrDefault();
                 Ball newBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
                 newBall.SetColor(color);
                 _colorItems.Remove(color);
 
-                _chainTracker.AddBall(newBall);
+                float minHead = i * _ballChainDto.SpacingBalls;
+                if (segment.HeadLogicalDistance < minHead)
+                    segment.SetHeadLogicalDistance(minHead);
+
+                float initDist = Mathf.Max(segment.HeadLogicalDistance - i * _ballChainDto.SpacingBalls, 0f);
+                segment.AddBall(newBall, initDist);
                 newBall.SetIndex(i);
-
-                float minDistance = i * _ballChainDto.SpacingBalls;
-                if (_chainTracker.DistanceTravelled < minDistance)
-                    _chainTracker.SetDistanceTravelled(minDistance);
-
-                float initDist = Mathf.Max(_chainTracker.DistanceTravelled - i * _ballChainDto.SpacingBalls, 0f);
-                _chainTracker.SetPathDistance(i, initDist);
 
                 await UniTask.Delay((int)(_ballChainDto.DurationSpawnBall * 1000), cancellationToken: token);
             }
@@ -161,73 +211,35 @@ namespace Code.Services.BallController
 
         private async UniTaskVoid BoostSpeedAsync(CancellationToken token)
         {
-            float elapsedTime = 0f;
-            float startSpeed = _ballChainDto.InitialSpeedMultiplier;
+            float elapsed = 0f;
+            float startSpeed = _ballChainDto.MoveSpeed * _ballChainDto.InitialSpeedMultiplier;
             float endSpeed = _ballChainDto.MoveSpeed;
 
-            _ballChainDto.MoveSpeed = startSpeed;
-
-            while (elapsedTime < _ballChainDto.BoostDuration)
+            while (elapsed < _ballChainDto.BoostDuration)
             {
-                elapsedTime += Time.deltaTime / 2;
-                _ballChainDto.MoveSpeed = Mathf.Lerp(startSpeed, endSpeed, elapsedTime);
+                elapsed += Time.deltaTime;
+                float speed = Mathf.Lerp(startSpeed, endSpeed, elapsed / _ballChainDto.BoostDuration);
+
+                foreach (var seg in _segments)
+                {
+                    if (!seg.IsCatchingUp)
+                    {
+                        seg.BaseSpeed = endSpeed;
+                        seg.CurrentSpeed = speed;
+                    }
+                }
+
                 await UniTask.Yield(cancellationToken: token);
             }
 
-            _isBoosting = false;
-        }
-
-        private void MoveBalls()
-        {
-            if (CurrentBalls.Count == 0)
-                return;
-
-            _chainTracker.AddDistanceTravelled(GetCurrentSpeed() * Time.deltaTime);
-
-            var path = _pathCreator.path;
-
-            for (int i = 0; i < CurrentBalls.Count; i++)
+            foreach (var seg in _segments)
             {
-                // Logical position: rigid, computed directly — no chain-propagation
-                float logicalDist = _chainTracker.DistanceTravelled - i * _ballChainDto.SpacingBalls;
-
-                if (logicalDist >= path.length)
+                if (!seg.IsCatchingUp)
                 {
-                    _loseBallChainHandler.TryLose(CurrentBalls[i].transform.position);
-                    CurrentBalls[i].Deactivate();
-                    _chainTracker.RemoveBall(CurrentBalls[i]);
-                    i--;
-                    continue;
+                    seg.BaseSpeed = endSpeed;
+                    seg.CurrentSpeed = endSpeed;
                 }
-
-                // Visual position: SmoothDamp toward logical — smooth but arrives cleanly
-                float visualDist = _chainTracker.GetPathDistance(i);
-                float vel = _chainTracker.GetVelocity(i);
-                float gap = Mathf.Abs(logicalDist - visualDist);
-                float smoothTime = gap > _ballChainDto.SpacingBalls * 1.5f
-                    ? 1f / _ballChainDto.ChainGapSpringStrength
-                    : 1f / _ballChainDto.ChainSpringStrength;
-
-                float newVisual = Mathf.SmoothDamp(visualDist, logicalDist, ref vel, smoothTime);
-                _chainTracker.SetPathDistance(i, newVisual);
-                _chainTracker.SetVelocity(i, vel);
-
-                CurrentBalls[i].transform.position = path.GetPointAtDistance(
-                    Mathf.Max(newVisual, 0f), EndOfPathInstruction.Stop);
             }
-
-            if (!_loseBallChainHandler.IsLose)
-                _mouthChainHandler.TryUpdateMouthProgress((float)_ballChainDto.PercentToDetectionLose / 100);
         }
-
-        private float GetCurrentSpeed()
-        {
-            float currentSpeed = _isBoosting
-                ? _ballChainDto.MoveSpeed * _ballChainDto.InitialSpeedMultiplier
-                : _ballChainDto.MoveSpeed;
-            return currentSpeed;
-        }
-
-        private List<Ball> CurrentBalls => _chainTracker.Balls;
     }
 }

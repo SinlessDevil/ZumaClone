@@ -10,6 +10,7 @@ namespace Code.Services.BallController
         public float DurationMovingOffset;
         public float ChainSpringStrength;
         public float ChainGapSpringStrength;
+        public float CatchupSpeedMultiplier;
 
         public float CollisionThreshold;
         public int MatchingCount;

@@ -13,7 +13,7 @@ namespace Code.Services.BallController
     {
         private readonly PathCreator _pathCreator;
         private readonly BallChainDTO _ballChainDto;
-        private readonly ChainTracker _chainTracker;
+        private readonly List<ChainSegment> _segments;
         private readonly WidgetBallChainProvider _widgetBallChainProvider;
         private readonly WinBallChainHandler _winBallChainHandler;
         private readonly ILevelService _levelService;
@@ -22,7 +22,7 @@ namespace Code.Services.BallController
         public AttachingBallChainHandler(
             PathCreator pathCreator,
             BallChainDTO ballChainDto,
-            ChainTracker chainTracker,
+            List<ChainSegment> segments,
             WidgetBallChainProvider widgetBallChainProvider,
             WinBallChainHandler winBallChainHandler,
             ILevelService levelService,
@@ -30,7 +30,7 @@ namespace Code.Services.BallController
         {
             _pathCreator = pathCreator;
             _ballChainDto = ballChainDto;
-            _chainTracker = chainTracker;
+            _segments = segments;
             _widgetBallChainProvider = widgetBallChainProvider;
             _winBallChainHandler = winBallChainHandler;
             _levelService = levelService;
@@ -39,84 +39,107 @@ namespace Code.Services.BallController
 
         public void TryAttachBall(Ball newBall)
         {
-            var collision = GetClosestCollision(newBall);
-            if (collision == null)
-                return;
+            var (segment, index) = FindClosestCollision(newBall);
+            if (segment == null) return;
 
-            InsertBallToChainByDistance(newBall, collision);
+            InsertBallToSegment(newBall, segment, index);
         }
 
-        private CollisionData GetClosestCollision(Ball newBall)
+        // Called by BallChainController after two segments merge
+        public void CheckMatchAtJunction(ChainSegment segment, int junctionIdx)
         {
-            float minDistance = float.MaxValue;
-            CollisionData closest = null;
+            if (segment.Count == 0) return;
 
-            for (int i = 0; i < _chainTracker.Balls.Count; i++)
+            junctionIdx = Mathf.Clamp(junctionIdx, 0, segment.Count - 1);
+            var balls = segment.Balls.ToList();
+            Ball anchor = balls[junctionIdx];
+            var matches = FindMatchesAroundBall(anchor, balls);
+
+            if (matches.Count >= _ballChainDto.MatchingCount)
             {
-                Ball existingBall = _chainTracker.Balls[i];
-                float distance = Vector3.Distance(existingBall.transform.position, newBall.transform.position);
+                int score = matches.Count *
+                    _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
+                _levelLocalProgressService.AddScore(score);
+                _widgetBallChainProvider.SetUpWidget(matches, anchor, score);
+                _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
 
-                if (distance <= _ballChainDto.CollisionThreshold && distance < minDistance)
+                DestroyAndSplit(matches, segment).Forget();
+            }
+        }
+
+        private (ChainSegment segment, int index) FindClosestCollision(Ball newBall)
+        {
+            float minDist = float.MaxValue;
+            ChainSegment closest = null;
+            int closestIndex = -1;
+
+            foreach (var segment in _segments)
+            {
+                for (int i = 0; i < segment.Count; i++)
                 {
-                    closest = new CollisionData { Ball = existingBall, Distance = distance, Index = i };
-                    minDistance = distance;
+                    float dist = Vector3.Distance(segment.GetBall(i).transform.position,
+                        newBall.transform.position);
+
+                    if (dist <= _ballChainDto.CollisionThreshold && dist < minDist)
+                    {
+                        minDist = dist;
+                        closest = segment;
+                        closestIndex = i;
+                    }
                 }
             }
 
-            return closest;
+            return (closest, closestIndex);
         }
 
-        private void InsertBallToChainByDistance(Ball newBall, CollisionData collision)
+        private void InsertBallToSegment(Ball newBall, ChainSegment segment, int collisionIndex)
         {
             var path = _pathCreator.path;
-
             float newBallDist = path.GetClosestDistanceAlongPath(newBall.transform.position);
-            float closestBallDist = path.GetClosestDistanceAlongPath(collision.Ball.transform.position);
+            float collidedDist = path.GetClosestDistanceAlongPath(
+                segment.GetBall(collisionIndex).transform.position);
 
-            if (collision.Index == _chainTracker.Balls.Count - 1 && newBallDist < closestBallDist)
-                AttachBallToChain(newBall, _chainTracker.Balls.Count);
-            else if (collision.Index == 0 && newBallDist > closestBallDist)
-                AttachBallToChain(newBall, 0);
+            int insertIndex;
+            if (collisionIndex == segment.Count - 1 && newBallDist < collidedDist)
+                insertIndex = segment.Count;
+            else if (collisionIndex == 0 && newBallDist > collidedDist)
+                insertIndex = 0;
             else
-            {
-                int insertIndex = (newBallDist > closestBallDist) ? collision.Index : collision.Index + 1;
-                AttachBallToChain(newBall, insertIndex);
-            }
-        }
+                insertIndex = newBallDist > collidedDist ? collisionIndex : collisionIndex + 1;
 
-        private void AttachBallToChain(Ball newBall, int index)
-        {
             newBall.Dispose();
 
-            float initialPathDist = _pathCreator.path.GetClosestDistanceAlongPath(newBall.transform.position);
-            _chainTracker.InsertBall(index, newBall, initialPathDist);
-            _chainTracker.AddDistanceTravelled(_ballChainDto.SpacingBalls);
+            float initialPathDist = path.GetClosestDistanceAlongPath(newBall.transform.position);
+            segment.InsertBall(insertIndex, newBall, initialPathDist);
+            segment.SetHeadLogicalDistance(segment.HeadLogicalDistance + _ballChainDto.SpacingBalls);
+            segment.ReIndexBalls();
 
-            ReIndexBalls();
-            SlideIntoSlotAndCheckMatches(newBall).Forget();
+            SlideInAndCheckMatches(newBall).Forget();
         }
 
-        private async UniTaskVoid SlideIntoSlotAndCheckMatches(Ball ball)
+        private async UniTaskVoid SlideInAndCheckMatches(Ball ball)
         {
             await UniTask.Delay((int)(_ballChainDto.DurationMovingOffset * 1000));
-            await CheckAndDestroyMatches(ball, _chainTracker.Balls);
+            await CheckAndDestroyMatches(ball);
         }
 
-        private async UniTask CheckAndDestroyMatches(Ball pivotBall, List<Ball> balls)
+        private async UniTask CheckAndDestroyMatches(Ball pivotBall)
         {
-            var matchingBalls = FindMatchesAroundBall(pivotBall, balls);
+            ChainSegment segment = FindSegmentOf(pivotBall);
+            if (segment == null) return;
 
-            if (matchingBalls.Count >= _ballChainDto.MatchingCount)
+            var balls = segment.Balls.ToList();
+            var matches = FindMatchesAroundBall(pivotBall, balls);
+
+            if (matches.Count >= _ballChainDto.MatchingCount)
             {
-                int score = matchingBalls.Count * _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
+                int score = matches.Count *
+                    _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
                 _levelLocalProgressService.AddScore(score);
-                _widgetBallChainProvider.SetUpWidget(matchingBalls, pivotBall, score);
-                _winBallChainHandler.TryWin(balls.Count - matchingBalls.Count);
+                _widgetBallChainProvider.SetUpWidget(matches, pivotBall, score);
+                _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
 
-                int junctionIndex = matchingBalls.Min(b => b.Index) - 1;
-
-                await DestroyBalls(matchingBalls, balls);
-                await CheckChainReaction(junctionIndex, balls);
+                await DestroyAndSplit(matches, segment);
             }
             else
             {
@@ -124,60 +147,53 @@ namespace Code.Services.BallController
             }
         }
 
-        // Recursively checks for new matches after a group is destroyed.
-        // junctionIndex points to the ball just before the destroyed group.
-        private async UniTask CheckChainReaction(int junctionIndex, List<Ball> balls)
+        private async UniTask DestroyAndSplit(List<Ball> matchBalls, ChainSegment segment)
         {
-            if (balls.Count == 0 || _winBallChainHandler.IsWin)
-                return;
+            await UniTask.WhenAll(matchBalls.Select(WaitForDestroyAnimation));
 
-            junctionIndex = Mathf.Clamp(junctionIndex, 0, balls.Count - 1);
-            Ball anchor = balls[junctionIndex];
-            var matchingBalls = FindMatchesAroundBall(anchor, balls);
+            int lowestIndex = matchBalls.Min(b => b.Index);
 
-            if (matchingBalls.Count >= _ballChainDto.MatchingCount)
+            // Remove from high to low to preserve indices during removal
+            foreach (var ball in matchBalls.OrderByDescending(b => b.Index))
             {
-                int score = matchingBalls.Count * _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
-                _levelLocalProgressService.AddScore(score);
-                _widgetBallChainProvider.SetUpWidget(matchingBalls, anchor, score);
-                _winBallChainHandler.TryWin(balls.Count - matchingBalls.Count);
-
-                int nextJunctionIndex = matchingBalls.Min(b => b.Index) - 1;
-
-                await DestroyBalls(matchingBalls, balls);
-                await CheckChainReaction(nextJunctionIndex, balls);
-            }
-        }
-
-        private async UniTask DestroyBalls(List<Ball> matchingBalls, List<Ball> allBalls)
-        {
-            await UniTask.WhenAll(matchingBalls.Select(WaitForDestroyAnimation));
-
-            int lowestIndex = matchingBalls.Min(b => b.Index);
-            float gapSize = matchingBalls.Count * _ballChainDto.SpacingBalls;
-
-            foreach (var ball in matchingBalls)
-            {
-                allBalls.Remove(ball);
+                segment.RemoveBallAt(ball.Index);
                 ball.Deactivate();
             }
-            ReIndexBalls();
 
-            // After re-index: lowestIndex-1 = last of A, lowestIndex = first of B
-            int frontIdx = lowestIndex - 1;
-            int backIdx = lowestIndex;
-            bool chainReactionPending = frontIdx >= 0
-                && backIdx < allBalls.Count
-                && allBalls[frontIdx].Color == allBalls[backIdx].Color;
-
-            if (chainReactionPending)
+            // Split remaining balls after match into back segment
+            if (lowestIndex < segment.Count)
             {
-                // Combo incoming: front segment (A) retreats backward toward back segment (B)
-                _chainTracker.SetDistanceTravelled(
-                    Mathf.Max(_chainTracker.DistanceTravelled - gapSize, 0f));
+                ChainSegment back = segment.SplitAt(lowestIndex);
+                segment.ReIndexBalls();
+                back.ReIndexBalls();
+
+                int segIdx = _segments.IndexOf(segment);
+
+                if (segment.Count > 0)
+                {
+                    // Front has balls — back catches up
+                    back.IsCatchingUp = true;
+                    back.CurrentSpeed = back.BaseSpeed * _ballChainDto.CatchupSpeedMultiplier;
+                    _segments.Insert(segIdx + 1, back);
+                }
+                else
+                {
+                    // Front is empty — back becomes the lead, no one to catch
+                    _segments[segIdx] = back;
+                }
             }
-            // else: no combo → back segment (B) springs forward to A naturally
+            else
+            {
+                segment.ReIndexBalls();
+            }
+
+            // Clean up empty front segment
+            if (segment.Count == 0 && _segments.Contains(segment))
+                _segments.Remove(segment);
         }
+
+        private ChainSegment FindSegmentOf(Ball ball) =>
+            _segments.FirstOrDefault(s => s.Balls.Contains(ball));
 
         private UniTask WaitForDestroyAnimation(Ball ball)
         {
@@ -204,19 +220,6 @@ namespace Code.Services.BallController
             }
 
             return matching;
-        }
-
-        private void ReIndexBalls()
-        {
-            for (int i = 0; i < _chainTracker.Balls.Count; i++)
-                _chainTracker.Balls[i].SetIndex(i);
-        }
-
-        private class CollisionData
-        {
-            public Ball Ball;
-            public float Distance;
-            public int Index;
         }
     }
 }
