@@ -10,6 +10,8 @@ namespace Code.StaticData
         public float MoveSpeed = 0.25f;
         public float SpacingBalls = 0.35f;
         public float DurationMovingOffset = 0.2f;
+        public float ChainSpringStrength = 25f;
+        public float ChainGapSpringStrength = 4f;
         [Space(10)] [Header("Attach Balls Settings")]
         public float CollisionThreshold = 1f;
         public int MatchingCount = 3;

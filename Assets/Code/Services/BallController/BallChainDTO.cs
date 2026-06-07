@@ -8,6 +8,8 @@ namespace Code.Services.BallController
         public float MoveSpeed;
         public float SpacingBalls;
         public float DurationMovingOffset;
+        public float ChainSpringStrength;
+        public float ChainGapSpringStrength;
 
         public float CollisionThreshold;
         public int MatchingCount;

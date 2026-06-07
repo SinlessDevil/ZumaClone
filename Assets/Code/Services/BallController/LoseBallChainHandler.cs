@@ -66,7 +66,6 @@ namespace Code.Services.BallController
             _inputService.Cleanup();
             
             _gameFactory.Player.PlayerAnimator.PlayLoopRotation();
-            _ballChainDto.DurationMovingOffset = _ballChainDto.BoostSpeedBallForLose;
             await UniTask.WaitUntil(() => _chainTracker.Balls.Count == 0);
             _gameFactory.Player.PlayerAnimator.StopRotation();
             await UniTask.Delay(1000);

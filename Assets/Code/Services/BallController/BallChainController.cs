@@ -140,17 +140,21 @@ namespace Code.Services.BallController
                 if (token.IsCancellationRequested)
                     return;
 
-                var color = _colorItems.FirstOrDefault();
-
-                float spawnDistance = i * _ballChainDto.SpacingBalls;
-                Ball newBall = _ballProvider.GetBall(_pathCreator.path.GetPointAtDistance(spawnDistance),
-                    Quaternion.identity);
+                Color color = _colorItems.FirstOrDefault();
+                Ball newBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
                 newBall.SetColor(color);
-
                 _colorItems.Remove(color);
 
-                AddBall(newBall);
+                _chainTracker.AddBall(newBall);
                 newBall.SetIndex(i);
+
+                float minDistance = i * _ballChainDto.SpacingBalls;
+                if (_chainTracker.DistanceTravelled < minDistance)
+                    _chainTracker.SetDistanceTravelled(minDistance);
+
+                float initDist = Mathf.Max(_chainTracker.DistanceTravelled - i * _ballChainDto.SpacingBalls, 0f);
+                _chainTracker.SetPathDistance(i, initDist);
+
                 await UniTask.Delay((int)(_ballChainDto.DurationSpawnBall * 1000), cancellationToken: token);
             }
         }
@@ -175,65 +179,45 @@ namespace Code.Services.BallController
 
         private void MoveBalls()
         {
-            if (_chainTracker.Balls.Count == 0)
+            if (CurrentBalls.Count == 0)
                 return;
 
-            var currentSpeed = GetCurrentSpeed();
-            _chainTracker.AddDistanceTravelled(currentSpeed * Time.deltaTime);
+            _chainTracker.AddDistanceTravelled(GetCurrentSpeed() * Time.deltaTime);
 
-            MoveFistBall();
-            HandleRemoveBallNearEndOfPath(CurrentBalls[0]);
+            var path = _pathCreator.path;
 
-            for (int i = 1; i < CurrentBalls.Count; i++)
+            for (int i = 0; i < CurrentBalls.Count; i++)
             {
-                MoveBall(CurrentBalls[i], i);
+                // Logical position: rigid, computed directly — no chain-propagation
+                float logicalDist = _chainTracker.DistanceTravelled - i * _ballChainDto.SpacingBalls;
 
-                if (HandleRemoveBallNearEndOfPath(CurrentBalls[i]))
+                if (logicalDist >= path.length)
+                {
+                    _loseBallChainHandler.TryLose(CurrentBalls[i].transform.position);
+                    CurrentBalls[i].Deactivate();
+                    _chainTracker.RemoveBall(CurrentBalls[i]);
                     i--;
+                    continue;
+                }
+
+                // Visual position: SmoothDamp toward logical — smooth but arrives cleanly
+                float visualDist = _chainTracker.GetPathDistance(i);
+                float vel = _chainTracker.GetVelocity(i);
+                float gap = Mathf.Abs(logicalDist - visualDist);
+                float smoothTime = gap > _ballChainDto.SpacingBalls * 1.5f
+                    ? 1f / _ballChainDto.ChainGapSpringStrength
+                    : 1f / _ballChainDto.ChainSpringStrength;
+
+                float newVisual = Mathf.SmoothDamp(visualDist, logicalDist, ref vel, smoothTime);
+                _chainTracker.SetPathDistance(i, newVisual);
+                _chainTracker.SetVelocity(i, vel);
+
+                CurrentBalls[i].transform.position = path.GetPointAtDistance(
+                    Mathf.Max(newVisual, 0f), EndOfPathInstruction.Stop);
             }
 
             if (!_loseBallChainHandler.IsLose)
                 _mouthChainHandler.TryUpdateMouthProgress((float)_ballChainDto.PercentToDetectionLose / 100);
-        }
-
-        private void MoveBall(Ball ball, int index)
-        {
-            float rawTargetDistance = _chainTracker.DistanceTravelled - (index * _ballChainDto.SpacingBalls);
-            float targetDistance = Mathf.Clamp(rawTargetDistance, 0f, _pathCreator.path.length - 0.1f);
-            float currentSpeed = Time.deltaTime / _ballChainDto.DurationMovingOffset;
-            
-            if (_loseBallChainHandler.IsLose)
-            {
-                currentSpeed = Time.deltaTime / (_ballChainDto.DurationMovingOffset + index * 0.03f);
-            }
-            
-            Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance, EndOfPathInstruction.Stop);
-            ball.transform.position = Vector3.Lerp(ball.transform.position, targetPosition,
-                currentSpeed);
-            
-        }
-
-        private void MoveFistBall()
-        {
-            float targetDistance = Mathf.Clamp(_chainTracker.DistanceTravelled, 0f, _pathCreator.path.length - 0.01f);
-            Vector3 targetPosition = _pathCreator.path.GetPointAtDistance(targetDistance, EndOfPathInstruction.Stop);
-            CurrentBalls[0].transform.position = Vector3.Lerp(CurrentBalls[0].transform.position, targetPosition,
-                Time.deltaTime / _ballChainDto.DurationMovingOffset);
-        }
-
-        private bool HandleRemoveBallNearEndOfPath(Ball ball)
-        {
-            var currentPosition = ball.transform.position;
-
-            if (_pathCreator.path.GetClosestDistanceAlongPath(currentPosition) >= _pathCreator.path.length - 0.1f)
-            {
-                _loseBallChainHandler.TryLose(ball.transform.position);
-
-                ball.Deactivate();
-                _chainTracker.RemoveBall(ball);
-                return true;
-            }
-            return false;
         }
 
         private float GetCurrentSpeed()
@@ -242,21 +226,6 @@ namespace Code.Services.BallController
                 ? _ballChainDto.MoveSpeed * _ballChainDto.InitialSpeedMultiplier
                 : _ballChainDto.MoveSpeed;
             return currentSpeed;
-        }
-
-        private void AddBall(Ball ball)
-        {
-            if (CurrentBalls.Count == 0)
-            {
-                ball.transform.position = _pathCreator.path.GetPointAtDistance(_chainTracker.DistanceTravelled);
-            }
-            else
-            {
-                Vector3 lastBallPosition = CurrentBalls[^1].transform.position;
-                ball.transform.position = lastBallPosition;
-            }
-
-            _chainTracker.AddBall(ball);
         }
 
         private List<Ball> CurrentBalls => _chainTracker.Balls;

@@ -88,18 +88,18 @@ namespace Code.Services.BallController
         {
             newBall.Dispose();
 
-            _chainTracker.InsertBall(index, newBall);
+            float initialPathDist = _pathCreator.path.GetClosestDistanceAlongPath(newBall.transform.position);
+            _chainTracker.InsertBall(index, newBall, initialPathDist);
             _chainTracker.AddDistanceTravelled(_ballChainDto.SpacingBalls);
 
             ReIndexBalls();
-
-            WaitToCheckAndDestroyMatches(newBall).Forget();
+            SlideIntoSlotAndCheckMatches(newBall).Forget();
         }
 
-        private async UniTask WaitToCheckAndDestroyMatches(Ball insertedBall)
+        private async UniTaskVoid SlideIntoSlotAndCheckMatches(Ball ball)
         {
             await UniTask.Delay((int)(_ballChainDto.DurationMovingOffset * 1000));
-            await CheckAndDestroyMatches(insertedBall, _chainTracker.Balls);
+            await CheckAndDestroyMatches(ball, _chainTracker.Balls);
         }
 
         private async UniTask CheckAndDestroyMatches(Ball pivotBall, List<Ball> balls)
@@ -131,8 +131,6 @@ namespace Code.Services.BallController
             if (balls.Count == 0 || _winBallChainHandler.IsWin)
                 return;
 
-            await UniTask.Delay((int)(_ballChainDto.DurationMovingOffset * 1000));
-
             junctionIndex = Mathf.Clamp(junctionIndex, 0, balls.Count - 1);
             Ball anchor = balls[junctionIndex];
             var matchingBalls = FindMatchesAroundBall(anchor, balls);
@@ -151,19 +149,34 @@ namespace Code.Services.BallController
             }
         }
 
-        // Waits for ALL destroy animations to finish, then removes balls and contracts the chain at once.
         private async UniTask DestroyBalls(List<Ball> matchingBalls, List<Ball> allBalls)
         {
             await UniTask.WhenAll(matchingBalls.Select(WaitForDestroyAnimation));
+
+            int lowestIndex = matchingBalls.Min(b => b.Index);
+            float gapSize = matchingBalls.Count * _ballChainDto.SpacingBalls;
 
             foreach (var ball in matchingBalls)
             {
                 allBalls.Remove(ball);
                 ball.Deactivate();
             }
-
-            _chainTracker.SubtractDistanceTravelled(matchingBalls.Count * _ballChainDto.SpacingBalls);
             ReIndexBalls();
+
+            // After re-index: lowestIndex-1 = last of A, lowestIndex = first of B
+            int frontIdx = lowestIndex - 1;
+            int backIdx = lowestIndex;
+            bool chainReactionPending = frontIdx >= 0
+                && backIdx < allBalls.Count
+                && allBalls[frontIdx].Color == allBalls[backIdx].Color;
+
+            if (chainReactionPending)
+            {
+                // Combo incoming: front segment (A) retreats backward toward back segment (B)
+                _chainTracker.SetDistanceTravelled(
+                    Mathf.Max(_chainTracker.DistanceTravelled - gapSize, 0f));
+            }
+            // else: no combo → back segment (B) springs forward to A naturally
         }
 
         private UniTask WaitForDestroyAnimation(Ball ball)
