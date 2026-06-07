@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <ui:ScrollView>
+
+        <!-- ── Existing Enum ──────────────────────────────────────────────────── -->
+        <ui:GroupBox name="enum-box" text="Existing Enum" class="section-box">
+            <ui:TextField name="enum-preview-field" label="VibrationType" multiline="true" class="enum-field" />
+        </ui:GroupBox>
+
+        <!-- ── Vibrations ─────────────────────────────────────────────────────── -->
+        <ui:GroupBox name="vibrations-box" text="Vibrations" class="section-box">
+            <ui:TextField name="search-field" label="Search" />
+            <ui:ScrollView name="vibrations-scroll" class="list-scroll">
+                <ui:VisualElement name="vibrations-list" />
+            </ui:ScrollView>
+            <ui:Button name="add-btn" text="Add Vibration" class="btn-green btn-add" />
+        </ui:GroupBox>
+
+        <!-- ── Generation ────────────────────────────────────────────────────── -->
+        <ui:GroupBox name="generation-box" text="Generation" class="section-box">
+            <ui:Button name="generate-btn" text="Generate Enum" class="btn-green btn-tall" />
+        </ui:GroupBox>
+
+    </ui:ScrollView>
+</ui:UXML>

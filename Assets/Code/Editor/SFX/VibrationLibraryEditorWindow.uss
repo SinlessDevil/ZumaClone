@@ -1,0 +1,42 @@
+.section-box {
+    margin: 4px;
+    padding: 4px;
+}
+
+.btn-tall { height: 32px; }
+.btn-add  { height: 28px; margin-top: 4px; }
+
+.btn-green { background-color: rgb(60, 160, 60); color: rgb(220, 220, 220); }
+.btn-green:hover { background-color: rgb(75, 185, 75); }
+
+.btn-red { background-color: rgb(160, 50, 50); color: rgb(220, 220, 220); margin-top: 4px; }
+.btn-red:hover { background-color: rgb(190, 65, 65); }
+
+.enum-field {
+    height: 88px;
+    margin: 2px 0;
+}
+
+.enum-field > .unity-base-field__input {
+    height: 88px;
+    white-space: normal;
+}
+
+.list-scroll {
+    height: 500px;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+    margin: 4px 0;
+}
+
+.vibration-item {
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 0, 0, 0.15);
+    margin-bottom: 1px;
+    padding: 0 4px;
+}
+
+.vibration-item > Foldout > .unity-foldout__toggle {
+    background-color: rgba(0, 0, 0, 0.08);
+}

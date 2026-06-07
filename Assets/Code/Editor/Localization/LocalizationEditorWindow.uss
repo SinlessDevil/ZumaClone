@@ -1,0 +1,104 @@
+.section-spacing {
+    height: 12px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.btn-tall {
+    height: 32px;
+    margin-top: 4px;
+}
+
+.btn-green  { background-color: rgb(60,  160, 60);  color: rgb(220, 220, 220); }
+.btn-red    { background-color: rgb(160, 50,  50);  color: rgb(220, 220, 220); }
+.btn-blue   { background-color: rgb(50,  120, 170); color: rgb(220, 220, 220); }
+.btn-lightblue { background-color: rgb(50, 155, 205); color: rgb(220, 220, 220); }
+
+.btn-green:hover    { background-color: rgb(75,  185, 75);  }
+.btn-red:hover      { background-color: rgb(190, 65,  65);  }
+.btn-blue:hover     { background-color: rgb(65,  145, 200); }
+.btn-lightblue:hover { background-color: rgb(70, 175, 225); }
+
+/* ── Table chrome ─────────────────────────────────────────────────────────── */
+
+.table-container {
+    margin: 4px 0;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.table-header-row {
+    flex-direction: row;
+    background-color: rgba(0, 0, 0, 0.22);
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 0, 0, 0.3);
+}
+
+.table-header-label {
+    -unity-font-style: bold;
+    font-size: 11px;
+    padding: 3px 4px;
+    overflow: hidden;
+}
+
+.table-row {
+    flex-direction: row;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.table-row:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Cell borders */
+.cell-key, .cell-name, .cell-parent, .cell-path {
+    border-right-width: 1px;
+    border-right-color: rgba(0, 0, 0, 0.2);
+}
+
+/* ── Entries table columns (key=240 | value=flex) ────────────────────────── */
+
+.cell-key {
+    width: 240px;
+    min-width: 240px;
+    flex-shrink: 0;
+}
+
+.cell-value {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+/* ── Assets table columns (name=150 | parent=120 | path=flex | key=180) ──── */
+
+.cell-name {
+    width: 150px;
+    min-width: 150px;
+    flex-shrink: 0;
+}
+
+.cell-parent {
+    width: 120px;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+.cell-path {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 80px;
+}
+
+.cell-lockey {
+    width: 180px;
+    min-width: 180px;
+    flex-shrink: 0;
+}
+
+/* Readonly cell tint */
+.cell-readonly > .unity-base-field__input {
+    background-color: rgba(0, 0, 0, 0.12);
+}

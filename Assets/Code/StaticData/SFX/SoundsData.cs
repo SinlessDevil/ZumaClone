@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Code.StaticData.SFX
 {
     [CreateAssetMenu(fileName = "SoundData", menuName = "StaticData/SoundsData")]
-    public class SoundsData : SerializedScriptableObject
+    public class SoundsData : ScriptableObject
     { 
         public List<SoundData> Sounds2DData = new();
         public List<Sound3DData> Sounds3DData = new();

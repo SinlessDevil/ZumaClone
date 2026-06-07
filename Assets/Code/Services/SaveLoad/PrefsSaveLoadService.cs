@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Text;
 using Code.Services.PersistenceProgress;
 using Code.Services.PersistenceProgress.Player;
-using Sirenix.Serialization;
 using UnityEngine;
 
 namespace Code.Services.SaveLoad
@@ -21,7 +21,7 @@ namespace Code.Services.SaveLoad
         
         public void Save(PlayerData playerData)
         {
-            byte[] serializedValue = SerializationUtility.SerializeValue(playerData, DataFormat.JSON);
+            byte[] serializedValue = Encoding.UTF8.GetBytes(JsonUtility.ToJson(playerData));
             string base64String = Convert.ToBase64String(serializedValue);
             PlayerPrefs.SetString(key: PlayerDataKey, base64String);
             PlayerPrefs.Save();
@@ -36,7 +36,7 @@ namespace Code.Services.SaveLoad
                 return null;
 
             byte[] serializedValue = Convert.FromBase64String(base64String);
-            return SerializationUtility.DeserializeValue<PlayerData>(serializedValue, DataFormat.JSON);
+            return JsonUtility.FromJson<PlayerData>(Encoding.UTF8.GetString(serializedValue));
         }
     }
 }

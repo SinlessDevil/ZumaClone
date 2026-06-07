@@ -2,18 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 using TestMode = UnityEditor.TestTools.TestRunner.Api.TestMode;
 
 namespace Code.Editor.Tests
 {
-    public class TestsToolWindow : OdinEditorWindow
+    public class TestsToolWindow : EditorWindow
     {
+        private const string UxmlPath = "Assets/Code/Editor/Tests/TestsToolWindow.uxml";
+        private const string UssPath  = "Assets/Code/Editor/Tests/TestsToolWindow.uss";
+
+        private readonly List<GroupedTestGroup> _groupedEditMode = new();
+        private readonly List<GroupedTestGroup> _groupedPlayMode = new();
+
+        private VisualElement _editModeContainer;
+        private VisualElement _playModeContainer;
+
         [MenuItem("Tools/Tests Tool Window", false, 2000)]
         private static void OpenWindow()
         {
@@ -22,213 +30,147 @@ namespace Code.Editor.Tests
             window.Show();
         }
 
-        [FoldoutGroup("Grouped Edit Mode", expanded: false)] [TableList]
-        public List<GroupedTestGroup> GroupedEditMode = new();
+        public void CreateGUI()
+        {
+            AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath).CloneTree(rootVisualElement);
+            rootVisualElement.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(UssPath));
 
-        [FoldoutGroup("Grouped Play Mode", expanded: false)] [TableList]
-        public List<GroupedTestGroup> GroupedPlayMode = new();
+            _editModeContainer = rootVisualElement.Q<VisualElement>("edit-mode-container");
+            _playModeContainer = rootVisualElement.Q<VisualElement>("play-mode-container");
 
-        public void OnEnable() => RefreshTests();
+            rootVisualElement.Q<Button>("find-btn").clicked           += RefreshTests;
+            rootVisualElement.Q<Button>("add-ignore-btn").clicked     += AddIgnoreAttributeTests;
+            rootVisualElement.Q<Button>("remove-ignore-btn").clicked  += RemoveIgnoreAttributeTests;
+            rootVisualElement.Q<Button>("open-runner-btn").clicked    += OpenTestRunner;
 
-        [Button("🔍 Find All Tests", ButtonSizes.Large), GUIColor(0.3f, 0.6f, 1f)]
+            RefreshTests();
+        }
+
+        // ── Actions ───────────────────────────────────────────────────────────────
+
         private void RefreshTests()
         {
-            GroupedEditMode.Clear();
-            GroupedPlayMode.Clear();
+            _groupedEditMode.Clear();
+            _groupedPlayMode.Clear();
 
             var api = new TestRunnerApi();
-            api.RetrieveTestList(TestMode.EditMode, root => CollectTestsRecursive(root, TestPlatform.EditMode));
-            api.RetrieveTestList(TestMode.PlayMode, root => CollectTestsRecursive(root, TestPlatform.PlayMode));
+            api.RetrieveTestList(TestMode.EditMode, root =>
+            {
+                CollectTestsRecursive(root, TestPlatform.EditMode);
+                RebuildContainer(_editModeContainer, _groupedEditMode);
+            });
+            api.RetrieveTestList(TestMode.PlayMode, root =>
+            {
+                CollectTestsRecursive(root, TestPlatform.PlayMode);
+                RebuildContainer(_playModeContainer, _groupedPlayMode);
+            });
         }
 
-        [Button("➕ Add [Ignore] Attribute Tests", ButtonSizes.Large), GUIColor(1f, 0.6f, 0.2f)]
         private void AddIgnoreAttributeTests()
         {
-            var testsToIgnore = GroupedEditMode.Concat(GroupedPlayMode)
+            var tests = _groupedEditMode.Concat(_groupedPlayMode)
                 .SelectMany(g => g.Tests)
                 .Where(t => !t.Enabled && t.IsChanged);
-            AddIgnoreAttributes(testsToIgnore);
+            AddIgnoreAttributes(tests);
         }
 
-        [Button("➖ Remove [Ignore] Attribute Tests", ButtonSizes.Large), GUIColor(1f, 0.3f, 0.3f)]
         private void RemoveIgnoreAttributeTests()
         {
-            var testsToRestore = GroupedEditMode.Concat(GroupedPlayMode)
+            var tests = _groupedEditMode.Concat(_groupedPlayMode)
                 .SelectMany(g => g.Tests)
                 .Where(t => t.Enabled && t.IsChanged);
-            RemoveIgnoreAttributes(testsToRestore);
+            RemoveIgnoreAttributes(tests);
         }
 
-        [Button("📋 Open Test Runner", ButtonSizes.Large), GUIColor(0.8f, 0.8f, 1f)]
         private void OpenTestRunner()
         {
-            var testRunnerType =
-                Type.GetType("UnityEditor.TestTools.TestRunner.TestRunnerWindow,UnityEditor.TestRunner");
-            if (testRunnerType != null)
-            {
-                GetWindow(testRunnerType, false, "Test Runner");
-            }
+            var type = Type.GetType("UnityEditor.TestTools.TestRunner.TestRunnerWindow,UnityEditor.TestRunner");
+            if (type != null)
+                GetWindow(type, false, "Test Runner");
             else
-            {
                 Debug.LogWarning("Test Runner Window not found. Make sure 'Test Framework' package is installed.");
-            }
         }
 
-        private void AddIgnoreAttributes(IEnumerable<TestCaseConfig> tests)
+        // ── UI rebuild ────────────────────────────────────────────────────────────
+
+        private static void RebuildContainer(VisualElement container, List<GroupedTestGroup> groups)
         {
-            var testsByFile = new Dictionary<string, List<string>>();
-
-            foreach (var test in tests)
-            {
-                var methodName = test.FullName.Split('.').Last();
-                var files = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
-
-                foreach (var file in files)
-                {
-                    if (File.ReadAllText(file).Contains($" {methodName}("))
-                    {
-                        if (!testsByFile.ContainsKey(file))
-                            testsByFile[file] = new List<string>();
-
-                        testsByFile[file].Add(methodName);
-                        break;
-                    }
-                }
-            }
-
-            foreach (var kvp in testsByFile)
-            {
-                var file = kvp.Key;
-                var methodNames = kvp.Value;
-                var lines = File.ReadAllLines(file).ToList();
-                bool modified = false;
-
-                for (int i = 0; i < lines.Count; i++)
-                {
-                    foreach (var methodName in methodNames)
-                    {
-                        if (lines[i].Contains($" {methodName}("))
-                        {
-                            int attrStart = i - 1;
-                            while (attrStart >= 0 && lines[attrStart].Trim().StartsWith("["))
-                            {
-                                attrStart--;
-                            }
-
-                            attrStart++;
-                            
-                            bool alreadyHasIgnore = false;
-                            for (int j = attrStart; j < i; j++)
-                            {
-                                if (lines[j].Contains("Ignore("))
-                                {
-                                    alreadyHasIgnore = true;
-                                    break;
-                                }
-                            }
-
-                            if (alreadyHasIgnore)
-                                continue;
-                            
-                            for (int j = attrStart; j < i; j++)
-                            {
-                                if (lines[j].Contains("[Test") || lines[j].Contains("[UnityTest"))
-                                {
-                                    if (lines[j].Contains("]"))
-                                    {
-                                        lines[j] = lines[j].Replace("]", ", Ignore(\"Disabled via TestsToolWindow\")]");
-                                        modified = true;
-                                        Debug.Log($"[TestsTool] Added Ignore in method: {methodName}");
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (modified)
-                {
-                    File.WriteAllLines(file, lines);
-                }
-            }
-
-            AssetDatabase.Refresh();
+            if (container == null) return;
+            container.Clear();
+            foreach (var group in groups)
+                container.Add(BuildAssemblyGroup(group));
         }
 
-        private void RemoveIgnoreAttributes(IEnumerable<TestCaseConfig> tests)
+        private static VisualElement BuildAssemblyGroup(GroupedTestGroup group)
         {
-            var testsByFile = new Dictionary<string, List<string>>();
-
-            foreach (var test in tests)
+            var foldout = new Foldout
             {
-                var methodName = test.FullName.Split('.').Last();
-                var files = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
+                text  = $"{group.AssemblyName}  ({group.Tests.Count})",
+                value = false
+            };
+            foldout.AddToClassList("assembly-foldout");
 
-                foreach (var file in files)
-                {
-                    if (File.ReadAllText(file).Contains($" {methodName}("))
-                    {
-                        if (!testsByFile.ContainsKey(file))
-                            testsByFile[file] = new List<string>();
+            // header
+            var header = new VisualElement();
+            header.AddToClassList("table-header-row");
+            header.Add(MakeHeaderLabel("Full Name", "col-fullname"));
+            header.Add(MakeHeaderLabel("Enabled",   "col-enabled"));
+            header.Add(MakeHeaderLabel("Changed",   "col-changed"));
+            foldout.Add(header);
 
-                        testsByFile[file].Add(methodName);
-                        break;
-                    }
-                }
-            }
+            foreach (var test in group.Tests)
+                foldout.Add(BuildTestRow(test));
 
-            foreach (var kvp in testsByFile)
-            {
-                var file = kvp.Key;
-                var methodNames = kvp.Value;
-                var lines = File.ReadAllLines(file).ToList();
-                bool modified = false;
-
-                for (int i = 0; i < lines.Count; i++)
-                {
-                    foreach (var methodName in methodNames)
-                    {
-                        if (lines[i].Contains($" {methodName}("))
-                        {
-                            int attrStart = i - 1;
-                            while (attrStart >= 0 && lines[attrStart].Trim().StartsWith("["))
-                            {
-                                attrStart--;
-                            }
-
-                            attrStart++;
-
-                            for (int j = attrStart; j < i; j++)
-                            {
-                                if (lines[j].Contains("Ignore(\"Disabled via TestsToolWindow\")"))
-                                {
-                                    lines[j] = lines[j].Replace(", Ignore(\"Disabled via TestsToolWindow\")", "");
-                                    modified = true;
-                                    Debug.Log($"[TestsTool] Deletes Ignore fot method: {methodName}");
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (modified)
-                {
-                    File.WriteAllLines(file, lines);
-                }
-            }
-
-            AssetDatabase.Refresh();
+            return foldout;
         }
+
+        private static VisualElement BuildTestRow(TestCaseConfig test)
+        {
+            var row = new VisualElement();
+            row.AddToClassList("test-row");
+            row.EnableInClassList("row-disabled", !test.Enabled);
+
+            var nameField = new TextField { value = test.FullName, isReadOnly = true };
+            nameField.AddToClassList("col-fullname");
+
+            var enabledToggle = new Toggle { value = test.Enabled };
+            enabledToggle.AddToClassList("col-enabled");
+
+            var changedLabel = new Label("⚑ changed");
+            changedLabel.AddToClassList("col-changed");
+            changedLabel.style.display = test.IsChanged ? DisplayStyle.Flex : DisplayStyle.None;
+
+            enabledToggle.RegisterValueChangedCallback(evt =>
+            {
+                test.Enabled = evt.newValue;
+                row.EnableInClassList("row-disabled", !evt.newValue);
+                changedLabel.style.display = test.IsChanged ? DisplayStyle.Flex : DisplayStyle.None;
+            });
+
+            row.Add(nameField);
+            row.Add(enabledToggle);
+            row.Add(changedLabel);
+            return row;
+        }
+
+        private static Label MakeHeaderLabel(string text, string cssClass)
+        {
+            var l = new Label(text);
+            l.AddToClassList("header-label");
+            l.AddToClassList(cssClass);
+            return l;
+        }
+
+        // ── Collect tests ─────────────────────────────────────────────────────────
 
         private void CollectTestsRecursive(ITestAdaptor adaptor, TestPlatform platform)
         {
             if (!adaptor.HasChildren && !string.IsNullOrEmpty(adaptor.FullName))
             {
-                var config = new TestCaseConfig(adaptor.FullName, adaptor.RunState != RunState.Ignored);
+                var config       = new TestCaseConfig(adaptor.FullName, adaptor.RunState != RunState.Ignored);
                 var assemblyName = adaptor.TypeInfo?.Assembly?.GetName()?.Name ?? "Unknown";
+                var groupList    = platform == TestPlatform.EditMode ? _groupedEditMode : _groupedPlayMode;
 
-                var groupList = platform == TestPlatform.EditMode ? GroupedEditMode : GroupedPlayMode;
                 var group = groupList.FirstOrDefault(g => g.AssemblyName == assemblyName);
                 if (group == null)
                 {
@@ -244,37 +186,133 @@ namespace Code.Editor.Tests
                     CollectTestsRecursive(child, platform);
             }
         }
+
+        // ── Ignore attribute logic ────────────────────────────────────────────────
+
+        private static void AddIgnoreAttributes(IEnumerable<TestCaseConfig> tests)
+        {
+            var testsByFile = GroupTestsByFile(tests);
+
+            foreach (var kvp in testsByFile)
+            {
+                var lines    = File.ReadAllLines(kvp.Key).ToList();
+                bool modified = false;
+
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    foreach (var methodName in kvp.Value)
+                    {
+                        if (!lines[i].Contains($" {methodName}(")) continue;
+
+                        int attrStart = FindAttrStart(lines, i);
+
+                        bool alreadyIgnored = false;
+                        for (int j = attrStart; j < i; j++)
+                        {
+                            if (!lines[j].Contains("Ignore(")) continue;
+                            alreadyIgnored = true;
+                            break;
+                        }
+                        if (alreadyIgnored) continue;
+
+                        for (int j = attrStart; j < i; j++)
+                        {
+                            if (!(lines[j].Contains("[Test") || lines[j].Contains("[UnityTest"))) continue;
+                            if (!lines[j].Contains("]")) continue;
+
+                            lines[j] = lines[j].Replace("]", ", Ignore(\"Disabled via TestsToolWindow\")]");
+                            modified = true;
+                            Debug.Log($"[TestsTool] Added Ignore: {methodName}");
+                            break;
+                        }
+                    }
+                }
+
+                if (modified) File.WriteAllLines(kvp.Key, lines);
+            }
+
+            AssetDatabase.Refresh();
+        }
+
+        private static void RemoveIgnoreAttributes(IEnumerable<TestCaseConfig> tests)
+        {
+            var testsByFile = GroupTestsByFile(tests);
+
+            foreach (var kvp in testsByFile)
+            {
+                var lines     = File.ReadAllLines(kvp.Key).ToList();
+                bool modified = false;
+
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    foreach (var methodName in kvp.Value)
+                    {
+                        if (!lines[i].Contains($" {methodName}(")) continue;
+
+                        int attrStart = FindAttrStart(lines, i);
+
+                        for (int j = attrStart; j < i; j++)
+                        {
+                            if (!lines[j].Contains("Ignore(\"Disabled via TestsToolWindow\")")) continue;
+                            lines[j]  = lines[j].Replace(", Ignore(\"Disabled via TestsToolWindow\")", "");
+                            modified  = true;
+                            Debug.Log($"[TestsTool] Removed Ignore: {methodName}");
+                        }
+                    }
+                }
+
+                if (modified) File.WriteAllLines(kvp.Key, lines);
+            }
+
+            AssetDatabase.Refresh();
+        }
+
+        private static Dictionary<string, List<string>> GroupTestsByFile(IEnumerable<TestCaseConfig> tests)
+        {
+            var result = new Dictionary<string, List<string>>();
+            var allFiles = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
+
+            foreach (var test in tests)
+            {
+                var methodName = test.FullName.Split('.').Last();
+                foreach (var file in allFiles)
+                {
+                    if (!File.ReadAllText(file).Contains($" {methodName}(")) continue;
+                    if (!result.ContainsKey(file))
+                        result[file] = new List<string>();
+                    result[file].Add(methodName);
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        private static int FindAttrStart(List<string> lines, int methodLine)
+        {
+            int i = methodLine - 1;
+            while (i >= 0 && lines[i].Trim().StartsWith("["))
+                i--;
+            return i + 1;
+        }
     }
 
     [Serializable]
     public class TestCaseConfig
     {
-        [TableColumnWidth(250, Resizable = true)] [ReadOnly]
         public string FullName;
+        public bool   IsChanged;
 
-        [GUIColor(0.2f, 0.8f, 0.2f)]
-        [BoxGroup("Enabled", showLabel: false)]
-        [TableColumnWidth(150, Resizable = false)]
-        [ShowInInspector]
-        [field: SerializeField]
         public bool Enabled
         {
             get => _enabled;
             set
             {
-                if (_enabled != value)
-                {
-                    _enabled = value;
-                    IsChanged = true;
-                }
+                if (_enabled == value) return;
+                _enabled  = value;
+                IsChanged = true;
             }
         }
-
-        [GUIColor(1f, 0f, 0)]
-        [BoxGroup("IsChanged", showLabel: false)]
-        [TableColumnWidth(150, Resizable = false)]
-        [ShowInInspector, ReadOnly, ShowIf(nameof(IsChanged))]
-        public bool IsChanged = false;
 
         private bool _enabled;
 
@@ -288,14 +326,9 @@ namespace Code.Editor.Tests
     [Serializable]
     public class GroupedTestGroup
     {
-        [TableColumnWidth(175, Resizable = false)] [ReadOnly]
-        public string AssemblyName;
+        public string              AssemblyName;
+        public List<TestCaseConfig> Tests = new();
 
-        [TableList] public List<TestCaseConfig> Tests = new();
-
-        public GroupedTestGroup(string assemblyName)
-        {
-            AssemblyName = assemblyName;
-        }
+        public GroupedTestGroup(string assemblyName) => AssemblyName = assemblyName;
     }
 }
