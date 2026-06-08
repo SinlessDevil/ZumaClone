@@ -80,6 +80,9 @@ namespace Code.Services.StaticData
             ballChainDTO.MoveSpeed = _ballChainConfig.MoveSpeed;
             ballChainDTO.SpacingBalls = _ballChainConfig.SpacingBalls;
             ballChainDTO.DurationMovingOffset = _ballChainConfig.DurationMovingOffset;
+            ballChainDTO.ChainSpringStrength = _ballChainConfig.ChainSpringStrength;
+            ballChainDTO.ChainGapSpringStrength = _ballChainConfig.ChainGapSpringStrength;
+            ballChainDTO.CatchupSpeedMultiplier = _ballChainConfig.CatchupSpeedMultiplier;
             ballChainDTO.CollisionThreshold = _ballChainConfig.CollisionThreshold;
             ballChainDTO.MatchingCount = _ballChainConfig.MatchingCount;
             ballChainDTO.InitialSpeedMultiplier = _ballChainConfig.InitialSpeedMultiplier;

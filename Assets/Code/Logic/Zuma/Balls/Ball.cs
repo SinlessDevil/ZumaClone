@@ -66,10 +66,7 @@ namespace Code.Logic.Zuma.Balls
             gameObject.SetActive(false);
         }
 
-        public void SetInteractive(bool isInteractive)
-        {
-            _isInteractive = isInteractive;
-        }
+        public void SetInteractive(bool isInteractive) => _isInteractive = isInteractive;
         
         public void SetIndex(int Index)
         {
