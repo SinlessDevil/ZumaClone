@@ -159,7 +159,8 @@ namespace Code.Services.BallController
                     _segments.RemoveAt(i + 1);
                     front.ReIndexBalls();
 
-                    _attachingBallChainHandler.CheckMatchAtJunction(front, junctionIdx);
+                    if (!_attachingBallChainHandler.IsProcessingCombo)
+                        _attachingBallChainHandler.CheckMatchAtJunction(front, junctionIdx);
                     i--;
                 }
             }

@@ -18,6 +18,7 @@ MonoBehaviour:
   DurationMovingOffset: 0.2
   ChainSpringStrength: 25
   ChainGapSpringStrength: 4
+  CatchupSpeedMultiplier: 2.5
   CollisionThreshold: 1
   MatchingCount: 3
   InitialSpeedMultiplier: 2.5

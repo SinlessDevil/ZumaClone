@@ -19,6 +19,10 @@ namespace Code.Services.BallController
         private readonly ILevelService _levelService;
         private readonly ILevelLocalProgressService _levelLocalProgressService;
 
+        // Counter instead of bool: handles user-shot combos overlapping with chain reactions
+        private int _activeComboCount;
+        public bool IsProcessingCombo => _activeComboCount > 0;
+
         public AttachingBallChainHandler(
             PathCreator pathCreator,
             BallChainDTO ballChainDto,
@@ -45,7 +49,7 @@ namespace Code.Services.BallController
             InsertBallToSegment(newBall, segment, index);
         }
 
-        // Called by BallChainController after two segments merge
+        // Called by BallChainController.CheckMerges only when no combo chain is active
         public void CheckMatchAtJunction(ChainSegment segment, int junctionIdx)
         {
             if (segment.Count == 0) return;
@@ -55,16 +59,15 @@ namespace Code.Services.BallController
             Ball anchor = balls[junctionIdx];
             var matches = FindMatchesAroundBall(anchor, balls);
 
-            if (matches.Count >= _ballChainDto.MatchingCount)
-            {
-                int score = matches.Count *
-                    _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
-                _levelLocalProgressService.AddScore(score);
-                _widgetBallChainProvider.SetUpWidget(matches, anchor, score);
-                _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
+            if (matches.Count < _ballChainDto.MatchingCount) return;
 
-                DestroyAndSplit(matches, segment).Forget();
-            }
+            int score = matches.Count *
+                _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
+            _levelLocalProgressService.AddScore(score);
+            _widgetBallChainProvider.SetUpWidget(matches, anchor, score);
+            _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
+
+            RunComboChain(matches, segment).Forget();
         }
 
         private (ChainSegment segment, int index) FindClosestCollision(Ball newBall)
@@ -139,7 +142,7 @@ namespace Code.Services.BallController
                 _widgetBallChainProvider.SetUpWidget(matches, pivotBall, score);
                 _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
 
-                await DestroyAndSplit(matches, segment);
+                await RunComboChain(matches, segment);
             }
             else
             {
@@ -147,47 +150,105 @@ namespace Code.Services.BallController
             }
         }
 
-        private async UniTask DestroyAndSplit(List<Ball> matchBalls, ChainSegment segment)
+        // Entry point for all combo chains — tracks nesting so IsProcessingCombo stays true
+        // for the full duration of a chain reaction, even across multiple sequential steps
+        private async UniTask RunComboChain(List<Ball> matchBalls, ChainSegment segment)
         {
+            _activeComboCount++;
+            try
+            {
+                await ComboStep(matchBalls, segment);
+            }
+            finally
+            {
+                _activeComboCount--;
+            }
+        }
+
+        // One step of a combo: destroy → split → wait for physical merge → check next match
+        private async UniTask ComboStep(List<Ball> matchBalls, ChainSegment segment)
+        {
+            // 1. Wait for all destroy animations to finish
             await UniTask.WhenAll(matchBalls.Select(WaitForDestroyAnimation));
 
             int lowestIndex = matchBalls.Min(b => b.Index);
 
-            // Remove from high to low to preserve indices during removal
+            // 2. Remove matched balls from high to low to keep indices valid
             foreach (var ball in matchBalls.OrderByDescending(b => b.Index))
             {
                 segment.RemoveBallAt(ball.Index);
                 ball.Deactivate();
             }
 
-            // Split remaining balls after match into back segment
-            if (lowestIndex < segment.Count)
+            if (lowestIndex >= segment.Count)
             {
-                ChainSegment back = segment.SplitAt(lowestIndex);
+                // Nothing behind the gap — just reindex and clean up
                 segment.ReIndexBalls();
-                back.ReIndexBalls();
-
-                int segIdx = _segments.IndexOf(segment);
-
-                if (segment.Count > 0)
-                {
-                    // Front has balls — back catches up
-                    back.IsCatchingUp = true;
-                    back.CurrentSpeed = back.BaseSpeed * _ballChainDto.CatchupSpeedMultiplier;
-                    _segments.Insert(segIdx + 1, back);
-                }
-                else
-                {
-                    // Front is empty — back becomes the lead, no one to catch
-                    _segments[segIdx] = back;
-                }
-            }
-            else
-            {
-                segment.ReIndexBalls();
+                TryCleanupEmptySegment(segment);
+                return;
             }
 
-            // Clean up empty front segment
+            // 3. Split: balls [lowestIndex..] become the new back segment
+            ChainSegment back = segment.SplitAt(lowestIndex);
+            segment.ReIndexBalls();
+            back.ReIndexBalls();
+
+            int segIdx = _segments.IndexOf(segment);
+
+            if (segment.Count == 0)
+            {
+                // Front wiped — back takes over, no gap to close
+                _segments[segIdx] = back;
+                TryCleanupEmptySegment(segment);
+                return;
+            }
+
+            // Index of front's last ball — this becomes the junction after merge
+            int junctionIdx = segment.Count - 1;
+
+            // 4. Launch back segment catch-up; CheckMerges will do the physical merge
+            back.IsCatchingUp = true;
+            back.CurrentSpeed = back.BaseSpeed * _ballChainDto.CatchupSpeedMultiplier;
+            _segments.Insert(segIdx + 1, back);
+
+            // 5. Wait until CheckMerges has logically merged back into front
+            await UniTask.WaitUntil(() => !_segments.Contains(back));
+
+            // 6. Wait for the visual gap at the junction to actually close.
+            // Logical merge fires early (distance math), but SmoothDamp needs more time.
+            // junctionIdx     = last ball of original front
+            // junctionIdx + 1 = first ball of original back (now part of segment after merge)
+            int nextIdx = junctionIdx + 1;
+            if (nextIdx < segment.Count)
+            {
+                await UniTask.WaitUntil(() =>
+                    nextIdx < segment.Count &&
+                    segment.GetVisualDistance(junctionIdx) - segment.GetVisualDistance(nextIdx)
+                        <= _ballChainDto.SpacingBalls * 1.5f
+                );
+            }
+
+            // 7. Chain is visually closed — check for a new match at the junction
+            if (junctionIdx < 0 || junctionIdx >= segment.Count) return;
+
+            var mergedBalls = segment.Balls.ToList();
+            Ball anchor = mergedBalls[junctionIdx];
+            var nextMatches = FindMatchesAroundBall(anchor, mergedBalls);
+
+            if (nextMatches.Count < _ballChainDto.MatchingCount) return;
+
+            int nextScore = nextMatches.Count *
+                _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
+            _levelLocalProgressService.AddScore(nextScore);
+            _widgetBallChainProvider.SetUpWidget(nextMatches, anchor, nextScore);
+            _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - nextMatches.Count);
+
+            // 8. Continue combo chain sequentially — same _activeComboCount scope
+            await ComboStep(nextMatches, segment);
+        }
+
+        private void TryCleanupEmptySegment(ChainSegment segment)
+        {
             if (segment.Count == 0 && _segments.Contains(segment))
                 _segments.Remove(segment);
         }
