@@ -165,13 +165,14 @@ namespace Code.Services.BallController
             }
         }
 
-        // One step of a combo: destroy → split → wait for physical merge → check next match
+        // One step of a combo: destroy → punch back → split → wait for merge → check next match
         private async UniTask ComboStep(List<Ball> matchBalls, ChainSegment segment)
         {
             // 1. Wait for all destroy animations to finish
             await UniTask.WhenAll(matchBalls.Select(WaitForDestroyAnimation));
 
             int lowestIndex = matchBalls.Min(b => b.Index);
+            float punchBack = matchBalls.Count * _ballChainDto.SpacingBalls;
 
             // 2. Remove matched balls from high to low to keep indices valid
             foreach (var ball in matchBalls.OrderByDescending(b => b.Index))
@@ -182,7 +183,8 @@ namespace Code.Services.BallController
 
             if (lowestIndex >= segment.Count)
             {
-                // Nothing behind the gap — just reindex and clean up
+                // Match was at the tail — skull-side balls get the punch back and chain stays put
+                segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - punchBack);
                 segment.ReIndexBalls();
                 TryCleanupEmptySegment(segment);
                 return;
@@ -197,24 +199,32 @@ namespace Code.Services.BallController
 
             if (segment.Count == 0)
             {
-                // Front wiped — back takes over, no gap to close
+                // Front wiped (match at head) — back keeps its original logical position,
+                // NOT the skull position that SplitAt(0) assigned.
+                // Without this fix the remaining balls lurch forward toward the skull.
+                back.SetHeadLogicalDistance(
+                    back.HeadLogicalDistance - matchBalls.Count * _ballChainDto.SpacingBalls);
                 _segments[segIdx] = back;
                 TryCleanupEmptySegment(segment);
                 return;
             }
 
+            // 4. Punch back: skull-side balls retreat proportional to the match size.
+            // SmoothDamp animates this gradually, giving the player visible breathing room.
+            segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - punchBack);
+
             // Index of front's last ball — this becomes the junction after merge
             int junctionIdx = segment.Count - 1;
 
-            // 4. Launch back segment catch-up; CheckMerges will do the physical merge
+            // 5. Launch back segment catch-up; CheckMerges will do the physical merge
             back.IsCatchingUp = true;
             back.CurrentSpeed = back.BaseSpeed * _ballChainDto.CatchupSpeedMultiplier;
             _segments.Insert(segIdx + 1, back);
 
-            // 5. Wait until CheckMerges has logically merged back into front
+            // 6. Wait until CheckMerges has logically merged back into front
             await UniTask.WaitUntil(() => !_segments.Contains(back));
 
-            // 6. Wait for the visual gap at the junction to actually close.
+            // 7. Wait for the visual gap at the junction to actually close.
             // Logical merge fires early (distance math), but SmoothDamp needs more time.
             // junctionIdx     = last ball of original front
             // junctionIdx + 1 = first ball of original back (now part of segment after merge)
@@ -228,7 +238,7 @@ namespace Code.Services.BallController
                 );
             }
 
-            // 7. Chain is visually closed — check for a new match at the junction
+            // 8. Chain is visually closed — check for a new match at the junction
             if (junctionIdx < 0 || junctionIdx >= segment.Count) return;
 
             var mergedBalls = segment.Balls.ToList();
@@ -243,7 +253,7 @@ namespace Code.Services.BallController
             _widgetBallChainProvider.SetUpWidget(nextMatches, anchor, nextScore);
             _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - nextMatches.Count);
 
-            // 8. Continue combo chain sequentially — same _activeComboCount scope
+            // 9. Continue combo chain sequentially — same _activeComboCount scope
             await ComboStep(nextMatches, segment);
         }
 
