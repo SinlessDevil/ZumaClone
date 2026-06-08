@@ -209,9 +209,15 @@ namespace Code.Services.BallController
                 return;
             }
 
-            // 4. Punch back: skull-side balls retreat proportional to the match size.
-            // SmoothDamp animates this gradually, giving the player visible breathing room.
-            segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - punchBack);
+            // 4. Check junction colors to decide movement direction.
+            // Same color  → punch back: front retreats toward back (both magnetize, combo incoming)
+            // Diff color  → front holds position: back catches up and pushes front (normal merge)
+            Ball frontTail = segment.GetBall(segment.Count - 1);
+            Ball backHead  = back.GetBall(0);
+            bool junctionMatch = frontTail.Color == backHead.Color;
+
+            if (junctionMatch)
+                segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - punchBack);
 
             // Index of front's last ball — this becomes the junction after merge
             int junctionIdx = segment.Count - 1;
