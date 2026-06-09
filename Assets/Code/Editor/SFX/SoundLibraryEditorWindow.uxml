@@ -1,0 +1,44 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <ui:ScrollView>
+
+        <!-- ── Existing Enums ─────────────────────────────────────────────────── -->
+        <ui:GroupBox name="enums-box" text="Existing Enums" class="section-box">
+            <ui:TextField name="enum-2d-field"    label="Sound2D Types" multiline="true" class="enum-field" />
+            <ui:TextField name="enum-3d-field"    label="Sound3D Types" multiline="true" class="enum-field" />
+            <ui:TextField name="enum-music-field" label="Music Types"   multiline="true" class="enum-field" />
+        </ui:GroupBox>
+
+        <!-- ── 2D Sounds ──────────────────────────────────────────────────────── -->
+        <ui:GroupBox name="sounds2d-box" text="2D Sounds" class="section-box">
+            <ui:TextField name="search-2d-field" label="Search" />
+            <ui:ScrollView name="scroll-2d" class="list-scroll">
+                <ui:VisualElement name="list-2d" />
+            </ui:ScrollView>
+            <ui:Button name="add-2d-btn" text="Add Sound 2D" class="btn-green btn-add" />
+        </ui:GroupBox>
+
+        <!-- ── 3D Sounds ──────────────────────────────────────────────────────── -->
+        <ui:GroupBox name="sounds3d-box" text="3D Sounds" class="section-box">
+            <ui:TextField name="search-3d-field" label="Search" />
+            <ui:ScrollView name="scroll-3d" class="list-scroll">
+                <ui:VisualElement name="list-3d" />
+            </ui:ScrollView>
+            <ui:Button name="add-3d-btn" text="Add Sound 3D" class="btn-green btn-add" />
+        </ui:GroupBox>
+
+        <!-- ── Music ─────────────────────────────────────────────────────────── -->
+        <ui:GroupBox name="music-box" text="Music" class="section-box">
+            <ui:TextField name="search-music-field" label="Search" />
+            <ui:ScrollView name="scroll-music" class="list-scroll">
+                <ui:VisualElement name="list-music" />
+            </ui:ScrollView>
+            <ui:Button name="add-music-btn" text="Add Music" class="btn-green btn-add" />
+        </ui:GroupBox>
+
+        <!-- ── Generation ────────────────────────────────────────────────────── -->
+        <ui:GroupBox name="generation-box" text="Generation" class="section-box">
+            <ui:Button name="generate-btn" text="Generate Enums" class="btn-green btn-tall" />
+        </ui:GroupBox>
+
+    </ui:ScrollView>
+</ui:UXML>

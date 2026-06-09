@@ -59,16 +59,14 @@ namespace Code.Logic.Zuma.Balls
         public void Deactivate()
         {
             _text.text = "";
-            
+
             Dispose();
+            SetInteractive(false);
 
             gameObject.SetActive(false);
         }
 
-        public void SetInteractive(bool isInteractive)
-        {
-            _isInteractive = isInteractive;
-        }
+        public void SetInteractive(bool isInteractive) => _isInteractive = isInteractive;
         
         public void SetIndex(int Index)
         {

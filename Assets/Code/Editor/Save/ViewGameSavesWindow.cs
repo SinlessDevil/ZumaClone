@@ -2,41 +2,30 @@
 using System;
 using System.IO;
 using System.Text;
-using Code.Services.PersistenceProgress.Player;
-using Sirenix.OdinInspector.Editor;
-using Sirenix.Serialization;
-using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Code.Editor
 {
-    public class ViewGameSavesWindow : OdinEditorWindow
+    public class ViewGameSavesWindow : EditorWindow
     {
         private const string PlayerPrefsKey = "PlayerData";
         private const string JsonFileName = "player_data.json";
         private const string XmlFileName = "player_data.xml";
+        private const string UxmlPath = "Assets/Code/Editor/Save/ViewGameSavesWindow.uxml";
+        private const string UssPath = "Assets/Code/Editor/Save/ViewGameSavesWindow.uss";
 
         private string SavePath => Application.persistentDataPath;
         private string JsonFilePath => Path.Combine(SavePath, JsonFileName);
         private string XmlFilePath => Path.Combine(SavePath, XmlFileName);
 
-        private Vector2 scrollPrefs;
-        private Vector2 scrollJson;
-        private Vector2 scrollXml;
-
-        private string DecodedPrefsData;
-        private string DecodedJsonData;
-        private string DecodedXmlData;
-
-        private string PrefsMessage = "No PlayerPrefs data found.";
-        private string JsonMessage = "No JSON file found.";
-        private string XmlMessage = "No XML file found.";
-
-        // Foldout toggles
-        private bool showPlayerPrefs = true;
-        private bool showJson = true;
-        private bool showXml = true;
+        private TextField _prefsText;
+        private HelpBox _prefsWarn;
+        private TextField _jsonText;
+        private HelpBox _jsonWarn;
+        private TextField _xmlText;
+        private HelpBox _xmlWarn;
 
         [MenuItem("Tools/Save System Kit/View Game Saves Window")]
         private static void OpenWindow()
@@ -47,54 +36,38 @@ namespace Code.Editor
             window.Show();
         }
 
-        private void OnEnable() => Refresh();
-
-        protected override void DrawEditor(int index)
+        public void CreateGUI()
         {
-            DrawFoldoutSection(ref showPlayerPrefs, "PlayerPrefs Preview", GetPlayerPrefsPath(), PrefsMessage, DecodedPrefsData, ref scrollPrefs, Refresh, DeletePlayerPrefs);
-            GUILayout.Space(20);
-            DrawFoldoutSection(ref showJson, "JSON File Preview", JsonFilePath, JsonMessage, DecodedJsonData, ref scrollJson, Refresh, DeleteJson);
-            GUILayout.Space(20);
-            DrawFoldoutSection(ref showXml, "XML File Preview", XmlFilePath, XmlMessage, DecodedXmlData, ref scrollXml, Refresh, DeleteXml);
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath);
+            uxml.CloneTree(rootVisualElement);
+
+            var uss = AssetDatabase.LoadAssetAtPath<StyleSheet>(UssPath);
+            rootVisualElement.styleSheets.Add(uss);
+
+            BindSection("prefs", out _prefsText, out _prefsWarn,
+                GetPlayerPrefsPath(), RefreshPlayerPrefs, DeletePlayerPrefs);
+
+            BindSection("json", out _jsonText, out _jsonWarn,
+                JsonFilePath, RefreshJsonFile, DeleteJson);
+
+            BindSection("xml", out _xmlText, out _xmlWarn,
+                XmlFilePath, RefreshXmlFile, DeleteXml);
+
+            Refresh();
         }
 
-        private void DrawFoldoutSection(ref bool foldout, string title, string path, string message, string data, 
-            ref Vector2 scroll, Action refresh, Action delete)
+        private void BindSection(string prefix, out TextField textField, out HelpBox warnBox,
+            string pathText, Action onRefresh, Action onDelete)
         {
-            foldout = SirenixEditorGUI.Foldout(foldout, title);
-            if (!foldout) 
-                return;
+            rootVisualElement.Q<HelpBox>($"{prefix}-path-help").text = pathText;
 
-            SirenixEditorGUI.BeginBox();
+            textField = rootVisualElement.Q<TextField>($"{prefix}-text");
+            textField.isReadOnly = true;
 
-            EditorGUILayout.LabelField("Save Location", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox(path, MessageType.Info);
+            warnBox = rootVisualElement.Q<HelpBox>($"{prefix}-warn");
 
-            GUILayout.Space(10);
-
-            if (!string.IsNullOrEmpty(data))
-            {
-                scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(300));
-                EditorGUILayout.TextArea(data, GUILayout.ExpandHeight(true));
-                EditorGUILayout.EndScrollView();
-            }
-            else
-            {
-                EditorGUILayout.HelpBox(message, MessageType.Warning);
-            }
-
-            GUILayout.Space(10);
-            GUI.backgroundColor = new Color(0.6f, 0.9f, 1f);
-            if (GUILayout.Button("Refresh", GUILayout.Height(35)))
-                refresh.Invoke();
-
-            GUILayout.Space(5);
-            GUI.backgroundColor = new Color(1f, 0.4f, 0.4f);
-            if (GUILayout.Button("Delete", GUILayout.Height(35)))
-                delete.Invoke();
-
-            GUI.backgroundColor = Color.white;
-            SirenixEditorGUI.EndBox();
+            rootVisualElement.Q<Button>($"{prefix}-refresh-btn").clicked += onRefresh;
+            rootVisualElement.Q<Button>($"{prefix}-delete-btn").clicked += onDelete;
         }
 
         private void Refresh()
@@ -102,111 +75,89 @@ namespace Code.Editor
             RefreshPlayerPrefs();
             RefreshJsonFile();
             RefreshXmlFile();
-            Repaint();
+        }
+
+        private void UpdateSection(TextField textField, HelpBox warnBox, string data, string emptyMessage)
+        {
+            bool hasData = !string.IsNullOrEmpty(data);
+            textField.style.display = hasData ? DisplayStyle.Flex : DisplayStyle.None;
+            warnBox.style.display = hasData ? DisplayStyle.None : DisplayStyle.Flex;
+
+            if (hasData)
+                textField.value = data;
+            else
+                warnBox.text = emptyMessage;
         }
 
         private void RefreshPlayerPrefs()
         {
-            DecodedPrefsData = string.Empty;
+            string data = string.Empty;
 
             if (PlayerPrefs.HasKey(PlayerPrefsKey))
             {
                 try
                 {
-                    string base64 = PlayerPrefs.GetString(PlayerPrefsKey);
-                    byte[] data = Convert.FromBase64String(base64);
-                    PlayerData deserialized = Sirenix.Serialization.SerializationUtility.DeserializeValue<PlayerData>(data, DataFormat.JSON);
-                    string json = Encoding.UTF8.GetString(Sirenix.Serialization.SerializationUtility.SerializeValue(deserialized, DataFormat.JSON));
-                    DecodedPrefsData = json;
-                    PrefsMessage = string.Empty;
+                    byte[] bytes = Convert.FromBase64String(PlayerPrefs.GetString(PlayerPrefsKey));
+                    data = Encoding.UTF8.GetString(bytes);
                 }
                 catch (Exception e)
                 {
-                    DecodedPrefsData = $"Failed to decode PlayerPrefs:\n{e.Message}";
-                    PrefsMessage = "PlayerPrefs data decode failed.";
+                    data = $"Failed to decode PlayerPrefs:\n{e.Message}";
                 }
             }
-            else
-            {
-                PrefsMessage = "No PlayerPrefs data found.";
-            }
+
+            UpdateSection(_prefsText, _prefsWarn, data, "No PlayerPrefs data found.");
         }
 
         private void RefreshJsonFile()
         {
-            DecodedJsonData = string.Empty;
+            string data = string.Empty;
 
             if (File.Exists(JsonFilePath))
             {
-                try
-                {
-                    DecodedJsonData = File.ReadAllText(JsonFilePath);
-                    JsonMessage = string.Empty;
-                }
-                catch (Exception e)
-                {
-                    DecodedJsonData = $"Failed to read JSON:\n{e.Message}";
-                    JsonMessage = "Failed to load JSON file.";
-                }
+                try { data = File.ReadAllText(JsonFilePath); }
+                catch (Exception e) { data = $"Failed to read JSON:\n{e.Message}"; }
             }
-            else
-            {
-                JsonMessage = "No JSON file found.";
-            }
+
+            UpdateSection(_jsonText, _jsonWarn, data, "No JSON file found.");
         }
 
         private void RefreshXmlFile()
         {
-            DecodedXmlData = string.Empty;
+            string data = string.Empty;
 
             if (File.Exists(XmlFilePath))
             {
-                try
-                {
-                    DecodedXmlData = File.ReadAllText(XmlFilePath);
-                    XmlMessage = string.Empty;
-                }
-                catch (Exception e)
-                {
-                    DecodedXmlData = $"Failed to read XML:\n{e.Message}";
-                    XmlMessage = "Failed to load XML file.";
-                }
+                try { data = File.ReadAllText(XmlFilePath); }
+                catch (Exception e) { data = $"Failed to read XML:\n{e.Message}"; }
             }
-            else
-            {
-                XmlMessage = "No XML file found.";
-            }
+
+            UpdateSection(_xmlText, _xmlWarn, data, "No XML file found.");
         }
 
         private void DeletePlayerPrefs()
         {
-            if (!PlayerPrefs.HasKey(PlayerPrefsKey)) 
+            if (!PlayerPrefs.HasKey(PlayerPrefsKey))
                 return;
-            
             PlayerPrefs.DeleteKey(PlayerPrefsKey);
             PlayerPrefs.Save();
-            Debug.Log("PlayerPrefs file deleted.");
-            Refresh();
+            RefreshPlayerPrefs();
         }
 
         private void DeleteJson()
         {
             if (!File.Exists(JsonFilePath))
                 return;
-            
             File.Delete(JsonFilePath);
-            Debug.Log("JSON file deleted.");
-            Refresh();
+            RefreshJsonFile();
         }
 
         private void DeleteXml()
         {
-            if (!File.Exists(XmlFilePath)) 
+            if (!File.Exists(XmlFilePath))
                 return;
-            
             File.Delete(XmlFilePath);
-            Debug.Log("XML file deleted.");
-            Refresh();
+            RefreshXmlFile();
         }
 
         private string GetPlayerPrefsPath()

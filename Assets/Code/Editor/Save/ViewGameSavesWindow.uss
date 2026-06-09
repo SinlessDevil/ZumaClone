@@ -1,0 +1,48 @@
+.section-foldout {
+    margin: 4px;
+    padding-left: 4px;
+}
+
+.bold-label {
+    -unity-font-style: bold;
+    margin: 4px 0 2px 0;
+}
+
+.data-text-field {
+    height: 280px;
+    margin: 4px 0;
+}
+
+.data-text-field > .unity-base-field__input {
+    height: 280px;
+    white-space: normal;
+    overflow: hidden;
+}
+
+.section-spacing {
+    height: 12px;
+}
+
+.btn-tall {
+    height: 35px;
+    margin-top: 4px;
+}
+
+.btn-blue {
+    background-color: rgb(50, 120, 170);
+    color: rgb(220, 220, 220);
+    margin-bottom: 4px;
+}
+
+.btn-blue:hover {
+    background-color: rgb(65, 145, 200);
+}
+
+.btn-red {
+    background-color: rgb(160, 50, 50);
+    color: rgb(220, 220, 220);
+}
+
+.btn-red:hover {
+    background-color: rgb(190, 65, 65);
+}

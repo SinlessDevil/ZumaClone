@@ -1,0 +1,74 @@
+.section-box {
+    margin: 4px;
+    padding: 4px;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
+
+.btn-tall {
+    height: 30px;
+}
+
+.btn-green {
+    background-color: rgb(60, 160, 60);
+    color: rgb(220, 220, 220);
+    margin-bottom: 8px;
+}
+
+.btn-green:hover {
+    background-color: rgb(75, 185, 75);
+}
+
+.btn-yellow {
+    width: 40%;
+    background-color: rgb(180, 140, 30);
+    color: rgb(220, 220, 220);
+}
+
+.btn-yellow:hover {
+    background-color: rgb(205, 165, 40);
+}
+
+.btn-red {
+    width: 120px;
+    background-color: rgb(160, 50, 50);
+    color: rgb(220, 220, 220);
+}
+
+.btn-red:hover {
+    background-color: rgb(190, 65, 65);
+}
+
+.row {
+    flex-direction: row;
+    margin-bottom: 4px;
+}
+
+.row > DropdownField {
+    flex-grow: 1;
+    margin-left: 4px;
+}
+
+.all-files-label {
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    margin: 6px 0 2px 0;
+}
+
+.file-row {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px 0;
+}
+
+.file-row > Button {
+    width: 30%;
+}
+
+.file-name-label {
+    flex-grow: 1;
+    margin-left: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

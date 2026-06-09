@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <ui:ScrollView>
+
+        <!-- ── Action buttons ─────────────────────────────────────────────────── -->
+        <ui:VisualElement class="buttons-row">
+            <ui:Button name="find-btn"         text="🔍 Find All Tests"              class="btn-blue    btn-action" />
+            <ui:Button name="add-ignore-btn"   text="➕ Add [Ignore] Attribute"      class="btn-orange  btn-action" />
+            <ui:Button name="remove-ignore-btn" text="➖ Remove [Ignore] Attribute"  class="btn-red     btn-action" />
+            <ui:Button name="open-runner-btn"  text="📋 Open Test Runner"            class="btn-lavender btn-action" />
+        </ui:VisualElement>
+
+        <!-- ── Edit Mode ──────────────────────────────────────────────────────── -->
+        <ui:Foldout name="edit-mode-foldout" text="Grouped Edit Mode" value="false" class="mode-foldout">
+            <ui:VisualElement name="edit-mode-container" />
+        </ui:Foldout>
+
+        <!-- ── Play Mode ──────────────────────────────────────────────────────── -->
+        <ui:Foldout name="play-mode-foldout" text="Grouped Play Mode" value="false" class="mode-foldout">
+            <ui:VisualElement name="play-mode-container" />
+        </ui:Foldout>
+
+    </ui:ScrollView>
+</ui:UXML>

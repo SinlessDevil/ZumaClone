@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <ui:ScrollView>
+
+        <!-- ── Localization File ──────────────────────────────────────────────── -->
+        <ui:Foldout name="lang-file-foldout" text="Localization File" value="true">
+            <ui:DropdownField name="lang-dropdown" label="Language" />
+            <ui:TextField name="search-key-field" label="Search Key" />
+            <ui:VisualElement name="entries-table-container" class="table-container" />
+            <ui:Button name="save-lang-btn" text="Save Current Language" class="btn-green btn-tall" />
+            <ui:Button name="delete-lang-btn" text="Delete Selected Language" class="btn-red btn-tall" />
+        </ui:Foldout>
+
+        <ui:VisualElement class="section-spacing" />
+
+        <!-- ── Create New Language ────────────────────────────────────────────── -->
+        <ui:Foldout name="create-lang-foldout" text="Create New Language TxT" value="true">
+            <ui:DropdownField name="new-lang-dropdown" label="New Language" />
+            <ui:DropdownField name="base-lang-dropdown" label="Base Language" />
+            <ui:Button name="create-lang-btn" text="Create New Language From Base" class="btn-blue btn-tall" />
+        </ui:Foldout>
+
+        <ui:VisualElement class="section-spacing" />
+
+        <!-- ── Find Localized Assets ──────────────────────────────────────────── -->
+        <ui:Foldout name="find-assets-foldout" text="Find Localized Assets" value="true">
+            <ui:VisualElement name="assets-table-container" class="table-container" />
+            <ui:Button name="find-localizers-btn" text="Find All TMP_Localizers in Resources" class="btn-blue btn-tall" />
+            <ui:Button name="save-changes-btn" text="Save Changes To Assets" class="btn-green btn-tall" />
+        </ui:Foldout>
+
+        <ui:VisualElement class="section-spacing" />
+
+        <!-- ── Add Missing Localizers ─────────────────────────────────────────── -->
+        <ui:Foldout name="add-localizers-foldout" text="Add Missing Localizers" value="true">
+            <ui:Button name="add-localizers-btn" text="Add TMP_Localizer to All TMP_Text In Resources" class="btn-lightblue btn-tall" />
+        </ui:Foldout>
+
+    </ui:ScrollView>
+</ui:UXML>

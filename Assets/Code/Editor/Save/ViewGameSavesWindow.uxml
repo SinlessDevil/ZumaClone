@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <ui:ScrollView>
+        <ui:Foldout name="prefs-foldout" text="PlayerPrefs Preview" value="true" class="section-foldout">
+            <ui:Label text="Save Location" class="bold-label" />
+            <ui:HelpBox name="prefs-path-help" message-type="Info" text="" />
+            <ui:TextField name="prefs-text" multiline="true" class="data-text-field" />
+            <ui:HelpBox name="prefs-warn" message-type="Warning" text="No PlayerPrefs data found." />
+            <ui:Button name="prefs-refresh-btn" text="Refresh" class="btn-blue btn-tall" />
+            <ui:Button name="prefs-delete-btn" text="Delete" class="btn-red btn-tall" />
+        </ui:Foldout>
+
+        <ui:VisualElement class="section-spacing" />
+
+        <ui:Foldout name="json-foldout" text="JSON File Preview" value="true" class="section-foldout">
+            <ui:Label text="Save Location" class="bold-label" />
+            <ui:HelpBox name="json-path-help" message-type="Info" text="" />
+            <ui:TextField name="json-text" multiline="true" class="data-text-field" />
+            <ui:HelpBox name="json-warn" message-type="Warning" text="No JSON file found." />
+            <ui:Button name="json-refresh-btn" text="Refresh" class="btn-blue btn-tall" />
+            <ui:Button name="json-delete-btn" text="Delete" class="btn-red btn-tall" />
+        </ui:Foldout>
+
+        <ui:VisualElement class="section-spacing" />
+
+        <ui:Foldout name="xml-foldout" text="XML File Preview" value="true" class="section-foldout">
+            <ui:Label text="Save Location" class="bold-label" />
+            <ui:HelpBox name="xml-path-help" message-type="Info" text="" />
+            <ui:TextField name="xml-text" multiline="true" class="data-text-field" />
+            <ui:HelpBox name="xml-warn" message-type="Warning" text="No XML file found." />
+            <ui:Button name="xml-refresh-btn" text="Refresh" class="btn-blue btn-tall" />
+            <ui:Button name="xml-delete-btn" text="Delete" class="btn-red btn-tall" />
+        </ui:Foldout>
+    </ui:ScrollView>
+</ui:UXML>

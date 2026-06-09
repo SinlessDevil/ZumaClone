@@ -774,7 +774,7 @@ public class TCP2_MaterialInspector : ShaderGUI
 		var propertiesShown = false;
 		foreach (var p in properties)
 		{
-			if ((p.flags & (MaterialProperty.PropFlags.PerRendererData | MaterialProperty.PropFlags.HideInInspector)) == MaterialProperty.PropFlags.None)
+			if ((p.propertyFlags & (ShaderPropertyFlags.PerRendererData | ShaderPropertyFlags.HideInInspector)) == ShaderPropertyFlags.None)
 				propertiesShown |= ShaderMaterialPropertyImpl(p, filter);
 		}
 

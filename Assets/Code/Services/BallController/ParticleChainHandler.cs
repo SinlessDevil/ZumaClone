@@ -10,24 +10,24 @@ namespace Code.Services.BallController
     {
         private readonly PathCreator _pathCreator;
         private readonly BallChainDTO _ballChainDto;
-        private readonly ChainTracker _chainTracker;
+        private readonly ChainState _chainState;
 
         public ParticleChainHandler(
-            BallChainDTO ballChainDto, 
-            PathCreator pathCreator, 
-            ChainTracker chainTracker)
+            BallChainDTO ballChainDto,
+            PathCreator pathCreator,
+            ChainState chainState)
         {
             _ballChainDto = ballChainDto;
             _pathCreator = pathCreator;
-            _chainTracker = chainTracker;
+            _chainState = chainState;
         }
 
         public async UniTask MoveParticleAlongPathAsync(ParticleSystemHolder particle)
         {
             particle.gameObject.SetActive(true);
             particle.Play();
-            
-            float distance = _chainTracker.DistanceTravelled;
+
+            float distance = _chainState.HeadDistance;
             float pathLength = _pathCreator.path.length;
 
             if (pathLength <= 0)
@@ -38,7 +38,7 @@ namespace Code.Services.BallController
 
             float startProgress = distance / pathLength;
             float currentSpeed = Mathf.Lerp(_ballChainDto.MinParticleSpeed, _ballChainDto.MaxParticleSpeed, startProgress);
-            
+
             float startTime = Time.time;
             float duration = pathLength / currentSpeed;
 
@@ -46,11 +46,11 @@ namespace Code.Services.BallController
             {
                 float progress = (Time.time - startTime) / duration;
                 progress = Mathf.Clamp01(progress);
-                distance = Mathf.Lerp(_chainTracker.DistanceTravelled, pathLength, progress);
+                distance = Mathf.Lerp(_chainState.HeadDistance, pathLength, progress);
 
-                if(distance == pathLength)
+                if (distance == pathLength)
                     break;
-                
+
                 particle.transform.position = _pathCreator.path.GetPointAtDistance(distance);
                 await UniTask.Yield();
             }

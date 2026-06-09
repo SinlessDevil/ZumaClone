@@ -365,7 +365,7 @@ internal class TCP2_MaterialInspector_SurfacePBS_SG : ShaderGUI
 				//Shader Generator Properties
 				for(var i = 0; i < SGProperties.Count; i++)
 				{
-					if (SGProperties[i].type == MaterialProperty.PropType.Texture)
+					if (SGProperties[i].propertyType == ShaderPropertyType.Texture)
 					{
 						//Compensate margins so that texture slot looks square
 						var fw = EditorGUIUtility.fieldWidth;
