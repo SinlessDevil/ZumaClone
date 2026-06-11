@@ -23,21 +23,18 @@ namespace Code.UI.Menu.Windows.Shop
 
         public void Enter()
         {
+            _rectTransform.DOKill();
             _window.gameObject.SetActive(true);
             _rectTransform.DOAnchorPosX(_visiblePosition.x, 0.5f)
-                .OnStart(() => { _rectTransform.gameObject.SetActive(true); })
-                .SetEase(Ease.OutExpo)
-                .OnComplete(() =>
-                {
-                    //TODO: update Window
-                });
+                .SetEase(Ease.OutExpo);
         }
 
         public void Exit()
         {
+            _rectTransform.DOKill();
             _rectTransform.DOAnchorPosX(_hiddenPosition.x, 0.5f)
                 .SetEase(Ease.OutQuint)
-                .OnComplete(() => { _rectTransform.gameObject.SetActive(false); });
+                .OnComplete(() => _rectTransform.gameObject.SetActive(false));
         }
 
         public void Update()
