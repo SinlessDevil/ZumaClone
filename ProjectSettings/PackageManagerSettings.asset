@@ -35,6 +35,7 @@ MonoBehaviour:
     m_Url: https://package.openupm.com
     m_Scopes:
     - com.svermeulen.extenject
+    - com.cysharp.unitask
     m_IsDefault: 0
     m_Capabilities: 0
     m_ConfigSource: 4
