@@ -8,46 +8,55 @@ namespace Code.UI
     {
         [SerializeField] private TMP_Text _text;
         [SerializeField] private CanvasGroup _canvasGroup;
-        
+
+        private RectTransform _rectTransform;
+
         private float _moveUpDuration = 0.5f;
-        private Vector3 _moveUpOffset = new(0, 0, 2);
+        private Vector2 _moveUpOffset = new(0, 80f);
         private float _fadeDuration = 0.5f;
         private float _scaleDuration = 0.3f;
-        
+
+        private void Awake()
+        {
+            _rectTransform = GetComponent<RectTransform>();
+        }
+
         public void SetText(string text)
         {
             _text.text = text;
         }
-        public void Activate(Vector3 position, Quaternion rotation)
+
+        public void Activate(Vector3 worldPosition)
         {
-            transform.SetPositionAndRotation(position, rotation);
-            
+            var screenPos = Camera.main.WorldToScreenPoint(worldPosition);
+            _rectTransform.position = screenPos;
+
             gameObject.SetActive(true);
         }
-        
+
         public void SetColor(Color color)
         {
             _text.color = color;
         }
-        
+
         public void Deactivate()
         {
             transform.localScale = Vector3.one;
             _canvasGroup.alpha = 1f;
             _text.text = string.Empty;
-            
+
             gameObject.SetActive(false);
         }
-        
+
         public void PlayAnimation()
         {
             Sequence sequence = DOTween.Sequence();
-            
+
             transform.localScale = Vector3.zero;
             _canvasGroup.alpha = 1f;
-            
+
             sequence.Append(transform.DOScale(Vector3.one, _scaleDuration).SetEase(Ease.OutBack));
-            sequence.Append(transform.DOMove(transform.position + _moveUpOffset, _moveUpDuration).SetEase(Ease.OutQuad));
+            sequence.Append(_rectTransform.DOAnchorPos(_rectTransform.anchoredPosition + _moveUpOffset, _moveUpDuration).SetEase(Ease.OutQuad));
             sequence.Join(_canvasGroup.DOFade(0f, _fadeDuration).SetEase(Ease.InOutQuad));
             sequence.OnComplete(() =>
             {

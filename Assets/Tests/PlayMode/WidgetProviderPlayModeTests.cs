@@ -49,7 +49,7 @@ namespace Tests.PlayMode
         {
             yield return new WaitForSeconds(5f);
             
-            Widget first = _provider.GetWidget(Vector3.zero, Quaternion.identity);
+            Widget first = _provider.GetWidget(Vector3.zero);
             first.SetText("Test");
             first.SetColor(Color.red);
             first.PlayAnimation();
@@ -57,7 +57,7 @@ namespace Tests.PlayMode
 
             yield return new WaitForSeconds(1f);
 
-            Widget reused = _provider.GetWidget(Vector3.right, Quaternion.identity);
+            Widget reused = _provider.GetWidget(Vector3.right);
             reused.SetText("Test_1");
             reused.SetColor(Color.gray);
             reused.PlayAnimation();

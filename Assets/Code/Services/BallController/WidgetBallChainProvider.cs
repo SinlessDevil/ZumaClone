@@ -33,7 +33,7 @@ namespace Code.Services.BallController
         
         public void SetUpWidget(Vector3 position, Color color, string text)
         {
-            var widget = _widgetProvider.GetWidget(position, Quaternion.identity);
+            var widget = _widgetProvider.GetWidget(position);
             widget.SetText(text);
             widget.SetColor(color);
             widget.PlayAnimation();

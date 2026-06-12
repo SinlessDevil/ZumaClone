@@ -25,7 +25,7 @@ namespace Code.Services.Providers.Widgets
 
             for (int i = 0; i < InitialCount; i++)
             {
-                var widget = CreateObject(Vector3.zero, Quaternion.identity);
+                var widget = CreateObject();
                 widget.Deactivate();
             }
         }
@@ -40,19 +40,19 @@ namespace Code.Services.Providers.Widgets
             _pool.Clear();
         }
 
-        public Widget GetWidget(Vector3 position, Quaternion rotation)
+        public Widget GetWidget(Vector3 worldPosition)
         {
             foreach (var widget in _pool)
             {
                 if (!widget.gameObject.activeInHierarchy)
                 {
-                    widget.Activate(position, rotation);
+                    widget.Activate(worldPosition);
                     return widget;
                 }
             }
 
-            Widget newWidget = CreateObject(position, rotation);
-            newWidget.Activate(position, rotation);
+            Widget newWidget = CreateObject();
+            newWidget.Activate(worldPosition);
             return newWidget;
         }
 
@@ -61,9 +61,9 @@ namespace Code.Services.Providers.Widgets
             widget.Deactivate();
         }
         
-        private Widget CreateObject(Vector3 position, Quaternion rotation)
+        private Widget CreateObject()
         {
-            var createdObject = _uiFactory.CreateWidget(position, rotation);
+            var createdObject = _uiFactory.CreateWidget();
             _pool.Add(createdObject);
             return createdObject;
         }

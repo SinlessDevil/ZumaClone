@@ -16,7 +16,7 @@ namespace Code.Services.Factories.UIFactory
         public RectTransform CrateWindow(WindowTypeId windowTypeId);
         public GameHud CreateGameHud();
         public MenuHud CreateMenuHud();
-        public Widget CreateWidget(Vector3 position, Quaternion rotation);
+        public Widget CreateWidget();
         public ItemLevel CreateItemLevel(Transform parent);
         public StartLevelInfoDisplayer CreateStartLevelInfoDisplayer();
     }

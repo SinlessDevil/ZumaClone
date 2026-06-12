@@ -50,9 +50,9 @@ namespace Code.Services.Factories.UIFactory
             return MenuHud = Instantiate(ResourcePath.MenuHudPath).GetComponent<MenuHud>();
         }
         
-        public Widget CreateWidget(Vector3 position, Quaternion rotation)
+        public Widget CreateWidget()
         {
-            var widget = Instantiate(ResourcePath.WidgetPath, position, rotation, null)
+            var widget = Instantiate(ResourcePath.WidgetPath, _uiRoot, true)
                 .GetComponent<Widget>();
             return widget;
         }

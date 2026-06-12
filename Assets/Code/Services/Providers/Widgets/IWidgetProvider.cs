@@ -7,7 +7,7 @@ namespace Code.Services.Providers.Widgets
     {
         public void CreatePoolWidgets();
         public void CleanupPool();
-        public Widget GetWidget(Vector3 position, Quaternion rotation);
+        public Widget GetWidget(Vector3 worldPosition);
         public void ReturnWidget(Widget widget);
     }
 }
