@@ -20,16 +20,20 @@ namespace Code.Services.BallController
             _pathCreator = pathCreator;
         }
         
-        public void SetUpWidget(List<Ball> matchingBalls, Ball insertedBall, int count)
+        public void SetUpWidget(List<Ball> matchingBalls, Ball insertedBall, int score, int comboMultiplier = 1)
         {
             var totalDistance = matchingBalls.Sum(ball => _pathCreator.path.GetClosestDistanceAlongPath(ball.transform.position));
             var averageDistance = totalDistance / matchingBalls.Count;
             var position = _pathCreator.path.GetPointAtDistance(averageDistance);
             var color = insertedBall.Color;
-            var countText = count.ToString();
-            
-            SetUpWidget(position, color, countText);
+            var text = FormatScoreText(score, comboMultiplier);
+
+            SetUpWidget(position, color, text);
         }
+
+        // Combo (multiplier > 1): "2x +100". Plain match: "+50".
+        private string FormatScoreText(int score, int comboMultiplier) =>
+            comboMultiplier > 1 ? $"+{score} {comboMultiplier}x" : $"+{score}";
         
         public void SetUpWidget(Vector3 position, Color color, string text)
         {

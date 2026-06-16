@@ -61,11 +61,8 @@ namespace Code.Services.BallController
 
             if (matches.Count < _ballChainDto.MatchingCount) return;
 
-            int score = matches.Count *
-                _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
-            _levelLocalProgressService.AddScore(score);
-            _widgetBallChainProvider.SetUpWidget(matches, anchor, score);
-            _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
+            // Initial match — no combo multiplier yet (1x)
+            ApplyMatchScore(matches, anchor, comboMultiplier: 1);
 
             RunComboChain(matches, segment).Forget();
         }
@@ -136,11 +133,8 @@ namespace Code.Services.BallController
 
             if (matches.Count >= _ballChainDto.MatchingCount)
             {
-                int score = matches.Count *
-                    _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
-                _levelLocalProgressService.AddScore(score);
-                _widgetBallChainProvider.SetUpWidget(matches, pivotBall, score);
-                _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
+                // Initial match from a player shot — no combo multiplier yet (1x)
+                ApplyMatchScore(matches, pivotBall, comboMultiplier: 1);
 
                 await RunComboChain(matches, segment);
             }
@@ -157,7 +151,8 @@ namespace Code.Services.BallController
             _activeComboCount++;
             try
             {
-                await ComboStep(matchBalls, segment);
+                // First chained follow-up match starts the multiplier at 2x
+                await ComboStep(matchBalls, segment, comboMultiplier: 2);
             }
             finally
             {
@@ -165,8 +160,10 @@ namespace Code.Services.BallController
             }
         }
 
-        // One step of a combo: destroy → punch back → split → wait for merge → check next match
-        private async UniTask ComboStep(List<Ball> matchBalls, ChainSegment segment)
+        // One step of a combo: destroy → punch back → split → wait for merge → check next match.
+        // comboMultiplier is applied to the next match found at the end of this step and grows by 1
+        // for every further link in the chain (2x → 3x → 4x …).
+        private async UniTask ComboStep(List<Ball> matchBalls, ChainSegment segment, int comboMultiplier)
         {
             // 1. Wait for all destroy animations to finish
             await UniTask.WhenAll(matchBalls.Select(WaitForDestroyAnimation));
@@ -253,14 +250,24 @@ namespace Code.Services.BallController
 
             if (nextMatches.Count < _ballChainDto.MatchingCount) return;
 
-            int nextScore = nextMatches.Count *
-                _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
-            _levelLocalProgressService.AddScore(nextScore);
-            _widgetBallChainProvider.SetUpWidget(nextMatches, anchor, nextScore);
-            _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - nextMatches.Count);
+            ApplyMatchScore(nextMatches, anchor, comboMultiplier);
 
-            // 9. Continue combo chain sequentially — same _activeComboCount scope
-            await ComboStep(nextMatches, segment);
+            // 9. Continue combo chain sequentially — same _activeComboCount scope,
+            //    multiplier grows by 1 for the next link (2x → 3x → 4x …)
+            await ComboStep(nextMatches, segment, comboMultiplier + 1);
+        }
+
+        // Scores a match: base = matchCount * ScorePerItem, multiplied by the combo multiplier.
+        // The widget shows "Nx +score" for combos (multiplier > 1) and just "+score" otherwise.
+        private void ApplyMatchScore(List<Ball> matches, Ball anchor, int comboMultiplier)
+        {
+            int baseScore = matches.Count *
+                _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
+            int score = baseScore * comboMultiplier;
+
+            _levelLocalProgressService.AddScore(score);
+            _widgetBallChainProvider.SetUpWidget(matches, anchor, score, comboMultiplier);
+            _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
         }
 
         private void TryCleanupEmptySegment(ChainSegment segment)
