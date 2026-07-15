@@ -19,17 +19,19 @@ MonoBehaviour:
   m_DismissPreviewPackagesInUse: 0
   oneTimeWarningShown: 0
   oneTimePackageErrorsPopUpShown: 0
-  m_Registries:
-  - m_Id: main
+  m_MainRegistry:
+    m_Id: main
     m_Name: 
     m_Url: https://packages.unity.com
     m_Scopes: []
     m_IsDefault: 1
+    m_IsUnityRegistry: 1
     m_Capabilities: 7
     m_ConfigSource: 0
     m_Compliance:
       m_Status: 0
       m_Violations: []
+  m_ScopedRegistries:
   - m_Id: scoped:project:package.openupm.com
     m_Name: package.openupm.com
     m_Url: https://package.openupm.com
@@ -37,6 +39,7 @@ MonoBehaviour:
     - com.svermeulen.extenject
     - com.cysharp.unitask
     m_IsDefault: 0
+    m_IsUnityRegistry: 0
     m_Capabilities: 0
     m_ConfigSource: 4
     m_Compliance:
@@ -48,7 +51,7 @@ MonoBehaviour:
     m_Modified: 0
     m_ErrorMessage: 
     m_UserModificationsEntityId:
-      m_Data: -922
+      m_rawData: 568105589213756508
     m_OriginalEntityId:
-      m_Data: -924
+      m_rawData: 568105589213756506
   m_LoadAssets: 0

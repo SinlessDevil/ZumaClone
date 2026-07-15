@@ -463,7 +463,7 @@ namespace ToonyColorsPro
 			if (!AssetDatabase.IsMainAsset(meshAsset))
 			{
 				var main = AssetDatabase.LoadMainAssetAtPath(meshPath);
-				meshName = main.name + " - " + meshName + "_" + mesh.GetInstanceID();
+				meshName = main.name + " - " + meshName + "_" + mesh.GetEntityId();
 			}
 
 			var sm = new SelectedMesh(mesh, meshName, isProjectAsset, _assoObj);

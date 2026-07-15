@@ -30,8 +30,7 @@ namespace Code.Services.BallController
 
             SetUpWidget(position, color, text);
         }
-
-        // Combo (multiplier > 1): "2x +100". Plain match: "+50".
+        
         private string FormatScoreText(int score, int comboMultiplier) =>
             comboMultiplier > 1 ? $"+{score} {comboMultiplier}x" : $"+{score}";
         

@@ -178,7 +178,7 @@ namespace ToonyColorsPro
 				}
 
 				reflectionRenderTexture = new RenderTexture(textureSize, textureSize, 16, renderTextureFormat, RenderTextureReadWrite.sRGB);
-				reflectionRenderTexture.name = "Planar Reflection for " + GetInstanceID();
+				reflectionRenderTexture.name = "Planar Reflection for " + GetEntityId();
 				reflectionRenderTexture.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
 			}
 
