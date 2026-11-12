@@ -1,0 +1,3 @@
+[mcp_servers.unity]
+command = "unity"
+args = ["mcp", "--project-path", 'E:\Unity\Projects\SinlessDevil\ZumaClone']

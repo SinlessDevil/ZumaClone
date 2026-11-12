@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chat Notes"
+  short_description: "Save a dated Markdown summary of the current chat"
+  default_prompt: "Use $chat-notes to save a concise summary of the current chat as a Markdown file in Docs, with a date and short topic in the filename."

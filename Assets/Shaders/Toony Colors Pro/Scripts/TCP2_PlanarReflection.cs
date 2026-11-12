@@ -7,15 +7,6 @@ using UnityEngine.Rendering;
 using UnityEditor;
 #endif
 
-// Use this script to generate the Reflection Render Texture when using the "Planar Reflection" mode from the Shader Generator
-
-// Usage:
-// - generate a water shader with "Planar Reflection"
-// - assign this shader to a planar mesh's material
-// - add this script on the same GameObject
-
-// Based on: http://wiki.unity3d.com/index.php/MirrorReflection4
-
 namespace ToonyColorsPro
 {
 	namespace Runtime
