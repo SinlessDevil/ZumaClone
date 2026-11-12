@@ -6,6 +6,7 @@
         "UnityEditor.TestRunner",
         "Zenject",
         "Game",
+        "PathCreator",
         "Zenject-TestFramework"
     ],
     "includePlatforms": [],

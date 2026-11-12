@@ -1,80 +1,71 @@
 using System.Collections;
-using Code.Infrastructure.StateMachine;
-using Code.Infrastructure.StateMachine.Game.States;
+using Code.Services.Factories.UIFactory;
 using Code.Services.Providers.Widgets;
 using Code.UI;
+using NSubstitute;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-using Zenject;
 
 namespace Tests.PlayMode
 {
     public class WidgetProviderPlayModeTest
     {
-        private IWidgetProvider _provider;
+        private GameObject _root;
+        private WidgetProvider _provider;
 
-        [UnitySetUp]
-        public IEnumerator SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            yield return LoadInitialScene();
-            yield return new WaitForSeconds(1f);
-            
-            DiContainer container = ProjectContext.Instance.Container;
-            var stateMachine = container.Resolve<IStateMachine<IGameState>>();
-            yield return stateMachine.Enter<LoadLevelTestState, string>("Game");
-            
-            _provider = container.Resolve<IWidgetProvider>();
-            Assert.IsNotNull(_provider, "WidgetProvider should not be null");
-            yield return null;
-        }
-        
-        [UnityTearDown]
-        public IEnumerator TearDown()
-        {
-            foreach (var obj in Object.FindObjectsOfType<GameObject>())
+            _root = new GameObject(nameof(WidgetProviderPlayModeTest));
+            if (Camera.main == null)
             {
-                if (obj.scene.name == null)
-                {
-                    Object.Destroy(obj);
-                }
+                GameObject cameraObject = new("Widget test camera") { tag = "MainCamera" };
+                cameraObject.transform.SetParent(_root.transform);
+                cameraObject.transform.position = new Vector3(0f, 0f, -10f);
+                cameraObject.AddComponent<Camera>();
             }
 
-            yield return null;
+            Widget prefab = Resources.Load<Widget>("UI/Widget");
+            IUIFactory factory = Substitute.For<IUIFactory>();
+            factory.CreateWidget().Returns(_ => Object.Instantiate(prefab, _root.transform));
+            _provider = new WidgetProvider(factory);
+            _provider.CreatePoolWidgets();
         }
-        
+
+        [TearDown]
+        public void TearDown()
+        {
+            _provider.CleanupPool();
+            Object.Destroy(_root);
+        }
+
         [UnityTest]
         public IEnumerator Should_Reuse_Play_Animation_Widget()
         {
-            yield return new WaitForSeconds(5f);
-            
             Widget first = _provider.GetWidget(Vector3.zero);
             first.SetText("Test");
             first.SetColor(Color.red);
             first.PlayAnimation();
+            yield return WaitForAnimation(first);
             _provider.ReturnWidget(first);
 
-            yield return new WaitForSeconds(1f);
-
             Widget reused = _provider.GetWidget(Vector3.right);
+            Assert.That(reused, Is.SameAs(first));
             reused.SetText("Test_1");
             reused.SetColor(Color.gray);
             reused.PlayAnimation();
-
-            yield return new WaitForSeconds(1f);
-
-            Assert.IsNotNull(first, "First widget is null. Possibly CreateWidget returned null.");
-            Assert.IsNotNull(reused, "Reused widget is null. It might have been destroyed or not created properly.");
-            Assert.AreSame(first, reused, "Expected the widget to be reused, but a different instance was returned.");
-            yield return null;
+            yield return WaitForAnimation(reused);
         }
-        
-        private IEnumerator LoadInitialScene()
+
+        private static IEnumerator WaitForAnimation(Widget widget)
         {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Initial");
-            yield return new WaitUntil(() => asyncLoad.isDone);
-            yield return null;
+            Assert.That(widget.gameObject.activeSelf, Is.True);
+            float deadline = Time.realtimeSinceStartup + 5f;
+            while (widget.gameObject.activeSelf && Time.realtimeSinceStartup < deadline)
+                yield return null;
+
+            Assert.That(widget.gameObject.activeSelf, Is.False, "The widget did not deactivate after the animation.");
         }
     }
 }
