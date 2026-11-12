@@ -143,7 +143,7 @@ namespace Code.Logic.Zuma.Players
             _canShoot = false;
             _shootTimer = _shootCooldown;
 
-            Vector3 mouseWorldPosition = _inputService.TouchPositionToWorldPosition;
+            Vector3 mouseWorldPosition = _inputService.GetWorldPointerPosition(_rotationTransform.position);
             Vector3 direction = mouseWorldPosition - _rotationTransform.position;
             direction = new Vector3(direction.x, 0, direction.z).normalized;
 

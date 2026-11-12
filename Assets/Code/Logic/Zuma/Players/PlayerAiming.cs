@@ -83,7 +83,7 @@ namespace Code.Logic.Zuma.Players
 
         private void RotateObjectWithMouse()
         {
-            Vector3 mouseWorldPosition = _inputService.TouchPositionToWorldPosition;
+            Vector3 mouseWorldPosition = _inputService.GetWorldPointerPosition(_rotationTransform.position);
             Vector3 direction = mouseWorldPosition - _rotationTransform.position;
 
             float newAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;

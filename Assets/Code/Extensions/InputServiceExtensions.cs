@@ -13,11 +13,16 @@ namespace Code.Extensions
                 return float.MaxValue;
             }
 
-            Vector3 touchScreenPosition = inputService.TouchPosition;
-            touchScreenPosition.z = Camera.main.WorldToScreenPoint(worldPosition).z;
-
-            Vector3 touchWorldPosition = Camera.main.ScreenToWorldPoint(touchScreenPosition);
+            Vector3 touchWorldPosition = inputService.GetWorldPointerPosition(worldPosition);
             return Vector3.Distance(worldPosition, touchWorldPosition);
+        }
+
+        public static Vector3 GetWorldPointerPosition(this IInputService inputService, Vector3 worldPosition)
+        {
+            Camera camera = Camera.main;
+            Vector3 screenPosition = inputService.TouchPosition;
+            screenPosition.z = camera.WorldToScreenPoint(worldPosition).z;
+            return camera.ScreenToWorldPoint(screenPosition);
         }
     }
 }

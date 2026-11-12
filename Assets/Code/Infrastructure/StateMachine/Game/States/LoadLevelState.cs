@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Code.Services.BallController;
 using Code.Services.Factories.Game;
 using Code.Services.Factories.UIFactory;
@@ -127,7 +127,11 @@ namespace Code.Infrastructure.StateMachine.Game.States
         private void InitBallChainController()
         {
             var levelHolder = _levelService.GetLevelHolder();
-            var ballChainDTO = _staticDataService.GetBallChainDTO();
+            BallChainDTO ballChainDTO = _staticDataService.GetBallChainDTO();
+            float levelMoveSpeed = _levelService.GetCurrentLevelStaticData().LevelConfig.BallMoveSpeedOverride;
+            if (levelMoveSpeed > 0f)
+                ballChainDTO.MoveSpeed = levelMoveSpeed;
+
             _ballChainController.Initialize(levelHolder.PathCreator, ballChainDTO);
         }
         

@@ -15,8 +15,9 @@ MonoBehaviour:
   LevelName: Zuma
   LevelId: 1
   LevelTypeId: 0
-  LevelHolder: {fileID: 986213291232290063, guid: e252e9ad4265ed94f9a71b89ba0bd7ae, type: 3}
+  LevelHolder: {fileID: 3018730990265930788, guid: d34ea8c5b31645e4da3201b82a8c6205, type: 3}
   LevelConfig:
-    CountItem: 6
+    CountItem: 30
+    BallMoveSpeedOverride: 1.2
     RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
     ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

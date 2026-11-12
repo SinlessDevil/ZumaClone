@@ -25,6 +25,8 @@ namespace Code.StaticData.Levels
     public class LevelConfig
     {
         public int CountItem;
+        [Min(0f), Tooltip("World units per second. Zero uses the shared ball chain speed.")]
+        public float BallMoveSpeedOverride;
         public LevelRandomConfigStaticData RandomConfig;
         public LevelScoreStaticData ScoreConfig;
     }

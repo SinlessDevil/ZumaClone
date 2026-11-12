@@ -19,6 +19,7 @@ namespace Code.Services.Input.Device
         public void UpdateInput()
         {
             _currentMousePosition = UnityEngine.Input.mousePosition;
+            TouchPosition = _currentMousePosition;
 
             if (UnityEngine.Input.GetMouseButtonDown(0))
             {
@@ -40,8 +41,6 @@ namespace Code.Services.Input.Device
             
             TouchPositionToWorldPosition = Camera.main.ScreenToWorldPoint(
                 new Vector3(UnityEngine.Input.mousePosition.x, UnityEngine.Input.mousePosition.y, 10f));
-
-            TouchPosition = _currentMousePosition;
         }
     }
 }
