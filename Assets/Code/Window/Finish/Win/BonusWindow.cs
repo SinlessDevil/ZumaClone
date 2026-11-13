@@ -1,5 +1,6 @@
 using Code.Infrastructure.StateMachine;
 using Code.Infrastructure.StateMachine.Game.States;
+using Code.Services.Levels;
 using Code.Services.SFX.Sound;
 using Code.Services.StaticData;
 using Zenject;
@@ -11,16 +12,19 @@ namespace Code.Window.Finish.Win
         private IStateMachine<IGameState> _gameStateMachine;
         private IStaticDataService _staticDataService;
         private ISoundService _soundService;
+        private ILevelService _levels;
         
         [Inject]
         public void Constructor(
             IStateMachine<IGameState> gameStateMachine,
             IStaticDataService staticDataService,
-            ISoundService soundService)
+            ISoundService soundService,
+            ILevelService levels)
         {
             _gameStateMachine = gameStateMachine;
             _staticDataService = staticDataService;
             _soundService = soundService;
+            _levels = levels;
         }
 
         public void OnDestroy()
@@ -46,7 +50,17 @@ namespace Code.Window.Finish.Win
         protected override void OnLoadLevelButtonClick()
         {
             _soundService.PlaySound(Sound2DType.Click);
-            
+
+            if (_levels.Mode != ZumaMode.Adventure)
+            {
+                _levels.NextGauntletRound();   
+            }
+            else if (_levels.AdventureFinished)
+            {
+                _gameStateMachine.Enter<LoadMenuState, string>(_staticDataService.GameConfig.MenuScene);
+                return;
+            }
+
             _gameStateMachine.Enter<LoadLevelState, string>(_staticDataService.GameConfig.GameScene);
         }
 

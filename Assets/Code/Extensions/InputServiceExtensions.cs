@@ -17,12 +17,17 @@ namespace Code.Extensions
             return Vector3.Distance(worldPosition, touchWorldPosition);
         }
 
-        public static Vector3 GetWorldPointerPosition(this IInputService inputService, Vector3 worldPosition)
+        public static Vector3 GetWorldPointerPosition(this IInputService inputService, Vector3 worldPosition) => ScreenToField(inputService.TouchPosition, worldPosition);
+
+        public static Vector3 ScreenToField(Vector2 screenPosition, Vector3 worldPosition)
         {
             Camera camera = Camera.main;
-            Vector3 screenPosition = inputService.TouchPosition;
-            screenPosition.z = camera.WorldToScreenPoint(worldPosition).z;
-            return camera.ScreenToWorldPoint(screenPosition);
+            if (camera == null)
+                return worldPosition;
+
+            Ray ray = camera.ScreenPointToRay(screenPosition);
+            Plane field = new(Vector3.up, worldPosition);
+            return field.Raycast(ray, out float distance) ? ray.GetPoint(distance) : worldPosition;
         }
     }
 }

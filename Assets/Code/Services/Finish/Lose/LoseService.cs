@@ -1,6 +1,5 @@
 using Code.Services.Levels;
 using Code.Services.LocalProgress;
-using Code.Services.PersistenceProgress.Player;
 using Code.Services.Timer;
 using Code.Services.Window;
 using Code.Window;
@@ -30,39 +29,26 @@ namespace Code.Services.Finish.Lose
         
         public void Lose()
         {
-            (string, string) recordTime = GetRecordText();
+            string elapsed = _timeService.GetFormattedElapsedTime();
             string scoreText = GetScoreText();
             
             RectTransform window = _windowService.Open(WindowTypeId.Lose);
             
             LoseWindow loseWindow = window.GetComponent<LoseWindow>();
-            loseWindow.SetTime(recordTime.Item1 + recordTime.Item2);
+            loseWindow.SetTime("Time: " + elapsed);
             loseWindow.SetScore(scoreText);
             loseWindow.Initialize();
             loseWindow.ResetWindow();
             loseWindow.OpenWindow(null, _levelLocalProgressService.Score, _timeService.GetElapsedTime());
         }
         
-        private float GetCurrentRecordTime()
+        private string GetScoreText()
         {
-            LevelContainer currentLevelContainer = _levelService.GetCurrentLevelContainer();
-            if(currentLevelContainer == null)
-                return 0;
-            
-            return currentLevelContainer.Time;
-        }
+            int score = _levelLocalProgressService.Score;
+            if (_levelService.Mode != ZumaMode.Adventure)
+                return $"Score: {score}  {_levelService.GetGauntletRank(score)}";
 
-        private (string, string) GetRecordText()
-        {
-            float currentRecordTime = GetCurrentRecordTime();
-            float currentTime = _timeService.GetElapsedTime();
-            
-            if(currentRecordTime == 0 || currentTime > currentRecordTime)
-                return ("New Record! Time: ", _timeService.GetFormattedElapsedTime());
-
-            return ("Record: ", _timeService.GetFormattedElapsedTime());
+            return _levelService.CanContinueAdventure ? $"Score: {score}  Lives: {_levelService.AdventureLives}" : $"Game Over  Score: {score}";
         }
-        
-        private string GetScoreText() => "Score: " + _levelLocalProgressService.Score;
     }
 }

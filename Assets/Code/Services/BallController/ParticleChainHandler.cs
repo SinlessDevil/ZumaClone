@@ -52,11 +52,18 @@ namespace Code.Services.BallController
                     break;
 
                 particle.transform.position = _pathCreator.path.GetPointAtDistance(distance);
-                await UniTask.Yield();
+                await UniTask.Yield(cancellationToken: _chainState.Token);
             }
 
-            particle.transform.DOScale(Vector3.zero, 0.4f).SetEase(Ease.InQuart);
-            await UniTask.Delay(650);
+            Tween shrink = particle.transform.DOScale(Vector3.zero, 0.4f).SetEase(Ease.InQuart);
+            try
+            {
+                await UniTask.Delay(650, cancellationToken: _chainState.Token);
+            }
+            finally
+            {
+                shrink.Kill();
+            }
             particle.gameObject.SetActive(false);
             particle.transform.localScale = Vector3.one;
             particle.Stop();

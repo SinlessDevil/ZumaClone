@@ -48,18 +48,13 @@ namespace Code.Services.BallController
             _levelService = levelService;
         }
 
-        public bool IsWin { get; private set; }
-
-        public void TryWin(int remainingBalls)
+        public void TryWin(int remainingBalls, float lastMatchDistance)
         {
-            if (remainingBalls <= 0 && !IsWin)
-            {
-                IsWin = true;
-                TriggerWinConditionAsync().Forget();
-            }
+            if (remainingBalls == 0 && _chainState.TryFinish(won: true))
+                TriggerWinConditionAsync(lastMatchDistance).Forget();
         }
 
-        private async UniTask TriggerWinConditionAsync()
+        private async UniTask TriggerWinConditionAsync(float lastMatchDistance)
         {
             _timeService.StopTimer();
             _inputService.Cleanup();
@@ -67,25 +62,35 @@ namespace Code.Services.BallController
             _particleChainHandler.MoveParticleAlongPathAsync(
                 _levelService.GetLevelHolder().DefaultParticleSystemHolder).Forget();
 
-            float step = _ballChainDto.SetToSpawnWidget;
-            float currentDistance = _chainState.HeadDistance;
-            float pathEnd = _pathCreator.path.length;
+            float step = Mathf.Max(0.01f, _ballChainDto.SetToSpawnWidget);
+            float currentDistance = Mathf.Max(0f, lastMatchDistance);
+            var finalPath = (_chainState.LastRemovalPath ?? _pathCreator).path;
+            float pathEnd = finalPath.length;
             Color widgetColor = _ballChainDto.BaseColorWidget;
             string widgetText = "+" + _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerStepPath;
 
             while (currentDistance < pathEnd)
             {
-                Vector3 position = _pathCreator.path.GetPointAtDistance(currentDistance);
+                Vector3 position = finalPath.GetPointAtDistance(currentDistance);
                 _widgetBallChainProvider.SetUpWidget(position, widgetColor, widgetText);
 
                 currentDistance += step;
                 _levelLocalProgressService.AddScore(
                     _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerStepPath);
 
-                await UniTask.Delay(_ballChainDto.TimeToSpawnWidget);
+                await UniTask.Delay(_ballChainDto.TimeToSpawnWidget, cancellationToken: _chainState.Token);
             }
 
-            await UniTask.Delay(1000);
+            float elapsed = _timeService.GetElapsedTime();
+            if (_ballChainDto.AceTime > 0f && elapsed <= _ballChainDto.AceTime)
+            {
+                int aceBonus = 100 + Mathf.FloorToInt((1f - elapsed / _ballChainDto.AceTime) * 25000f);
+                _levelLocalProgressService.AddScore(aceBonus);
+                _widgetBallChainProvider.SetUpWidget(finalPath.GetPointAtDistance(pathEnd, EndOfPathInstruction.Stop),
+                    widgetColor, $"Ace +{aceBonus}");
+            }
+
+            await UniTask.Delay(1000, cancellationToken: _chainState.Token);
             _finishService.Win();
         }
     }

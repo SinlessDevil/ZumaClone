@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using Code.Services.BallController;
 using Code.Services.Factories.Game;
 using Code.Services.Factories.UIFactory;
@@ -8,8 +9,10 @@ using Code.Services.Levels;
 using Code.Services.Providers.Balls;
 using Code.Services.Providers.Widgets;
 using Code.Services.Random;
+using Code.Services.SaveLoad;
 using Code.Services.StaticData;
 using Code.StaticData;
+using Code.StaticData.Levels;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -29,6 +32,8 @@ namespace Code.Infrastructure.StateMachine.Game.States
         private readonly IBallChainController _ballChainController;
         private readonly IStaticDataService _staticDataService;
         private readonly IRandomService _randomService;
+        private readonly ISaveLoadFacade _saveLoad;
+        private int _loadVersion;
 
         public LoadLevelState(
             IStateMachine<IGameState> gameStateMachine, 
@@ -42,7 +47,8 @@ namespace Code.Infrastructure.StateMachine.Game.States
             IWidgetProvider widgetProvider,
             IBallChainController ballChainController,
             IStaticDataService staticDataService,
-            IRandomService randomService)
+            IRandomService randomService,
+            ISaveLoadFacade saveLoad)
         {
             _gameFactory = gameFactory;
             _gameStateMachine = gameStateMachine;
@@ -56,22 +62,33 @@ namespace Code.Infrastructure.StateMachine.Game.States
             _ballChainController = ballChainController;
             _staticDataService = staticDataService;
             _randomService = randomService;
+            _saveLoad = saveLoad;
         }
 
         public void Enter(string payload)
         {
             _loadingCurtain.Show();
-            _sceneLoader.Load(payload, OnLevelLoad);
+            int version = ++_loadVersion;
+            _sceneLoader.Load(payload, () =>
+            {
+                if (version == _loadVersion)
+                    OnLevelLoad();
+            });
         }
 
         public void Exit()
         {
+            ++_loadVersion;
             _loadingCurtain.Hide();
         }
 
         protected virtual void OnLevelLoad()
         {
+            if (_levelService.Mode == ZumaMode.Adventure)
+                _levelService.PrepareAdventureSelection();
             InitGameWorld();
+            if (_levelService.VisitLevel())
+                _saveLoad.SaveProgress(SaveMethodType.PlayerPrefs);
 
             _gameStateMachine.Enter<GameLoopState>();
         }
@@ -90,7 +107,7 @@ namespace Code.Infrastructure.StateMachine.Game.States
 
             InitBallChainController();
             
-            PlayStartLevelAsync().Forget();
+            PlayStartLevelAsync(_ballChainController.AttemptToken).Forget();
         }
 
         private void InitLevelHolder()
@@ -128,17 +145,22 @@ namespace Code.Infrastructure.StateMachine.Game.States
         {
             var levelHolder = _levelService.GetLevelHolder();
             BallChainDTO ballChainDTO = _staticDataService.GetBallChainDTO();
-            float levelMoveSpeed = _levelService.GetCurrentLevelStaticData().LevelConfig.BallMoveSpeedOverride;
+            LevelConfig config = _levelService.GetCurrentLevelStaticData().LevelConfig;
+            ballChainDTO.Survival = _levelService.Mode == ZumaMode.Survival;
+            ballChainDTO.ZumaTargetScore = config.GetZumaTarget();
+            ballChainDTO.AceTime = config.AceTime;
+            ballChainDTO.CollisionThreshold = Mathf.Min(ballChainDTO.CollisionThreshold, ballChainDTO.SpacingBalls * 1.15f);
+            float levelMoveSpeed = config.BallMoveSpeedOverride;
             if (levelMoveSpeed > 0f)
                 ballChainDTO.MoveSpeed = levelMoveSpeed;
 
             _ballChainController.Initialize(levelHolder.PathCreator, ballChainDTO);
         }
         
-        private async UniTask PlayStartLevelAsync()
+        private async UniTask PlayStartLevelAsync(CancellationToken token)
         {
-            await UniTask.WaitUntil(() => !_loadingCurtain.IsActive);
-            await UniTask.Delay(150);
+            await UniTask.WaitUntil(() => !_loadingCurtain.IsActive, cancellationToken: token);
+            await UniTask.Delay(150, cancellationToken: token);
             
             var startLevelInfoDisplayer = _uiFactory.CreateStartLevelInfoDisplayer();
             var nameLevel = _levelService.GetCurrentLevelStaticData().LevelName;
@@ -146,16 +168,18 @@ namespace Code.Infrastructure.StateMachine.Game.States
             var level = nameLevel + " " + numberLevel;
             startLevelInfoDisplayer.Initialize(level);
             startLevelInfoDisplayer.Play();
-            await UniTask.WaitUntil(() => !startLevelInfoDisplayer.IsActive);
+            await UniTask.WaitUntil(() => !startLevelInfoDisplayer.IsActive, cancellationToken: token);
             
             await _ballChainController.MoveParticleAlongPathAsync(_levelService.GetLevelHolder().DefaultParticleSystemHolder);
             
+            token.ThrowIfCancellationRequested();
             List<Color> colors = _randomService.GetColorsByLevelRandomConfig();
             
             _gameFactory.Player.PlayerShooting.Activate(colors);
             _ballChainController.StartBallSpawning(colors);
 
-            switch (_staticDataService.GameConfig.TypeInput)
+            TypeInput inputType = Application.isMobilePlatform ? TypeInput.Mobile : TypeInput.PC;
+            switch (inputType)
             {
                 case TypeInput.PC:
                     _inputService.SetInputDevice(new MouseInputDevice());

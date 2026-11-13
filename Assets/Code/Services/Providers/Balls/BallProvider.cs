@@ -35,6 +35,7 @@ namespace Code.Services.Providers.Balls
         {
             foreach (var ball in _pool.Where(ball => ball != null))
             {
+                ball.Deactivate();
                 Object.Destroy(ball.gameObject);
             }
 
@@ -43,13 +44,10 @@ namespace Code.Services.Providers.Balls
 
         public Ball GetBall(Vector3 position, Quaternion rotation)
         {
-            foreach (var ball in _pool)
+            foreach (var ball in _pool.Where(ball => !ball.gameObject.activeSelf))
             {
-                if (!ball.gameObject.activeInHierarchy)
-                {
-                    ball.Activate(position, rotation);
-                    return ball;
-                }
+                ball.Activate(position, rotation);
+                return ball;
             }
 
             Ball newBall = CreateObject(position, rotation);

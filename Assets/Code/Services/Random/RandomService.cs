@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Code.StaticData.Levels;
 using System.Linq;
 using Code.Logic.Zuma;
 using Code.Services.Levels;
@@ -9,6 +11,7 @@ namespace Code.Services.Random
     public class RandomService : IRandomService
     {
         private readonly ILevelService _levelService;
+        private readonly System.Random _ammoRandom = new();
 
         public RandomService(ILevelService levelService)
         {
@@ -17,29 +20,13 @@ namespace Code.Services.Random
 
         public List<Color> GetColorsByLevelRandomConfig()
         {
-            var levelRandomConfig = _levelService.GetCurrentLevelStaticData().LevelConfig.RandomConfig;
-            var count = _levelService.GetCurrentLevelStaticData().LevelConfig.CountItem;
+            LevelConfig config = _levelService.GetCurrentLevelStaticData().LevelConfig;
+            var palette = BuildPalette(config.RandomConfig);
+            if (palette.Count == 0 || config.CountItem < 1)
+                throw new InvalidOperationException("A level needs a positive opening count and at least one weighted ball color.");
 
-            if (levelRandomConfig == null || levelRandomConfig.ItemProbabilities.Count == 0)
-                return new List<Color>();
-
-            List<Color> selectedColors = new();
-
-            foreach (var itemProbability in levelRandomConfig.ItemProbabilities)
-            {
-                int exactCount = Mathf.RoundToInt(count * (itemProbability.Probability / 100f));
-                for (int i = 0; i < exactCount; i++)
-                    selectedColors.Add(itemProbability.Item.ItemColor);
-            }
-
-            // Перемешиваем
-            for (int i = selectedColors.Count - 1; i > 0; i--)
-            {
-                int randomIndex = UnityEngine.Random.Range(0, i + 1);
-                (selectedColors[i], selectedColors[randomIndex]) = (selectedColors[randomIndex], selectedColors[i]);
-            }
-
-            return selectedColors;
+            System.Random opening = new(UnityEngine.Random.Range(0, int.MaxValue));
+            return Enumerable.Range(0, config.CountItem).Select(_ => Sample(palette, opening)).ToList();
         }
 
         public Color GetColorByCurrentItems(List<Item> items, Item currentItem)
@@ -56,9 +43,34 @@ namespace Code.Services.Random
             return SelectColorFromAvailable(colors, currentColor);
         }
 
+        public static List<(Color color, float weight)> BuildPalette(LevelRandomConfigStaticData config)
+        {
+            if (config == null)
+                return new List<(Color, float)>();
+
+            return config.ItemProbabilities
+                .Where(entry => entry.Item != null && entry.Item.ItemColor.a > 0f && entry.Probability > 0f)
+                .GroupBy(entry => entry.Item.ItemColor)
+                .Select(group => (group.Key, group.Sum(entry => entry.Probability)))
+                .ToList();
+        }
+
+        public static Color Sample(IReadOnlyList<(Color color, float weight)> palette, System.Random random)
+        {
+            double roll = random.NextDouble() * palette.Sum(entry => entry.weight);
+            foreach ((Color color, float weight) in palette)
+            {
+                roll -= weight;
+                if (roll < 0d)
+                    return color;
+            }
+            return palette[^1].color;
+        }
+
         private Color SelectColorFromAvailable(IEnumerable<Color> colors, Color? excludeColor)
         {
             var availableColors = colors?
+                .Where(color => color.a > 0f)
                 .Distinct()
                 .ToList() ?? new List<Color>();
 
@@ -68,7 +80,7 @@ namespace Code.Services.Random
             if (excludeColor.HasValue && availableColors.Count > 1)
                 availableColors.Remove(excludeColor.Value);
 
-            return availableColors[UnityEngine.Random.Range(0, availableColors.Count)];
+            return availableColors[_ammoRandom.Next(availableColors.Count)];
         }
 
         public string GenerateId() => System.Guid.NewGuid().ToString();

@@ -35,7 +35,6 @@ namespace Code.Logic.Zuma.Players
         
         private void Dispose()
         {
-            _playerAiming.Dispose();
             _playerShooting.Dispose();
         }
     }   

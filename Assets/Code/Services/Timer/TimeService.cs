@@ -11,20 +11,23 @@ namespace Code.Services.Timer
 
         public void StartTimer()
         {
-            _startTime = Time.unscaledTime - _elapsedTime;
+            _startTime = Time.time - _elapsedTime;
             _isRunning = true;
         }
 
         public void StopTimer()
         {
-            _elapsedTime = Time.unscaledTime - _startTime;
+            if (!_isRunning)
+                return;
+
+            _elapsedTime = Time.time - _startTime;
             _isRunning = false;
         }
         
         public float GetElapsedTime()
         {
             if (_isRunning)
-                return Time.unscaledTime - _startTime;
+                return Time.time - _startTime;
             return _elapsedTime;
         }
 

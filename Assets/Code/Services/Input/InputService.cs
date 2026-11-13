@@ -12,9 +12,12 @@ namespace Code.Services.Input
         public Vector2 Direction => _inputDevice?.Direction ?? Vector2.zero;
         public Vector3 TouchPositionToWorldPosition => _inputDevice?.TouchPositionToWorldPosition ?? Vector3.zero;
         public Vector3 TouchPosition => _inputDevice?.TouchPosition ?? Vector3.zero;
-        public bool IsActiveInput => _inputDevice != null;
+        public bool IsActiveInput => _inputDevice is not null and not NullableInputDevice;
+        public bool CanAim => Time.timeScale > 0f && (_inputDevice?.CanAim ?? false);
+        public bool UsesMouse => _inputDevice is MouseInputDevice;
 
         public event Action<Vector2> TapEvent;
+        public event Action<Vector2> AlternatePointerEvent;
         public event Action PointerDownEvent;
         public event Action PointerUpEvent;
         public event Action InputUpdateEvent;
@@ -36,6 +39,12 @@ namespace Code.Services.Input
             if (_inputDevice == null)
                 return;
 
+            if (Time.timeScale == 0f || !Application.isFocused)
+            {
+                _inputDevice.CancelGesture();
+                return;
+            }
+
             _inputDevice.UpdateInput();
             
             if (Direction.magnitude > 0)
@@ -52,6 +61,7 @@ namespace Code.Services.Input
         private void SubscribeInputEvents(IInputDevice inputDevice)
         {
             inputDevice.TapEvent += OnTap;
+            inputDevice.AlternatePointerEvent += OnAlternatePointer;
             inputDevice.PointerDownEvent += OnPointerDown;
             inputDevice.PointerUpEvent += OnPointerUp;
         }
@@ -59,11 +69,14 @@ namespace Code.Services.Input
         private void UnsubscribeInputEvents(IInputDevice inputDevice)
         {
             inputDevice.TapEvent -= OnTap;
+            inputDevice.AlternatePointerEvent -= OnAlternatePointer;
             inputDevice.PointerDownEvent -= OnPointerDown;
             inputDevice.PointerUpEvent -= OnPointerUp;
         }
 
         private void OnTap(Vector2 position) => TapEvent?.Invoke(position);
+
+        private void OnAlternatePointer(Vector2 position) => AlternatePointerEvent?.Invoke(position);
         
         private void OnPointerDown() => PointerDownEvent?.Invoke();
         

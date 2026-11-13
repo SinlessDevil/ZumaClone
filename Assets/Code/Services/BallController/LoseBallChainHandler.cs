@@ -4,15 +4,11 @@ using Code.Services.Input;
 using Code.Services.Levels;
 using Code.Services.Timer;
 using Cysharp.Threading.Tasks;
-using Code.PathCreation;
-using UnityEngine;
 
 namespace Code.Services.BallController
 {
     public class LoseBallChainHandler
     {
-        private readonly BallChainDTO _ballChainDto;
-        private readonly PathCreator _pathCreator;
         private readonly ChainState _chainState;
 
         private readonly ITimeService _timeService;
@@ -22,8 +18,6 @@ namespace Code.Services.BallController
         private readonly IFinishService _finishService;
 
         public LoseBallChainHandler(
-            BallChainDTO ballChainDto,
-            PathCreator pathCreator,
             ChainState chainState,
             ITimeService timeService,
             ILevelService levelService,
@@ -31,8 +25,6 @@ namespace Code.Services.BallController
             IGameFactory gameFactory,
             IFinishService finishService)
         {
-            _ballChainDto = ballChainDto;
-            _pathCreator = pathCreator;
             _chainState = chainState;
             _timeService = timeService;
             _levelService = levelService;
@@ -41,21 +33,15 @@ namespace Code.Services.BallController
             _finishService = finishService;
         }
 
-        public bool IsLose { get; private set; }
+        public bool IsLose => _chainState.HasLost;
 
-        public void TryLose(Vector3 positionLastBall)
+        public void TryLose(ChainSegment segment)
         {
-            if (IsLose) return;
-
-            IsLose = true;
+            if (!_chainState.TryFinish(won: false))
+                return;
             TriggerDefeatConditionAsync().Forget();
 
-            float thresholdDistance = _pathCreator.path.length * 0.2f;
-            float distanceTravelled = _pathCreator.path.GetClosestDistanceAlongPath(positionLastBall);
-            float remainingDistance = _pathCreator.path.length - distanceTravelled;
-            float normalizedValue = Mathf.Clamp01(1 - (remainingDistance / thresholdDistance));
-
-            _levelService.GetLevelHolder().LevelEnd.SetMouthProgressionAnimation(normalizedValue);
+            (segment.Track?.End ?? _levelService.GetLevelHolder().LevelEnd).SetMouthProgressionAnimation(1f);
         }
 
         private async UniTask TriggerDefeatConditionAsync()
@@ -64,9 +50,9 @@ namespace Code.Services.BallController
             _inputService.Cleanup();
 
             _gameFactory.Player.PlayerAnimator.PlayLoopRotation();
-            await UniTask.WaitUntil(() => _chainState.TotalBallCount == 0);
+            await UniTask.WaitUntil(() => _chainState.TotalBallCount == 0, cancellationToken: _chainState.Token);
             _gameFactory.Player.PlayerAnimator.StopRotation();
-            await UniTask.Delay(1000);
+            await UniTask.Delay(1000, cancellationToken: _chainState.Token);
 
             _finishService.Lose();
         }

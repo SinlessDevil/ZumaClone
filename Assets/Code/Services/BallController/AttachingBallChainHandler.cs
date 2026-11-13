@@ -1,309 +1,316 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Code.Logic.Zuma.Balls;
+using Code.PathCreation;
 using Code.Services.Levels;
 using Code.Services.LocalProgress;
-using Cysharp.Threading.Tasks;
-using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Services.BallController
 {
     public class AttachingBallChainHandler
     {
-        private readonly PathCreator _pathCreator;
-        private readonly BallChainDTO _ballChainDto;
+        private readonly BallChainDTO _settings;
         private readonly List<ChainSegment> _segments;
-        private readonly WidgetBallChainProvider _widgetBallChainProvider;
-        private readonly WinBallChainHandler _winBallChainHandler;
-        private readonly ILevelService _levelService;
-        private readonly ILevelLocalProgressService _levelLocalProgressService;
-
-        // Counter instead of bool: handles user-shot combos overlapping with chain reactions
-        private int _activeComboCount;
-        public bool IsProcessingCombo => _activeComboCount > 0;
+        private readonly WidgetBallChainProvider _widgets;
+        private readonly ILevelLocalProgressService _progress;
+        private readonly ChainState _state;
+        private readonly int _pointsPerBall;
+        private readonly Dictionary<int, bool> _shotResults = new();
+        private int _shotId;
+        private int _ballId;
+        private int _nextResult = 1;
+        private int _streak;
 
         public AttachingBallChainHandler(
-            PathCreator pathCreator,
-            BallChainDTO ballChainDto,
+            BallChainDTO settings, 
             List<ChainSegment> segments,
-            WidgetBallChainProvider widgetBallChainProvider,
-            WinBallChainHandler winBallChainHandler,
-            ILevelService levelService,
-            ILevelLocalProgressService levelLocalProgressService)
+            WidgetBallChainProvider widgets, 
+            ILevelService levels, 
+            ILevelLocalProgressService progress,
+            ChainState state)
         {
-            _pathCreator = pathCreator;
-            _ballChainDto = ballChainDto;
+            _settings = settings;
             _segments = segments;
-            _widgetBallChainProvider = widgetBallChainProvider;
-            _winBallChainHandler = winBallChainHandler;
-            _levelService = levelService;
-            _levelLocalProgressService = levelLocalProgressService;
+            _widgets = widgets;
+            _progress = progress;
+            _state = state;
+            _pointsPerBall = levels.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
         }
 
-        public void TryAttachBall(Ball newBall)
-        {
-            var (segment, index) = FindClosestCollision(newBall);
-            if (segment == null) return;
+        public event Action<BallPowerup, Vector3, int, int> PowerupTriggered;
 
-            InsertBallToSegment(newBall, segment, index);
+        public void RegisterShot(Ball ball) => ball.ShotId = ++_shotId;
+        public void RegisterChainBall(Ball ball) => ball.ChainId = ++_ballId;
+
+        public void ResolveShot(int shotId, bool matched, Vector3 position)
+        {
+            if (shotId <= 0 || !_state.CanPlay)
+                return;
+
+            _shotResults.Add(shotId, matched);
+            while (_shotResults.Remove(_nextResult, out bool result))
+            {
+                _nextResult++;
+                _streak = result ? _streak + 1 : 0;
+                if (_streak < 5) 
+                    continue;
+                
+                int bonus = 100 + (_streak - 5) * 10;
+                _progress.AddScore(bonus);
+                _widgets.SetUpWidget(position, Color.white, $"Chain +{bonus}");
+            }
         }
 
-        // Called by BallChainController.CheckMerges only when no combo chain is active
-        public void CheckMatchAtJunction(ChainSegment segment, int junctionIdx)
+        public bool TryAttachBall(Ball shot, Vector3 start, Vector3 end, bool stationaryTargets = false,
+            float coinTime = float.PositiveInfinity)
         {
-            if (segment.Count == 0) return;
+            (ChainSegment targetSegment, int targetIndex, float earliest) = FindContact(start, end, stationaryTargets);
+            if (!stationaryTargets)
+                TrackGaps(shot, start, Vector3.Lerp(start, end, Mathf.Min(earliest, coinTime)));
 
-            junctionIdx = Mathf.Clamp(junctionIdx, 0, segment.Count - 1);
-            var balls = segment.Balls.ToList();
-            Ball anchor = balls[junctionIdx];
-            var matches = FindMatchesAroundBall(anchor, balls);
+            if (targetSegment == null || coinTime < earliest)
+                return false;
 
-            if (matches.Count < _ballChainDto.MatchingCount) return;
-
-            // Initial match — no combo multiplier yet (1x)
-            ApplyMatchScore(matches, anchor, comboMultiplier: 1);
-
-            RunComboChain(matches, segment).Forget();
+            Ball hit = targetSegment.GetBall(targetIndex);
+            Vector3 impact = Vector3.Lerp(start, end, earliest);
+            Vector3 hitPosition = stationaryTargets ? hit.transform.position :
+                Vector3.Lerp(hit.PreviousChainPosition, hit.transform.position, earliest);
+            Insert(shot, targetSegment, targetIndex, impact, impact - hitPosition);
+            return true;
         }
 
-        private (ChainSegment segment, int index) FindClosestCollision(Ball newBall)
-        {
-            float minDist = float.MaxValue;
-            ChainSegment closest = null;
-            int closestIndex = -1;
+        public float ContactFraction(Vector3 start, Vector3 end) => FindContact(start, end, stationaryTargets: true).time;
 
-            foreach (var segment in _segments)
+        private (ChainSegment segment, int index, float time) FindContact(Vector3 start, Vector3 end, bool stationaryTargets)
+        {
+            float earliest = float.PositiveInfinity;
+            ChainSegment targetSegment = null;
+            int targetIndex = -1;
+            foreach (ChainSegment segment in _segments)
             {
                 for (int i = 0; i < segment.Count; i++)
                 {
-                    float dist = Vector3.Distance(segment.GetBall(i).transform.position,
-                        newBall.transform.position);
+                    if (!segment.IsExposed(segment.GetVisualDistance(i)))
+                        continue;
 
-                    if (dist <= _ballChainDto.CollisionThreshold && dist < minDist)
-                    {
-                        minDist = dist;
-                        closest = segment;
-                        closestIndex = i;
-                    }
+                    Ball target = segment.GetBall(i);
+                    Vector3 current = target.transform.position;
+                    Vector3 previous = stationaryTargets ? current : target.PreviousChainPosition;
+                    if (!TryContact(start - previous, end - current, _settings.CollisionThreshold,
+                            out float time) || time >= earliest)
+                        continue;
+
+                    earliest = time;
+                    targetSegment = segment;
+                    targetIndex = i;
                 }
             }
 
-            return (closest, closestIndex);
+            return (targetSegment, targetIndex, earliest);
         }
 
-        private void InsertBallToSegment(Ball newBall, ChainSegment segment, int collisionIndex)
+        private void TrackGaps(Ball shot, Vector3 start, Vector3 end)
         {
-            var path = _pathCreator.path;
-            float newBallDist = path.GetClosestDistanceAlongPath(newBall.transform.position);
-            float collidedDist = path.GetClosestDistanceAlongPath(
-                segment.GetBall(collisionIndex).transform.position);
-
-            int insertIndex;
-            if (collisionIndex == segment.Count - 1 && newBallDist < collidedDist)
-                insertIndex = segment.Count;
-            else if (collisionIndex == 0 && newBallDist > collidedDist)
-                insertIndex = 0;
-            else
-                insertIndex = newBallDist > collidedDist ? collisionIndex : collisionIndex + 1;
-
-            newBall.Dispose();
-
-            float initialPathDist = path.GetClosestDistanceAlongPath(newBall.transform.position);
-            segment.InsertBall(insertIndex, newBall, initialPathDist);
-            segment.SetHeadLogicalDistance(segment.HeadLogicalDistance + _ballChainDto.SpacingBalls);
-            segment.ReIndexBalls();
-
-            SlideInAndCheckMatches(newBall).Forget();
-        }
-
-        private async UniTaskVoid SlideInAndCheckMatches(Ball ball)
-        {
-            await UniTask.Delay((int)(_ballChainDto.DurationMovingOffset * 1000));
-            await CheckAndDestroyMatches(ball);
-        }
-
-        private async UniTask CheckAndDestroyMatches(Ball pivotBall)
-        {
-            ChainSegment segment = FindSegmentOf(pivotBall);
-            if (segment == null) return;
-
-            var balls = segment.Balls.ToList();
-            var matches = FindMatchesAroundBall(pivotBall, balls);
-
-            if (matches.Count >= _ballChainDto.MatchingCount)
+            for (int i = 0; i + 1 < _segments.Count; i++)
             {
-                // Initial match from a player shot — no combo multiplier yet (1x)
-                ApplyMatchScore(matches, pivotBall, comboMultiplier: 1);
+                ChainSegment front = _segments[i];
+                ChainSegment back = _segments[i + 1];
+                if (front.Track != back.Track)
+                    continue;
 
-                await RunComboChain(matches, segment);
-            }
-            else
-            {
-                pivotBall.SetInteractive(false);
+                float near = back.GetVisualDistance(0);
+                float far = front.GetVisualDistance(front.Count - 1);
+                float diameter = _settings.CollisionThreshold;
+                float width = far - near - diameter;
+                if (width < diameter || !front.IsExposed(far) || !back.IsExposed(near))
+                    continue;
+
+                float from = near + diameter * 0.5f;
+                float to = far - diameter * 0.5f;
+                var path = front.Path.path;
+                int steps = Mathf.Max(1, Mathf.CeilToInt((to - from) / _settings.SpacingBalls));
+                Vector3 previous = path.GetPointAtDistance(from, EndOfPathInstruction.Stop);
+                for (int j = 1; j <= steps; j++)
+                {
+                    float distance = Mathf.Lerp(from, to, (float)j / steps);
+                    Vector3 next = path.GetPointAtDistance(distance, EndOfPathInstruction.Stop);
+                    if (front.IsExposed(distance) && Crosses(start, end, previous, next))
+                    {
+                        int bonus = Mathf.RoundToInt(Mathf.Lerp(_settings.Survival ? 250f : 500f, 10f,
+                            Mathf.InverseLerp(diameter, _settings.SpacingBalls * 8f, width)));
+                        shot.RecordGap(front.GetBall(front.Count - 1).ChainId, back.GetBall(0).ChainId, bonus);
+                        break;
+                    }
+                    previous = next;
+                }
             }
         }
 
-        // Entry point for all combo chains — tracks nesting so IsProcessingCombo stays true
-        // for the full duration of a chain reaction, even across multiple sequential steps
-        private async UniTask RunComboChain(List<Ball> matchBalls, ChainSegment segment)
+        private static bool Crosses(Vector3 start, Vector3 end, Vector3 a, Vector3 b)
         {
-            _activeComboCount++;
-            try
-            {
-                // First chained follow-up match starts the multiplier at 2x
-                await ComboStep(matchBalls, segment, comboMultiplier: 2);
-            }
-            finally
-            {
-                _activeComboCount--;
-            }
+            Vector3 travel = end - start;
+            Vector3 edge = b - a;
+            Vector3 offset = a - start;
+            float determinant = travel.x * edge.z - travel.z * edge.x;
+            if (Mathf.Abs(determinant) < 0.00001f)
+                return false;
+
+            float t = (offset.x * edge.z - offset.z * edge.x) / determinant;
+            float u = (offset.x * travel.z - offset.z * travel.x) / determinant;
+            return t > 0f && t <= 1f && u >= 0f && u <= 1f;
         }
 
-        // One step of a combo: destroy → punch back → split → wait for merge → check next match.
-        // comboMultiplier is applied to the next match found at the end of this step and grows by 1
-        // for every further link in the chain (2x → 3x → 4x …).
-        private async UniTask ComboStep(List<Ball> matchBalls, ChainSegment segment, int comboMultiplier)
+        public void Explode(Vector3 position, float radius, int shotId, int depth)
         {
-            // 1. Wait for all destroy animations to finish
-            await UniTask.WhenAll(matchBalls.Select(WaitForDestroyAnimation));
-
-            int lowestIndex = matchBalls.Min(b => b.Index);
-            float punchBack = matchBalls.Count * _ballChainDto.SpacingBalls;
-
-            // 2. Remove matched balls from high to low to keep indices valid
-            foreach (var ball in matchBalls.OrderByDescending(b => b.Index))
+            List<Ball> victims = new();
+            foreach (ChainSegment segment in _segments)
             {
-                segment.RemoveBallAt(ball.Index);
-                ball.Deactivate();
+                victims.AddRange(from ball in segment.Balls where segment
+                    .IsExposed(segment
+                        .GetVisualDistance(ball.Index)) let offset = ball.transform.position - position where offset.x * offset.x + offset.z * offset.z <= radius * radius select ball);
             }
 
-            if (lowestIndex >= segment.Count)
+            int removed = 0;
+            foreach (Ball victim in victims)
             {
-                // Match was at the tail — skull-side balls get the punch back and chain stays put
-                segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - punchBack);
-                segment.ReIndexBalls();
-                TryCleanupEmptySegment(segment);
+                ChainSegment segment = _segments.Find(candidate =>
+                    victim.Index < candidate.Count && candidate.GetBall(victim.Index) == victim);
+                if (segment == null)
+                    continue;
+
+                _state.LastRemovalDistance = segment.GetVisualDistance(victim.Index);
+                _state.LastRemovalPath = segment.Path;
+                RemoveMatch(segment, victim.Index, 1, shotId, depth);
+                removed++;
+            }
+
+            if (removed <= 0) 
                 return;
-            }
+            
+            int score = removed * _pointsPerBall;
+            _progress.AddScore(score);
+            _widgets.SetUpWidget(position, Color.white, $"Explosion +{score}");
+        }
 
-            // 3. Split: balls [lowestIndex..] become the new back segment
-            ChainSegment back = segment.SplitAt(lowestIndex);
+        public static bool TryContact(Vector3 start, Vector3 end, float radius, out float time)
+        {
+            Vector2 origin = new(start.x, start.z);
+            Vector2 travel = new(end.x - start.x, end.z - start.z);
+            float c = origin.sqrMagnitude - radius * radius;
+            time = 0f;
+            if (c <= 0f)
+                return true;
+
+            float a = travel.sqrMagnitude;
+            float b = Vector2.Dot(origin, travel);
+            float discriminant = b * b - a * c;
+            if (a == 0f || b >= 0f || discriminant < 0f)
+                return false;
+
+            time = c / (-b + Mathf.Sqrt(discriminant));
+            return time <= 1f;
+        }
+
+        public void CheckMatchAtJunction(ChainSegment segment, int junction, int shotId, int depth)
+        {
+            if (segment.GetBall(junction).Color == segment.GetBall(junction + 1).Color)
+                TryMatch(segment, junction, shotId, depth);
+        }
+
+        private void Insert(Ball shot, ChainSegment segment, int hitIndex, Vector3 impact, Vector3 offset)
+        {
+            float hitDistance = segment.GetVisualDistance(hitIndex);
+            Vector3 tangent = segment.Path.path.GetDirectionAtDistance(hitDistance, EndOfPathInstruction.Stop);
+            float along = Vector3.Dot(new Vector3(offset.x, 0f, offset.z), tangent);
+            int insertIndex = along > 0f ? hitIndex : hitIndex + 1;
+            float distance = hitDistance + Mathf.Clamp(along, -_settings.SpacingBalls, _settings.SpacingBalls);
+
+            shot.Dispose();
+            shot.SetChainPosition(impact);
+            shot.SetInteractive(false);
+            RegisterChainBall(shot);
+            segment.InsertBall(insertIndex, shot, distance);
+            segment.SetHeadLogicalDistance(segment.HeadLogicalDistance + _settings.SpacingBalls);
             segment.ReIndexBalls();
-            back.ReIndexBalls();
 
-            int segIdx = _segments.IndexOf(segment);
+            int shotId = shot.ShotId;
+            bool matched = TryMatch(segment, insertIndex, shotId, 1);
+            if (matched && shot.GapBonus > 0)
+            {
+                _progress.AddScore(shot.GapBonus);
+                _widgets.SetUpWidget(impact, Color.white, $"Gap +{shot.GapBonus}");
+            }
+            ResolveShot(shotId, matched, impact);
+        }
+
+        private bool TryMatch(ChainSegment segment, int pivot, int shotId, int depth)
+        {
+            Color color = segment.GetBall(pivot).Color;
+            int first = pivot;
+            int last = pivot;
+            
+            while (first > 0 && segment.GetBall(first - 1).Color == color)
+                first--;
+            while (last + 1 < segment.Count && segment.GetBall(last + 1).Color == color)
+                last++;
+
+            int count = last - first + 1;
+            if (count < _settings.MatchingCount)
+                return false;
+
+            Vector3 position = segment.GetBall(pivot).transform.position;
+            _state.LastRemovalDistance = segment.GetVisualDistance(pivot);
+            _state.LastRemovalPath = segment.Path;
+            int score = count * _pointsPerBall + (depth - 1) * 100;
+            _progress.AddScore(score);
+            _widgets.SetUpWidget(position, color, depth > 1 ? $"Combo +{score}" : $"+{score}");
+            RemoveMatch(segment, first, count, shotId, depth);
+            return true;
+        }
+
+        private void RemoveMatch(ChainSegment segment, int first, int count, int shotId, int depth)
+        {
+            int segmentIndex = _segments.IndexOf(segment);
+            List<(BallPowerup kind, Vector3 position)> powerups = null;
+            for (int i = first + count - 1; i >= first; i--)
+            {
+                Ball ball = segment.GetBall(i);
+                if (ball.Powerup != BallPowerup.None)
+                {
+                    powerups ??= new List<(BallPowerup, Vector3)>();
+                    powerups.Add((ball.Powerup, ball.transform.position));
+                    ball.SetPowerup(BallPowerup.None);
+                }
+                segment.RemoveBallAt(i);
+                ball.PlayDestroyAnimation(ball.Deactivate);
+            }
 
             if (segment.Count == 0)
             {
-                // Front wiped (match at head) — back keeps its original logical position,
-                // NOT the skull position that SplitAt(0) assigned.
-                // Without this fix the remaining balls lurch forward toward the skull.
-                back.SetHeadLogicalDistance(
-                    back.HeadLogicalDistance - matchBalls.Count * _ballChainDto.SpacingBalls);
-                _segments[segIdx] = back;
-                TryCleanupEmptySegment(segment);
+                _segments.RemoveAt(segmentIndex);
+            }
+            else if (first == 0)
+            {
+                segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - count * _settings.SpacingBalls);
+            }
+            else if (first < segment.Count)
+            {
+                ChainSegment back = segment.SplitAt(first);
+                back.SetHeadLogicalDistance(back.HeadLogicalDistance - count * _settings.SpacingBalls);
+                back.JunctionShotId = shotId;
+                back.JunctionComboDepth = depth + 1;
+                _segments.Insert(segmentIndex + 1, back);
+                back.ReIndexBalls();
+            }
+
+            segment.ReIndexBalls();
+            if (powerups == null) 
                 return;
-            }
-
-            // 4. Check junction colors to decide movement direction.
-            // Same color  → punch back: front retreats toward back (both magnetize, combo incoming)
-            // Diff color  → front holds position: back catches up and pushes front (normal merge)
-            Ball frontTail = segment.GetBall(segment.Count - 1);
-            Ball backHead  = back.GetBall(0);
-            bool junctionMatch = frontTail.Color == backHead.Color;
-
-            if (junctionMatch)
-                segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - punchBack);
-
-            // Index of front's last ball — this becomes the junction after merge
-            int junctionIdx = segment.Count - 1;
-
-            // 5. Launch back segment catch-up; CheckMerges will do the physical merge
-            back.IsCatchingUp = true;
-            back.CurrentSpeed = back.BaseSpeed * _ballChainDto.CatchupSpeedMultiplier;
-            _segments.Insert(segIdx + 1, back);
-
-            // 6. Wait until CheckMerges has logically merged back into front
-            await UniTask.WaitUntil(() => !_segments.Contains(back));
-
-            // 7. Wait for the visual gap at the junction to actually close.
-            // Logical merge fires early (distance math), but SmoothDamp needs more time.
-            // junctionIdx     = last ball of original front
-            // junctionIdx + 1 = first ball of original back (now part of segment after merge)
-            int nextIdx = junctionIdx + 1;
-            if (nextIdx < segment.Count)
-            {
-                await UniTask.WaitUntil(() =>
-                    nextIdx < segment.Count &&
-                    segment.GetVisualDistance(junctionIdx) - segment.GetVisualDistance(nextIdx)
-                        <= _ballChainDto.SpacingBalls * 1.5f
-                );
-            }
-
-            // 8. Chain is visually closed — check for a new match at the junction
-            if (junctionIdx < 0 || junctionIdx >= segment.Count) return;
-
-            var mergedBalls = segment.Balls.ToList();
-            Ball anchor = mergedBalls[junctionIdx];
-            var nextMatches = FindMatchesAroundBall(anchor, mergedBalls);
-
-            if (nextMatches.Count < _ballChainDto.MatchingCount) return;
-
-            ApplyMatchScore(nextMatches, anchor, comboMultiplier);
-
-            // 9. Continue combo chain sequentially — same _activeComboCount scope,
-            //    multiplier grows by 1 for the next link (2x → 3x → 4x …)
-            await ComboStep(nextMatches, segment, comboMultiplier + 1);
-        }
-
-        // Scores a match: base = matchCount * ScorePerItem, multiplied by the combo multiplier.
-        // The widget shows "Nx +score" for combos (multiplier > 1) and just "+score" otherwise.
-        private void ApplyMatchScore(List<Ball> matches, Ball anchor, int comboMultiplier)
-        {
-            int baseScore = matches.Count *
-                _levelService.GetCurrentLevelStaticData().LevelConfig.ScoreConfig.ScorePerItem;
-            int score = baseScore * comboMultiplier;
-
-            _levelLocalProgressService.AddScore(score);
-            _widgetBallChainProvider.SetUpWidget(matches, anchor, score, comboMultiplier);
-            _winBallChainHandler.TryWin(_segments.Sum(s => s.Count) - matches.Count);
-        }
-
-        private void TryCleanupEmptySegment(ChainSegment segment)
-        {
-            if (segment.Count == 0 && _segments.Contains(segment))
-                _segments.Remove(segment);
-        }
-
-        private ChainSegment FindSegmentOf(Ball ball) =>
-            _segments.FirstOrDefault(s => s.Balls.Contains(ball));
-
-        private UniTask WaitForDestroyAnimation(Ball ball)
-        {
-            var tcs = new UniTaskCompletionSource();
-            ball.PlayDestroyAnimation(() => tcs.TrySetResult());
-            return tcs.Task;
-        }
-
-        private List<Ball> FindMatchesAroundBall(Ball pivotBall, List<Ball> balls)
-        {
-            var matching = new List<Ball> { pivotBall };
-            Color color = pivotBall.Color;
-
-            for (int i = pivotBall.Index - 1; i >= 0; i--)
-            {
-                if (balls[i].Color == color) matching.Add(balls[i]);
-                else break;
-            }
-
-            for (int i = pivotBall.Index + 1; i < balls.Count; i++)
-            {
-                if (balls[i].Color == color) matching.Add(balls[i]);
-                else break;
-            }
-
-            return matching;
+            
+            foreach ((BallPowerup kind, Vector3 position) in powerups)
+                PowerupTriggered?.Invoke(kind, position, shotId, depth);
         }
     }
 }

@@ -4,6 +4,10 @@ namespace Code.Services.BallController
 {
     public class BallChainDTO
     {
+        public int ZumaTargetScore;
+        public float MeterReverseDuration = 0.6f;
+        public float AceTime;
+        public bool Survival;
         public float DurationSpawnBall;
         public float MoveSpeed;
         public float SpacingBalls;

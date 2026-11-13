@@ -7,6 +7,7 @@ namespace Code.StaticData.Levels
     public class ChapterStaticData : ScriptableObject
     {
         public int ChapterId;
+        public int TempleId = 1;
         public List<LevelStaticData> Levels = new();
     }
 }

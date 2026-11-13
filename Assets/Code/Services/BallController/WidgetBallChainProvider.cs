@@ -32,7 +32,7 @@ namespace Code.Services.BallController
         }
         
         private string FormatScoreText(int score, int comboMultiplier) =>
-            comboMultiplier > 1 ? $"+{score} {comboMultiplier}x" : $"+{score}";
+            comboMultiplier > 1 ? $"Combo +{score}" : $"+{score}";
         
         public void SetUpWidget(Vector3 position, Color color, string text)
         {

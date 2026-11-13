@@ -7,6 +7,10 @@ namespace Code.Services.Input
     public interface IInputService
     {
         public event Action InputUpdateEvent;
+        public event Action<Vector2> TapEvent;
+        public event Action<Vector2> AlternatePointerEvent;
+        public bool CanAim { get; }
+        public bool UsesMouse { get; }
         public event Action PointerDownEvent;
         public event Action PointerUpEvent;
         

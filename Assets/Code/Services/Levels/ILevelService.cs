@@ -5,6 +5,12 @@ using Code.StaticData.Levels;
 
 namespace Code.Services.Levels
 {
+    public enum ZumaMode
+    {
+        Adventure,
+        Practice,
+        Survival
+    }
     public interface ILevelService
     {
         public LevelStaticData GetCurrentLevelStaticData();
@@ -14,6 +20,18 @@ namespace Code.Services.Levels
         public int GetCurrentChapterIndex();
         public void SetUpCurrentLevel(int levelNumber, int chapterId);
         public void LevelsComplete();
+        ZumaMode Mode { get; }
+        int AdventureLives { get; }
+        bool CanContinueAdventure { get; }
+        bool AdventureFinished { get; }
+        string GetGauntletRank(int score);
+        bool VisitLevel();
+        bool IsGauntletUnlocked(int chapter, int level);
+        bool SelectGauntlet(ZumaMode mode, int chapter, int level, bool random);
+        void ReturnToAdventure();
+        void NextGauntletRound();
+        void PrepareAdventureSelection();
+        void FinishRun(bool won, int score);
         public void SetLevelHolder(LevelHolder levelHolder);
         public LevelHolder GetLevelHolder();
         public void Cleanup();

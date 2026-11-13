@@ -1,40 +1,32 @@
 using UnityEngine;
-using Cysharp.Threading.Tasks;
-using System.Threading;
 
 namespace Code.Logic.Zuma.Balls
 {
     public class BallMover : MonoBehaviour
     {
-        private CancellationTokenSource _cts;
+        private BallIntersectionTracker _tracker;
+        private Vector3 _velocity;
 
         public void StartMoveToDirection(Vector3 direction, float speed)
         {
-            if (_cts != null) 
-                return;
-
-            _cts = new CancellationTokenSource();
-            MoveAsync(direction, speed, _cts.Token).Forget();
+            _tracker ??= GetComponent<BallIntersectionTracker>();
+            _velocity = direction * speed;
         }
 
-        public void StopMove()
-        {
-            if (_cts == null) 
-                return;
+        public void StopMove() => _velocity = Vector3.zero;
 
-            _cts.Cancel();
-            _cts.Dispose();
-            _cts = null;
-        }
-
-        private async UniTaskVoid MoveAsync(Vector3 direction, float speed, 
-            CancellationToken token)
+        public bool Step(float deltaTime)
         {
-            while (!token.IsCancellationRequested)
-            {
-                transform.position += direction * speed * Time.deltaTime;
-                await UniTask.Yield(PlayerLoopTiming.Update, token);
-            }
+            if (_velocity == Vector3.zero)
+                return true;
+
+            Vector3 start = transform.position;
+            Vector3 end = start + _velocity * deltaTime;
+            if (_tracker.ResolveStep(start, end))
+                return true;
+
+            transform.position = end;
+            return false;
         }
     }
 }

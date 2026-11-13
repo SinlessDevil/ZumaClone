@@ -13,6 +13,10 @@ namespace Code.Services.Input.Device
         public event Action PointerDownEvent;
         public event Action PointerUpEvent;
 
-        public void UpdateInput();
+        bool CanAim { get; }
+        event Action<Vector2> AlternatePointerEvent;
+
+        void UpdateInput();
+        void CancelGesture();
     }
 }

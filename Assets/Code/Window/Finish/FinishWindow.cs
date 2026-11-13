@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using Code.Extensions;
 using Code.UI;
-using DG.Tweening;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
+using TMPro;
 
 namespace Code.Window.Finish
 {
@@ -73,6 +73,8 @@ namespace Code.Window.Finish
 
             sequence.OnComplete(() =>
             {
+                _textScore.text = _score;
+                _textTime.text = _time;
                 _buttonScalers.ForEach(x => x.SetupScaleOrigin());
                 onFinished?.Invoke();
             });

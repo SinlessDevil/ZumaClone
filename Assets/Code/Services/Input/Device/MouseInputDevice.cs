@@ -1,46 +1,44 @@
 using System;
+using Code.UI;
 using UnityEngine;
 
 namespace Code.Services.Input.Device
 {
     public class MouseInputDevice : IInputDevice
     {
-        private Vector2 _lastMousePosition;
-        private Vector2 _currentMousePosition;
-        
         public Vector2 Direction { get; private set; }
         public Vector3 TouchPositionToWorldPosition { get; private set; }
         public Vector3 TouchPosition { get; private set; }
+        public bool CanAim { get; private set; }
 
         public event Action<Vector2> TapEvent;
+        public event Action<Vector2> AlternatePointerEvent;
         public event Action PointerDownEvent;
         public event Action PointerUpEvent;
 
         public void UpdateInput()
         {
-            _currentMousePosition = UnityEngine.Input.mousePosition;
-            TouchPosition = _currentMousePosition;
+            Vector3 position = UnityEngine.Input.mousePosition;
+            Direction = position - TouchPosition;
+            TouchPosition = position;
+            CanAim = InputZona.Contains(position, -1);
+            Camera camera = Camera.main;
+            if (camera != null)
+                TouchPositionToWorldPosition = camera.ScreenToWorldPoint(new Vector3(position.x, position.y, 10f));
 
-            if (UnityEngine.Input.GetMouseButtonDown(0))
+            if (CanAim && UnityEngine.Input.GetMouseButtonDown(1))
+                AlternatePointerEvent?.Invoke(position);
+
+            if (CanAim && UnityEngine.Input.GetMouseButtonDown(0))
             {
                 PointerDownEvent?.Invoke();
-                _lastMousePosition = _currentMousePosition;
+                TapEvent?.Invoke(position);
             }
 
             if (UnityEngine.Input.GetMouseButtonUp(0))
-            {
                 PointerUpEvent?.Invoke();
-                TapEvent?.Invoke(_currentMousePosition);
-            }
-
-            if (UnityEngine.Input.GetMouseButton(0))
-            {
-                Direction = (_currentMousePosition - _lastMousePosition).normalized;
-                _lastMousePosition = _currentMousePosition;
-            }
-            
-            TouchPositionToWorldPosition = Camera.main.ScreenToWorldPoint(
-                new Vector3(UnityEngine.Input.mousePosition.x, UnityEngine.Input.mousePosition.y, 10f));
         }
+
+        public void CancelGesture() => CanAim = false;
     }
 }

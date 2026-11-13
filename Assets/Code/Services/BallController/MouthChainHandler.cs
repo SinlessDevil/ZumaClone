@@ -1,3 +1,4 @@
+using Code.Logic.Zuma.Level;
 using Code.Services.Levels;
 using Cysharp.Threading.Tasks;
 
@@ -21,25 +22,19 @@ namespace Code.Services.BallController
 
         public void TryUpdateMouthProgress(float percentage)
         {
-            var frontBall = _chainState.FrontBall;
-            if (frontBall == null) return;
-
-            float pathLength = _levelService.GetLevelHolder().PathCreator.path.length;
+            LevelHolder level = _levelService.GetLevelHolder();
+            float pathLength = level.PathCreator.path.length;
             float thresholdDistance = pathLength * percentage;
-
-            float closestDistanceAlongPath = _levelService.GetLevelHolder().PathCreator.path
-                .GetClosestDistanceAlongPath(frontBall.transform.position);
+            float closestDistanceAlongPath = _chainState.GetHeadDistance(level.PathCreator);
             float remainingDistance = pathLength - closestDistanceAlongPath;
 
-            if (remainingDistance <= thresholdDistance)
-            {
-                _levelService.GetLevelHolder().LevelEnd
-                    .UpdateMouthProgress(closestDistanceAlongPath, pathLength, thresholdDistance);
-
-                if (_levelService.GetLevelHolder().LoseParticleSystemHolder.IsActive == false)
-                    _particleChainHandler.MoveParticleAlongPathAsync(
-                        _levelService.GetLevelHolder().LoseParticleSystemHolder).Forget();
-            }
+            level.LevelEnd.UpdateMouthProgress(closestDistanceAlongPath, pathLength, thresholdDistance);
+            if (!(thresholdDistance > 0f) || !(remainingDistance <= thresholdDistance)) 
+                return;
+            
+            if (_levelService.GetLevelHolder().LoseParticleSystemHolder.IsActive == false)
+                _particleChainHandler.MoveParticleAlongPathAsync(
+                    _levelService.GetLevelHolder().LoseParticleSystemHolder).Forget();
         }
     }
 }

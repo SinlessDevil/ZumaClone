@@ -38,14 +38,10 @@ namespace Code.Services.Finish.Win
         
         public void Win()
         {
-            CompleteLevel();
-            
-            CompleteTutor();
-
             (string, string) recordTime = GetRecordText();
             string scoreText = GetScoreText();
-
-            SetRecordText();
+            CompleteLevel();
+            CompleteTutor();
             
             SaveProgress();
             
@@ -60,14 +56,10 @@ namespace Code.Services.Finish.Win
 
         public void BonusWin()
         {
-            CompleteLevel();
-            
-            CompleteTutor();
-
             (string, string) recordTime = GetRecordText();
             string scoreText = GetScoreText();
-
-            SetRecordText();
+            CompleteLevel();
+            CompleteTutor();
             
             SaveProgress();
             
@@ -87,23 +79,8 @@ namespace Code.Services.Finish.Win
 
         private void CompleteTutor()
         {
-            _persistenceProgressService.PlayerData.PlayerTutorialData.HasFirstCompleteLevel = true;
-        }
-
-        private void SetRecordText()
-        {
-            float currentRecordTime = GetCurrentRecordTime();
-            float currentTime = _timeService.GetElapsedTime();
-            LevelContainer currentLevelContainer = _levelService.GetCurrentLevelContainer();
-            
-            if(currentRecordTime == 0)
-                return;   
-
-            if (!(currentTime > currentRecordTime)) 
-                return;
-            
-            LevelContainer existingLevel = _persistenceProgressService.PlayerData.PlayerLevelData.LevelsComleted.Find(level => level == currentLevelContainer);
-            existingLevel.Time = currentTime;
+            if (_levelService.Mode == ZumaMode.Adventure)
+                _persistenceProgressService.PlayerData.PlayerTutorialData.HasFirstCompleteLevel = true;
         }
 
         private float GetCurrentRecordTime()
@@ -118,16 +95,25 @@ namespace Code.Services.Finish.Win
 
         private (string, string) GetRecordText()
         {
+            if (_levelService.Mode != ZumaMode.Adventure)
+                return ("Time: ", _timeService.GetFormattedElapsedTime());
+
             float currentRecordTime = GetCurrentRecordTime();
             float currentTime = _timeService.GetElapsedTime();
             
-            if(currentRecordTime == 0 || currentTime > currentRecordTime)
+            if(currentRecordTime == 0 || currentTime < currentRecordTime)
                 return ("New Record! Time: ", _timeService.GetFormattedElapsedTime());
 
-            return ("Record: ", _timeService.GetFormattedElapsedTime());
+            return ("Record: ", System.TimeSpan.FromSeconds(currentRecordTime).ToString(@"hh\:mm\:ss"));
         }
         
-        private string GetScoreText() => "Score: " + _levelLocalProgressService.Score;
+        private string GetScoreText()
+        {
+            int score = _levelLocalProgressService.Score;
+            return _levelService.Mode == ZumaMode.Adventure
+                ? $"Score: {score}  Lives: {_levelService.AdventureLives}"
+                : $"Score: {score}  {_levelService.GetGauntletRank(score)}";
+        }
 
         private void SaveProgress()
         {

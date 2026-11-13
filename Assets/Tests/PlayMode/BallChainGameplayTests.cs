@@ -155,19 +155,19 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator MatchAtJunction_RemovesBothGroupsAndDoublesComboScore()
+        public IEnumerator MatchAtJunction_RemovesBothGroupsAndAddsComboBonus()
         {
             yield return Spawn(Color.red, Color.blue, Color.blue, Color.red, Color.red, Color.green);
             Ball[] before = ActiveBalls();
             List<int> scores = new();
             _progress.UpdateScoreEvent += scores.Add;
             Ball shot = InsertBehind(before[1], Color.blue);
-            yield return AdvanceUntil(() => _chain.ActiveItems.Count == 1);
+            yield return AdvanceUntil(() => _chain.ActiveItems.Count == 1 && !shot.gameObject.activeSelf);
 
             Assert.That(ActiveBalls(), Is.EqualTo(new[] { before[5] }));
             Assert.That(before[5].Index, Is.Zero);
             Assert.That(shot.gameObject.activeSelf, Is.False);
-            Assert.That(scores, Is.EqualTo(new[] { 3 * ScorePerBall, 9 * ScorePerBall }));
+            Assert.That(scores, Is.EqualTo(new[] { 3 * ScorePerBall, 6 * ScorePerBall + 100 }));
             _finish.DidNotReceive().Win();
             _finish.DidNotReceive().Lose();
         }

@@ -26,9 +26,10 @@ namespace Code.UI.Menu.Windows.Map
         [SerializeField] private List<CanvasGroup> _canvasGroups;
 
         private int _currentChapterIndex;
+        private ZumaMode _selectedMode;
+        private Button _randomButton;
 
         private List<ItemLevel> _levelPool = new();
-        private List<ChapterStaticData> _chapters;
 
         private ILevelService _levelService;
         private IUIFactory _uiFactory;
@@ -72,7 +73,7 @@ namespace Code.UI.Menu.Windows.Map
                 buttonSwipeChapter.SwipedChapterEvent += OnSwipeChapter;
             }
 
-            _chapters = _levelService.GetAllChapters();
+            CreateModeButtons();
             
             _currentChapterIndex = _levelService.GetCurrentChapterIndex();
 
@@ -137,11 +138,13 @@ namespace Code.UI.Menu.Windows.Map
 
         private void UpdateLevelUI()
         {
+            _currentChapterIndex = _chapterNavigator.CurrentChapterIndex;
             SetNameChapter();
+            _randomButton.interactable = _selectedMode != ZumaMode.Adventure;
 
             ClearLevelPool();
 
-            ChapterStaticData currentChapter = _chapters[_currentChapterIndex];
+            ChapterStaticData currentChapter = _chapterNavigator.CurrentChapter;
             
             foreach (var level in currentChapter.Levels)
             {
@@ -150,6 +153,15 @@ namespace Code.UI.Menu.Windows.Map
 
                 ItemLevel levelItem = GetPooledItemLevel();
                 levelItem.Initialize(levelIndex, chapterIndex);
+
+                if (_selectedMode != ZumaMode.Adventure)
+                {
+                    if (_levelService.IsGauntletUnlocked(chapterIndex, levelIndex))
+                        levelItem.SetUnlockedNonCompleted();
+                    else
+                        levelItem.SetLocked();
+                    continue;
+                }
 
                 if (_levelService.IsLevelCurrent(chapterIndex, levelIndex))
                 {
@@ -178,7 +190,8 @@ namespace Code.UI.Menu.Windows.Map
         private void SetNameChapter()
         {
             int currentChapter = _currentChapterIndex + 1;
-            _chapterName.text = "Chapter " + currentChapter;
+            ChapterStaticData stage = _chapterNavigator.CurrentChapter;
+            _chapterName.text = $"Temple {stage.TempleId}  ·  Stage {currentChapter}  ·  {_selectedMode}";
         }
 
         private ItemLevel GetPooledItemLevel()
@@ -202,10 +215,70 @@ namespace Code.UI.Menu.Windows.Map
         {
             _soundService.PlaySound(Sound2DType.Click);
             
-            _levelService.SetUpCurrentLevel(levelNumber, chapterId);
-            _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);
+            if (_selectedMode == ZumaMode.Adventure)
+            {
+                _levelService.PrepareAdventureSelection();
+                _levelService.SetUpCurrentLevel(levelNumber, chapterId);
+                _saveLoadFacade.SaveProgress(SaveMethodType.PlayerPrefs);
+            }
+            else if (!_levelService.SelectGauntlet(_selectedMode, chapterId, levelNumber, false))
+            {
+                return;
+            }
 
             _stateMachine.Enter<LoadLevelState, string>(_staticData.GameConfig.GameScene);
+        }
+
+        private void CreateModeButtons()
+        {
+            RectTransform title = _chapterName.rectTransform;
+            _chapterName.margin = new Vector4(0f, 0f, 0f, 44f);
+            CreateModeButton(title, "Adventure", 0, () => SetMode(ZumaMode.Adventure));
+            CreateModeButton(title, "Practice", 1, () => SetMode(ZumaMode.Practice));
+            CreateModeButton(title, "Survival", 2, () => SetMode(ZumaMode.Survival));
+            _randomButton = CreateModeButton(title, "Random", 3, StartRandom);
+        }
+
+        private UnityEngine.UI.Button CreateModeButton(RectTransform parent, string label, int index, Action select)
+        {
+            GameObject control = new(label, typeof(RectTransform), typeof(UnityEngine.UI.Image), typeof(UnityEngine.UI.Button));
+            RectTransform rect = (RectTransform)control.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = new Vector2(index * 0.25f, 0f);
+            rect.anchorMax = new Vector2((index + 1) * 0.25f, 0f);
+            rect.offsetMin = new Vector2(4f, 4f);
+            rect.offsetMax = new Vector2(-4f, 44f);
+            UnityEngine.UI.Image image = control.GetComponent<UnityEngine.UI.Image>();
+            image.color = new Color(0.18f, 0.12f, 0.08f, 0.94f);
+            UnityEngine.UI.Button button = control.GetComponent<UnityEngine.UI.Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(() => select());
+
+            GameObject caption = new("Caption", typeof(RectTransform), typeof(TextMeshProUGUI));
+            TextMeshProUGUI text = caption.GetComponent<TextMeshProUGUI>();
+            text.rectTransform.SetParent(rect, false);
+            text.rectTransform.anchorMin = Vector2.zero;
+            text.rectTransform.anchorMax = Vector2.one;
+            text.rectTransform.offsetMin = Vector2.zero;
+            text.rectTransform.offsetMax = Vector2.zero;
+            text.font = _chapterName.font;
+            text.fontSize = 25f;
+            text.alignment = TextAlignmentOptions.Center;
+            text.raycastTarget = false;
+            text.text = label;
+            return button;
+        }
+
+        private void SetMode(ZumaMode mode)
+        {
+            _selectedMode = mode;
+            UpdateLevelUI();
+        }
+
+        private void StartRandom()
+        {
+            if (_levelService.SelectGauntlet(_selectedMode, 0, 0, true))
+                _stateMachine.Enter<LoadLevelState, string>(_staticData.GameConfig.GameScene);
         }
 
         private void ClearLevelPool()

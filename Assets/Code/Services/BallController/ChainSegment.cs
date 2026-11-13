@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Code.Logic.Zuma.Balls;
+using Code.Logic.Zuma.Level;
 using Code.PathCreation;
 using UnityEngine;
 
@@ -20,14 +21,18 @@ namespace Code.Services.BallController
         public float TailLogicalDistance => HeadLogicalDistance - (_balls.Count - 1) * _spacing;
         public float BaseSpeed { get; set; }
         public float CurrentSpeed { get; set; }
-        public bool IsCatchingUp { get; set; }
+        public int JunctionShotId { get; set; }
+        public int JunctionComboDepth { get; set; }
+        public PathCreator Path => _pathCreator;
+        public LevelTrack Track { get; }
         public IReadOnlyList<Ball> Balls => _balls;
         public int Count => _balls.Count;
 
         public ChainSegment(PathCreator pathCreator, float spacing, float speed,
-            float springStrength, float gapSpringStrength)
+            float springStrength, float gapSpringStrength, LevelTrack track = null)
         {
             _pathCreator = pathCreator;
+            Track = track;
             _spacing = spacing;
             BaseSpeed = speed;
             CurrentSpeed = speed;
@@ -35,11 +40,15 @@ namespace Code.Services.BallController
             _gapSpringStrength = gapSpringStrength;
         }
 
-        public void Update(float deltaTime)
+        public void Advance(float deltaTime, float speed)
         {
-            if (_balls.Count == 0) return;
+            HeadLogicalDistance += speed * deltaTime;
+        }
 
-            HeadLogicalDistance += CurrentSpeed * deltaTime;
+        public void UpdatePositions(float deltaTime)
+        {
+            if (_balls.Count == 0) 
+                return;
 
             var path = _pathCreator.path;
 
@@ -54,15 +63,20 @@ namespace Code.Services.BallController
                     ? 1f / _gapSpringStrength
                     : 1f / _springStrength;
 
-                float newVisual = Mathf.SmoothDamp(visualDist, logicalDist, ref vel, smoothTime);
+                float newVisual = Mathf.SmoothDamp(visualDist, logicalDist, ref vel, smoothTime,
+                    Mathf.Infinity, deltaTime);
+                if (i > 0)
+                    newVisual = Mathf.Min(newVisual, _visualDistances[i - 1]);
                 _visualDistances[i] = newVisual;
                 _velocities[i] = vel;
 
-                _balls[i].transform.position = path.GetPointAtDistance(
-                    Mathf.Max(newVisual, 0f), EndOfPathInstruction.Stop);
+                _balls[i].SetTrackVisibility(IsExposed(newVisual));
+                _balls[i].SetChainPosition(path.GetPointAtDistance(
+                    Mathf.Max(newVisual, 0f), EndOfPathInstruction.Stop));
             }
         }
 
+        public bool IsExposed(float distance) => distance >= 0f && (Track?.IsExposed(distance) ?? true);
         public Ball GetBall(int index) => _balls[index];
         public float GetVisualDistance(int index) => _visualDistances[index];
 
@@ -92,7 +106,7 @@ namespace Code.Services.BallController
         // Splits: balls [splitIndex..] become a new back segment, removed from this segment
         public ChainSegment SplitAt(int splitIndex)
         {
-            var back = new ChainSegment(_pathCreator, _spacing, BaseSpeed, _springStrength, _gapSpringStrength);
+            var back = new ChainSegment(_pathCreator, _spacing, BaseSpeed, _springStrength, _gapSpringStrength, Track);
             back.SetHeadLogicalDistance(HeadLogicalDistance - splitIndex * _spacing);
 
             for (int i = splitIndex; i < _balls.Count; i++)
