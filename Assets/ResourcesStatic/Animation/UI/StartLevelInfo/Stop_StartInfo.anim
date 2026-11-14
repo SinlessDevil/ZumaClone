@@ -7,7 +7,7 @@ AnimationClip:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Stop_StartInfo
-  serializedVersion: 7
+  serializedVersion: 8
   m_Legacy: 0
   m_Compressed: 0
   m_UseHighQualityCurve: 1
@@ -31,7 +31,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Container/Text_Level
+    path: Container/LevelText
   - curve:
       serializedVersion: 2
       m_Curve:
@@ -47,7 +47,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Container/Text_When_Spirals_Attack
+    path: Container/WhenSpiralsAttackText
   m_FloatCurves: []
   m_PPtrCurves: []
   m_SampleRate: 60
@@ -58,7 +58,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 3748651566
+      path: 148203446
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -66,8 +66,9 @@ AnimationClip:
       isPPtrCurve: 0
       isIntCurve: 0
       isSerializeReferenceCurve: 0
+      metaData: 0
     - serializedVersion: 2
-      path: 645990572
+      path: 1040980104
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -75,6 +76,7 @@ AnimationClip:
       isPPtrCurve: 0
       isIntCurve: 0
       isSerializeReferenceCurve: 0
+      metaData: 0
     pptrCurveMapping: []
   m_AnimationClipSettings:
     serializedVersion: 2
@@ -114,7 +116,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: Container/Text_Level
+    path: Container/LevelText
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -135,7 +137,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: Container/Text_Level
+    path: Container/LevelText
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -156,7 +158,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: Container/Text_Level
+    path: Container/LevelText
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -177,7 +179,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: Container/Text_When_Spirals_Attack
+    path: Container/WhenSpiralsAttackText
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -198,7 +200,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: Container/Text_When_Spirals_Attack
+    path: Container/WhenSpiralsAttackText
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -219,7 +221,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: Container/Text_When_Spirals_Attack
+    path: Container/WhenSpiralsAttackText
     classID: 224
     script: {fileID: 0}
     flags: 0

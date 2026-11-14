@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8187855495525703694}
   - component: {fileID: 8201357320483669601}
   m_Layer: 5
-  m_Name: Button_Exit_To_Menu
+  m_Name: ExitToMenuButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 400, y: 100}
+  m_SizeDelta: {x: 600, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2676165913984871519
 CanvasRenderer:
@@ -162,7 +162,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1610326289855122005}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -172,10 +172,10 @@ RectTransform:
   - {fileID: 3528775438752626306}
   m_Father: {fileID: 2491952011400337389}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.079, y: 0.441}
-  m_AnchorMax: {x: 0.92700005, y: 0.74224997}
-  m_AnchoredPosition: {x: -3, y: -2}
-  m_SizeDelta: {x: -6.755615, y: -4.749878}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 10, y: 0}
+  m_SizeDelta: {x: 1815, y: 975}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6727354655892074422
 CanvasRenderer:
@@ -316,7 +316,7 @@ GameObject:
   - component: {fileID: 6818592532901008030}
   - component: {fileID: 18557886575927042}
   m_Layer: 5
-  m_Name: Text_Score
+  m_Name: ScoreText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -399,14 +399,15 @@ MonoBehaviour:
   m_fontSize: 102
   m_fontSizeBase: 102
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 102
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -490,8 +491,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -37.3443}
-  m_SizeDelta: {x: -122.4149, y: 159.4099}
+  m_AnchoredPosition: {x: 0, y: -55}
+  m_SizeDelta: {x: 229.99997, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2975573512140775796
 CanvasRenderer:
@@ -616,7 +617,7 @@ GameObject:
   - component: {fileID: 1339923457241159506}
   - component: {fileID: 4902309193544860800}
   m_Layer: 5
-  m_Name: Panel_Time
+  m_Name: TimePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -713,10 +714,10 @@ RectTransform:
   - {fileID: 9198744237584253902}
   m_Father: {fileID: 4009651639330990827}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.21000001}
-  m_AnchorMax: {x: 1, y: 0.81939226}
-  m_AnchoredPosition: {x: 0, y: -0.15048218}
-  m_SizeDelta: {x: 0, y: 0.2790985}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 77.98083}
+  m_SizeDelta: {x: 1816, y: 466.0165}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3971566801476586629
 MonoBehaviour:
@@ -736,7 +737,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
+  m_Spacing: 12.5
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -757,7 +758,7 @@ GameObject:
   - component: {fileID: 7246556674479699976}
   - component: {fileID: 3648805692733336555}
   m_Layer: 5
-  m_Name: Text_Exit_To_Menu
+  m_Name: ExitToMenuText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -779,7 +780,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.11000001}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.098400116}
+  m_AnchoredPosition: {x: 0, y: 0.0983963}
   m_SizeDelta: {x: 0, y: -0.1967001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5751875373101302586
@@ -848,6 +849,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -909,7 +911,7 @@ GameObject:
   - component: {fileID: 6123187035745585203}
   - component: {fileID: 259493075278070531}
   m_Layer: 5
-  m_Name: Text_Time
+  m_Name: TimeText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1000,6 +1002,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1061,7 +1064,7 @@ GameObject:
   - component: {fileID: 5767448660177955037}
   - component: {fileID: 5594298938093270034}
   m_Layer: 5
-  m_Name: Text_Continue
+  m_Name: ContinueText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1083,7 +1086,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.09}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.049999237}
+  m_AnchoredPosition: {x: 0, y: -0.05000305}
   m_SizeDelta: {x: 0, y: 0.10009956}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7606510469024183235
@@ -1152,6 +1155,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1212,7 +1216,7 @@ GameObject:
   - component: {fileID: 7590017071678679339}
   - component: {fileID: 3375637160876807897}
   m_Layer: 5
-  m_Name: Panel_Score
+  m_Name: ScorePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1290,7 +1294,7 @@ GameObject:
   - component: {fileID: 5054430980099715613}
   - component: {fileID: 828787296541256928}
   m_Layer: 5
-  m_Name: Button_Continue
+  m_Name: ContinueButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1314,7 +1318,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 400, y: 100}
+  m_SizeDelta: {x: 600, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3141325193509824165
 CanvasRenderer:
@@ -1446,10 +1450,10 @@ RectTransform:
   - {fileID: 4400191656277891249}
   m_Father: {fileID: 4009651639330990827}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.029353641}
-  m_AnchorMax: {x: 1, y: 0.21000001}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 180}
+  m_SizeDelta: {x: 0, y: 360}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6023424502805419962
 MonoBehaviour:
@@ -1490,7 +1494,7 @@ GameObject:
   - component: {fileID: 845572380329734941}
   - component: {fileID: 5538399551839872063}
   m_Layer: 5
-  m_Name: Text_Win
+  m_Name: LoseText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1510,10 +1514,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6052469225886741207}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.15686479}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.13569641}
-  m_SizeDelta: {x: 0, y: 0.27149963}
+  m_AnchoredPosition: {x: 0, y: 15.3044}
+  m_SizeDelta: {x: 0, y: -30.6088}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1489715622741598336
 CanvasRenderer:
@@ -1545,8 +1549,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Lose !
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 9a2157e1f9c4c4d38841fbb92558f587, type: 2}
-  m_sharedMaterial: {fileID: -6360588970910393389, guid: 9a2157e1f9c4c4d38841fbb92558f587, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5c5ee151f9307453bad78be36b51a077, type: 2}
+  m_sharedMaterial: {fileID: 2517202264660172603, guid: 5c5ee151f9307453bad78be36b51a077, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1570,17 +1574,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 100
-  m_fontSizeBase: 100
+  m_fontSize: 119.5
+  m_fontSizeBase: 119.5
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 119.5
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
