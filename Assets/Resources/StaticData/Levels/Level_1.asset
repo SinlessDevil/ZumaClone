@@ -26,6 +26,5 @@ MonoBehaviour:
     ExplosionRadius: 1.4
     CoinInterval: 8
     CoinLifetime: 4
-    BallMoveSpeedOverride: 0.9
     RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
     ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

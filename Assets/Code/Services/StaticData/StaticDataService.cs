@@ -85,15 +85,13 @@ namespace Code.Services.StaticData
             ballChainDTO.CatchupSpeedMultiplier = _ballChainConfig.CatchupSpeedMultiplier;
             ballChainDTO.CollisionThreshold = _ballChainConfig.CollisionThreshold;
             ballChainDTO.MatchingCount = _ballChainConfig.MatchingCount;
-            ballChainDTO.InitialSpeedMultiplier = _ballChainConfig.InitialSpeedMultiplier;
-            ballChainDTO.BoostDuration = _ballChainConfig.BoostDuration;
             ballChainDTO.MinParticleSpeed = _ballChainConfig.MinParticleSpeed;
             ballChainDTO.MaxParticleSpeed = _ballChainConfig.MaxParticleSpeed;
             ballChainDTO.BaseColorWidget = _ballChainConfig.BaseColorWidget;
             ballChainDTO.SetToSpawnWidget = _ballChainConfig.SetToSpawnWidget;
             ballChainDTO.TimeToSpawnWidget = _ballChainConfig.TimeToSpawnWidget;
             ballChainDTO.PercentToDetectionLose = _ballChainConfig.PercentToDetectionLose;
-            ballChainDTO.BoostSpeedBallForLose = _ballChainConfig.BoostSpeedBallForLose;
+            ballChainDTO.LoseSpeedMultiplier = _ballChainConfig.LoseSpeedMultiplier;
             return ballChainDTO;
         }
     }

@@ -57,7 +57,6 @@ namespace Code.Services.BallController
         private AttachingBallChainHandler _hits;
         private List<Color> _openingColors;
         private List<(Color color, float weight)> _palette;
-        private float _startedAt;
         private float _slowUntil;
         private float _reverseUntil;
         private float _accuracyUntil;
@@ -162,14 +161,14 @@ namespace Code.Services.BallController
             _palette = RandomService.BuildPalette(_config.RandomConfig);
             if (_palette.Count == 0)
                 _palette = colors.Distinct().Select(color => (color, 1f)).ToList();
-            _startedAt = Time.time;
+            float startedAt = Time.time;
             System.Random seedSource = new(seed);
             foreach (Feed feed in _feeds)
             {
-                feed.NextTime = _startedAt;
+                feed.NextTime = startedAt;
                 feed.Random = new System.Random(seedSource.Next());
             }
-            _nextCoinTime = _startedAt + _config.CoinInterval;
+            _nextCoinTime = startedAt + _config.CoinInterval;
             _state.Start();
             _timeService.StartTimer();
             TrySpawn();
@@ -419,12 +418,7 @@ namespace Code.Services.BallController
 
         private void MoveSegments()
         {
-            float timeSinceStart = Time.time - _startedAt;
-            float boost = _settings.BoostDuration > 0f
-                ? Mathf.Lerp(_settings.InitialSpeedMultiplier, 1f, timeSinceStart / _settings.BoostDuration)
-                : 1f;
-            float survivalBoost = _settings.Survival ? 1f + Mathf.Min(3f, _progress.Score / 1500 * 0.12f) : 1f;
-            float speed = _settings.MoveSpeed * boost * survivalBoost;
+            float speed = _settings.MoveSpeed;
             if (Time.time < _slowUntil)
                 speed *= 0.45f;
             bool reversing = Time.time < Mathf.Max(_state.MeterReverseUntil, _reverseUntil);
@@ -434,7 +428,7 @@ namespace Code.Services.BallController
                 bool hasBack = i + 1 < _segments.Count && _segments[i + 1].Track == segment.Track;
                 float segmentSpeed = speed;
                 if (_state.HasLost)
-                    segmentSpeed = speed + _settings.BoostSpeedBallForLose;
+                    segmentSpeed = _settings.MoveSpeed * _settings.LoseSpeedMultiplier;
                 else if (reversing)
                     segmentSpeed = -Mathf.Min(speed * 2f, Mathf.Max(0f, segment.TailLogicalDistance) / Time.deltaTime);
                 else if (hasBack)

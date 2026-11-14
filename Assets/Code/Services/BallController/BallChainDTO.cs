@@ -19,9 +19,6 @@ namespace Code.Services.BallController
         public float CollisionThreshold;
         public int MatchingCount;
 
-        public float InitialSpeedMultiplier;
-        public float BoostDuration;
-        
         public float MinParticleSpeed;
         public float MaxParticleSpeed;
 
@@ -30,6 +27,6 @@ namespace Code.Services.BallController
         public int TimeToSpawnWidget;
         
         public int PercentToDetectionLose;
-        public float BoostSpeedBallForLose;
+        public float LoseSpeedMultiplier = 4f;
     }
 }

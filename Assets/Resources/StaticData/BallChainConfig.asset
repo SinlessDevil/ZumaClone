@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BallChainConfig
   m_EditorClassIdentifier: 
   DurationSpawnBall: 0.05
-  MoveSpeed: 0.25
+  MoveSpeed: 0.9
   SpacingBalls: 0.35
   DurationMovingOffset: 0.2
   ChainSpringStrength: 25
@@ -21,8 +21,6 @@ MonoBehaviour:
   CatchupSpeedMultiplier: 5
   CollisionThreshold: 1
   MatchingCount: 3
-  InitialSpeedMultiplier: 2.5
-  BoostDuration: 3
   MinParticleSpeed: 35
   MaxParticleSpeed: 70
   DurationHideParticles: 0.4
@@ -30,4 +28,4 @@ MonoBehaviour:
   SetToSpawnWidget: 1.15
   TimeToSpawnWidget: 50
   PercentToDetectionLose: 20
-  BoostSpeedBallForLose: 0.05
+  LoseSpeedMultiplier: 4

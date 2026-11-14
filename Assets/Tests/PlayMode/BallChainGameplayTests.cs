@@ -224,15 +224,32 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator BallReachingTheGoal_IsConsumedAndLoses()
+        public IEnumerator BallReachingTheGoal_SpeedsUpTheRemainingChainAndLoses()
         {
-            _settings.MoveSpeed = 30f;
-            yield return Spawn(Color.blue);
-            Ball ball = ActiveBalls()[0];
+            _settings.MoveSpeed = 5f;
+            _settings.LoseSpeedMultiplier = 4f;
+            yield return Spawn(Color.blue, Color.red, Color.green, Color.blue, Color.red, Color.green, Color.blue, Color.red, Color.green);
+            Ball[] balls = ActiveBalls();
+            yield return AdvanceUntil(() => !balls[0].gameObject.activeSelf);
+
+            Ball tail = balls[^1];
+            Vector3 start = tail.transform.position;
+            float elapsed = 0f;
+            while (elapsed < 0.3f)
+            {
+                _chain.Update();
+                elapsed += Time.deltaTime;
+                if (elapsed < 0.3f)
+                    yield return null;
+            }
+
+            float distance = Vector3.Distance(start, tail.transform.position);
+            Assert.That(tail.gameObject.activeSelf, Is.True);
+            Assert.That(distance / elapsed, Is.EqualTo(20f).Within(2f));
             yield return AdvanceUntil(() => _finish.ReceivedCalls().Any());
 
             Assert.That(_chain.ActiveItems, Is.Empty);
-            Assert.That(ball.gameObject.activeSelf, Is.False);
+            Assert.That(tail.gameObject.activeSelf, Is.False);
             Assert.That(_progress.Score, Is.Zero);
             _finish.Received(1).Lose();
             _finish.DidNotReceive().Win();

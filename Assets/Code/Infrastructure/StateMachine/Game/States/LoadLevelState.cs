@@ -150,9 +150,6 @@ namespace Code.Infrastructure.StateMachine.Game.States
             ballChainDTO.ZumaTargetScore = config.GetZumaTarget();
             ballChainDTO.AceTime = config.AceTime;
             ballChainDTO.CollisionThreshold = Mathf.Min(ballChainDTO.CollisionThreshold, ballChainDTO.SpacingBalls * 1.15f);
-            float levelMoveSpeed = config.BallMoveSpeedOverride;
-            if (levelMoveSpeed > 0f)
-                ballChainDTO.MoveSpeed = levelMoveSpeed;
 
             _ballChainController.Initialize(levelHolder.PathCreator, ballChainDTO);
         }
