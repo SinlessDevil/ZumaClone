@@ -17,6 +17,9 @@ namespace Code.Logic.Zuma.Balls
         private int _index;
         private bool _isInteractive;
         private float _powerupExpiresAt;
+        private Vector3 _chainEntryStart;
+        private float _chainEntryDuration;
+        private float _chainEntryRemaining;
         private readonly System.Collections.Generic.HashSet<(int, int)> _passedGaps = new();
         private int _bestGap;
         
@@ -37,6 +40,7 @@ namespace Code.Logic.Zuma.Balls
         public BallIntersectionTracker BallIntersectionTracker => _ballIntersectionTracker;
 
         public Vector3 PreviousChainPosition { get; private set; }
+        public bool IsEnteringChain => _chainEntryRemaining > 0f;
         public int ShotId { get; set; }
         public int ChainId { get; set; }
         public int GapBonus => _bestGap * _passedGaps.Count;
@@ -81,6 +85,24 @@ namespace Code.Logic.Zuma.Balls
             PreviousChainPosition = transform.position;
             transform.position = position;
         }
+        public void BeginChainEntry(float duration)
+        {
+            _chainEntryStart = transform.position;
+            _chainEntryDuration = _chainEntryRemaining = duration;
+        }
+
+        public void MoveAlongChain(Vector3 position, float deltaTime)
+        {
+            if (IsEnteringChain)
+            {
+                _chainEntryRemaining = Mathf.Max(0f, _chainEntryRemaining - deltaTime);
+                float progress = 1f - _chainEntryRemaining / _chainEntryDuration;
+                position = Vector3.Lerp(_chainEntryStart, position, Mathf.SmoothStep(0f, 1f, progress));
+            }
+
+            SetChainPosition(position);
+        }
+
         public bool IsInteractive => _isInteractive;
         
         public void Initialize()
@@ -101,6 +123,7 @@ namespace Code.Logic.Zuma.Balls
             transform.localScale = Vector3.one;
             transform.SetPositionAndRotation(position, rotation);
             PreviousChainPosition = position;
+            _chainEntryRemaining = 0f;
             ShotId = 0;
             ChainId = 0;
             _passedGaps.Clear();

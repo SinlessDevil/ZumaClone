@@ -155,12 +155,45 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator DirectMatch_WaitsForShotToReachItsSlot()
+        {
+            _settings.DurationMovingOffset = 0.2f;
+            yield return Spawn(Color.red, Color.red, Color.green);
+            Ball[] before = ActiveBalls();
+            Ball shot = CreateBall(before[0].transform.position + new Vector3(-0.2f, 0f, 0.25f), Color.red);
+            shot.SetInteractive(true);
+            _chain.TryAttachBall(shot);
+            float impactZ = shot.transform.position.z;
+
+            Assert.That(ActiveBalls(), Does.Contain(shot));
+            Assert.That(shot.IsEnteringChain, Is.True);
+            Assert.That(_progress.Score, Is.Zero);
+
+            yield return AdvanceUntil(() => shot.transform.position.z < impactZ || _progress.Score > 0);
+            Assert.That(shot.transform.position.z, Is.InRange(0.001f, impactZ));
+            Assert.That(_progress.Score, Is.Zero);
+
+            yield return AdvanceUntil(() => _progress.Score > 0);
+
+            Assert.That(shot.IsEnteringChain, Is.False);
+            Assert.That(shot.transform.position.z, Is.EqualTo(0f).Within(0.001f));
+            Assert.That(_progress.Score, Is.EqualTo(3 * ScorePerBall));
+            Assert.That(ActiveBalls(), Is.EqualTo(new[] { before[2] }));
+        }
+
+        [UnityTest]
         public IEnumerator MatchAtJunction_RemovesBothGroupsAndAddsComboBonus()
         {
             yield return Spawn(Color.red, Color.blue, Color.blue, Color.red, Color.red, Color.green);
             Ball[] before = ActiveBalls();
             List<int> scores = new();
-            _progress.UpdateScoreEvent += scores.Add;
+            float junctionSpacing = float.PositiveInfinity;
+            _progress.UpdateScoreEvent += score =>
+            {
+                scores.Add(score);
+                if (scores.Count == 2)
+                    junctionSpacing = Vector3.Distance(before[0].transform.position, before[3].transform.position);
+            };
             Ball shot = InsertBehind(before[1], Color.blue);
             yield return AdvanceUntil(() => _chain.ActiveItems.Count == 1 && !shot.gameObject.activeSelf);
 
@@ -168,6 +201,7 @@ namespace Tests.PlayMode
             Assert.That(before[5].Index, Is.Zero);
             Assert.That(shot.gameObject.activeSelf, Is.False);
             Assert.That(scores, Is.EqualTo(new[] { 3 * ScorePerBall, 6 * ScorePerBall + 100 }));
+            Assert.That(junctionSpacing, Is.EqualTo(_settings.SpacingBalls).Within(_settings.SpacingBalls * 0.1f));
             _finish.DidNotReceive().Win();
             _finish.DidNotReceive().Lose();
         }

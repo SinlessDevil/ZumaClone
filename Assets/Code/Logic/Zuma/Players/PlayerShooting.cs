@@ -20,7 +20,7 @@ namespace Code.Logic.Zuma.Players
         [SerializeField] private Transform _spawnPointBall;
         [SerializeField] private MeshRenderer _spareBallIndicator;
 
-        private const float ShootSpeed = 30f;
+        private const float ShootSpeed = 9.6f;
         private const float BallSpawnDuration = 0.12f;
         private const float ShootCooldown = 0.18f;
         private float _shootTimer = 0f;

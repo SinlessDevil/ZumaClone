@@ -11,6 +11,8 @@ namespace Code.Services.BallController
 {
     public class AttachingBallChainHandler
     {
+        private const float MatchSpacingTolerance = 0.1f;
+
         private readonly BallChainDTO _settings;
         private readonly List<ChainSegment> _segments;
         private readonly WidgetBallChainProvider _widgets;
@@ -18,6 +20,7 @@ namespace Code.Services.BallController
         private readonly ChainState _state;
         private readonly int _pointsPerBall;
         private readonly Dictionary<int, bool> _shotResults = new();
+        private readonly List<(Ball ball, int chainId, int shotId, int gapBonus, Vector3 impact)> _settlingShots = new();
         private int _shotId;
         private int _ballId;
         private int _nextResult = 1;
@@ -219,6 +222,31 @@ namespace Code.Services.BallController
                 TryMatch(segment, junction, shotId, depth);
         }
 
+        public void ResolveSettledShots()
+        {
+            for (int i = 0; i < _settlingShots.Count; i++)
+            {
+                (Ball ball, int chainId, int shotId, int gapBonus, Vector3 impact) = _settlingShots[i];
+                ChainSegment segment = ball != null && ball.ChainId == chainId
+                    ? _segments.Find(candidate => ball.Index < candidate.Count && candidate.GetBall(ball.Index) == ball)
+                    : null;
+                if (segment != null && ball.IsEnteringChain)
+                    continue;
+
+                bool? matched = segment == null ? false : TryMatch(segment, ball.Index, shotId, 1, waitForSeating: true);
+                if (!matched.HasValue)
+                    continue;
+
+                _settlingShots.RemoveAt(i--);
+                if (matched.Value && gapBonus > 0)
+                {
+                    _progress.AddScore(gapBonus);
+                    _widgets.SetUpWidget(impact, Color.white, $"Gap +{gapBonus}");
+                }
+                ResolveShot(shotId, matched.Value, impact);
+            }
+        }
+
         private void Insert(Ball shot, ChainSegment segment, int hitIndex, Vector3 impact, Vector3 offset)
         {
             float hitDistance = segment.GetVisualDistance(hitIndex);
@@ -229,23 +257,17 @@ namespace Code.Services.BallController
 
             shot.Dispose();
             shot.SetChainPosition(impact);
+            shot.BeginChainEntry(_settings.DurationMovingOffset);
             shot.SetInteractive(false);
             RegisterChainBall(shot);
             segment.InsertBall(insertIndex, shot, distance);
             segment.SetHeadLogicalDistance(segment.HeadLogicalDistance + _settings.SpacingBalls);
             segment.ReIndexBalls();
 
-            int shotId = shot.ShotId;
-            bool matched = TryMatch(segment, insertIndex, shotId, 1);
-            if (matched && shot.GapBonus > 0)
-            {
-                _progress.AddScore(shot.GapBonus);
-                _widgets.SetUpWidget(impact, Color.white, $"Gap +{shot.GapBonus}");
-            }
-            ResolveShot(shotId, matched, impact);
+            _settlingShots.Add((shot, shot.ChainId, shot.ShotId, shot.GapBonus, impact));
         }
 
-        private bool TryMatch(ChainSegment segment, int pivot, int shotId, int depth)
+        private bool? TryMatch(ChainSegment segment, int pivot, int shotId, int depth, bool waitForSeating = false)
         {
             Color color = segment.GetBall(pivot).Color;
             int first = pivot;
@@ -260,6 +282,9 @@ namespace Code.Services.BallController
             if (count < _settings.MatchingCount)
                 return false;
 
+            if (waitForSeating && !IsGroupSeated(segment, first, last))
+                return null;
+
             Vector3 position = segment.GetBall(pivot).transform.position;
             _state.LastRemovalDistance = segment.GetVisualDistance(pivot);
             _state.LastRemovalPath = segment.Path;
@@ -267,6 +292,23 @@ namespace Code.Services.BallController
             _progress.AddScore(score);
             _widgets.SetUpWidget(position, color, depth > 1 ? $"Combo +{score}" : $"+{score}");
             RemoveMatch(segment, first, count, shotId, depth);
+            return true;
+        }
+
+        private bool IsGroupSeated(ChainSegment segment, int first, int last)
+        {
+            float spacing = _settings.SpacingBalls;
+            for (int i = first; i <= last; i++)
+            {
+                if (segment.GetBall(i).IsEnteringChain)
+                    return false;
+                if (i == first)
+                    continue;
+
+                float distance = segment.GetVisualDistance(i - 1) - segment.GetVisualDistance(i);
+                if (Mathf.Abs(distance - spacing) > spacing * MatchSpacingTolerance)
+                    return false;
+            }
             return true;
         }
 

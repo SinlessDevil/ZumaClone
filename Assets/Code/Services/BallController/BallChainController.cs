@@ -23,6 +23,8 @@ namespace Code.Services.BallController
 {
     public class BallChainController : IBallChainController
     {
+        private const float JunctionSpacingTolerance = 1.1f;
+
         private sealed class Feed
         {
             public LevelTrack Track;
@@ -192,6 +194,7 @@ namespace Code.Services.BallController
 
             CloseFeedAtTarget();
             MoveSegments();
+            _hits.ResolveSettledShots();
             MergeNeighbors();
             ConsumeAtSkull();
             
@@ -459,7 +462,8 @@ namespace Code.Services.BallController
                 ChainSegment back = _segments[i + 1];
                 float spacing = _settings.SpacingBalls;
                 if (front.Track != back.Track || back.HeadLogicalDistance < front.TailLogicalDistance - spacing - 0.0001f ||
-                    front.GetVisualDistance(front.Count - 1) - back.GetVisualDistance(0) > spacing * 1.25f)
+                    front.GetVisualDistance(front.Count - 1) - back.GetVisualDistance(0) > spacing * JunctionSpacingTolerance ||
+                    front.Balls.Any(ball => ball.IsEnteringChain) || back.Balls.Any(ball => ball.IsEnteringChain))
                 {
                     i++;
                     continue;

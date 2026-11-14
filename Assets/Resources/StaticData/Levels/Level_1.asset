@@ -18,6 +18,14 @@ MonoBehaviour:
   LevelHolder: {fileID: 3018730990265930788, guid: d34ea8c5b31645e4da3201b82a8c6205, type: 3}
   LevelConfig:
     CountItem: 30
-    BallMoveSpeedOverride: 1.2
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupLifetime: 6
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    BallMoveSpeedOverride: 0.9
     RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
     ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

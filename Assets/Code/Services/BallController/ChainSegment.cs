@@ -71,8 +71,8 @@ namespace Code.Services.BallController
                 _velocities[i] = vel;
 
                 _balls[i].SetTrackVisibility(IsExposed(newVisual));
-                _balls[i].SetChainPosition(path.GetPointAtDistance(
-                    Mathf.Max(newVisual, 0f), EndOfPathInstruction.Stop));
+                _balls[i].MoveAlongChain(path.GetPointAtDistance(
+                    Mathf.Max(newVisual, 0f), EndOfPathInstruction.Stop), deltaTime);
             }
         }
 
