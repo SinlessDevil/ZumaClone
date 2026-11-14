@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Code.Services.StaticData;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Zenject;
 
 namespace Code.UI.Game
@@ -35,8 +34,6 @@ namespace Code.UI.Game
             _typeLevelDisplayer.Initialize();
             _scoreDisplayer.Initialize();
             _timeDisplayer.Initialize();
-            
-            TrySetUpEventSystem();
         }
 
         private void OnDestroy()
@@ -54,17 +51,6 @@ namespace Code.UI.Game
             {
                 debugObject.SetActive(true);
             }
-        }
-
-        private void TrySetUpEventSystem()
-        {
-            EventSystem eventSystem = FindObjectOfType<EventSystem>();
-            if (eventSystem != null) 
-                return;
-            
-            GameObject gameObjectEventSystem = new GameObject("EventSystem");
-            gameObjectEventSystem.AddComponent<EventSystem>();
-            gameObjectEventSystem.AddComponent<StandaloneInputModule>();
         }
     }
 }

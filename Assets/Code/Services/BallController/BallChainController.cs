@@ -6,6 +6,7 @@ using Code.Logic.Zuma;
 using Code.Logic.Zuma.Balls;
 using Code.Logic.Zuma.Level;
 using Code.PathCreation;
+using Code.Services.Factories;
 using Code.Services.Factories.Game;
 using Code.Services.Finish;
 using Code.Services.Input;
@@ -64,7 +65,6 @@ namespace Code.Services.BallController
         private Bounds _field;
         private WidgetBallChainProvider _widgets;
         private GameObject _coin;
-        private Material _coinMaterial;
         private float _coinExpiresAt;
         private float _nextCoinTime;
         private int _coinIndex;
@@ -130,6 +130,14 @@ namespace Code.Services.BallController
                     if (position != null)
                         _field.Encapsulate(position.position);
             _field.Expand(2f);
+
+            if (holder.CoinPositions != null && holder.CoinPositions.Any(position => position != null) &&
+                _config.CoinInterval > 0f && _config.CoinLifetime > 0f)
+            {
+                GameObject prefab = Resources.Load<GameObject>(ResourcePath.ZumaCoinPath);
+                _coin = Object.Instantiate(prefab, holder.transform);
+                _coin.transform.localScale = new Vector3(_settings.CollisionThreshold, 0.04f, _settings.CollisionThreshold);
+            }
         }
 
         public bool IsOutsideField(Vector3 position)
@@ -172,7 +180,9 @@ namespace Code.Services.BallController
             _state?.Cancel();
             if (_hits != null)
                 _hits.PowerupTriggered -= ApplyPowerup;
-            ClearCoin();
+            if (_coin != null)
+                Object.Destroy(_coin);
+            _coin = null;
             CancelProjectiles();
             _segments.Clear();
             _feeds.Clear();
@@ -286,7 +296,7 @@ namespace Code.Services.BallController
 
         private float CoinContact(Vector3 start, Vector3 end)
         {
-            if (_coin != null && AttachingBallChainHandler.TryContact(start - _coin.transform.position,
+            if (_coin != null && _coin.activeSelf && AttachingBallChainHandler.TryContact(start - _coin.transform.position,
                     end - _coin.transform.position, _settings.CollisionThreshold * 0.85f, out float time))
                 return time;
 
@@ -295,38 +305,30 @@ namespace Code.Services.BallController
 
         private void UpdateCoin()
         {
-            if (_coin != null && Time.time >= _coinExpiresAt)
-                ClearCoin();
-
-            Transform[] positions = _levelService.GetLevelHolder().CoinPositions;
-            if (_coin != null || positions == null || positions.Length == 0 || _config.CoinInterval <= 0f ||
-                _config.CoinLifetime <= 0f || Time.time < _nextCoinTime)
+            if (_coin == null)
                 return;
 
+            if (_coin.activeSelf && Time.time >= _coinExpiresAt)
+                ClearCoin();
+
+            if (_coin.activeSelf || Time.time < _nextCoinTime)
+                return;
+
+            Transform[] positions = _levelService.GetLevelHolder().CoinPositions;
             Transform marker = positions[_coinIndex++ % positions.Length];
             _nextCoinTime = Time.time + _config.CoinInterval;
             if (marker == null)
                 return;
 
-            _coin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            _coin.name = "Zuma Coin";
-            _coin.transform.SetParent(marker, false);
-            _coin.transform.localScale = new Vector3(_settings.CollisionThreshold, 0.04f, _settings.CollisionThreshold);
-            _coin.GetComponent<Collider>().enabled = false;
-            _coinMaterial = _coin.GetComponent<Renderer>().material;
-            _coinMaterial.color = Color.yellow;
+            _coin.transform.SetPositionAndRotation(marker.position, marker.rotation);
             _coinExpiresAt = Time.time + _config.CoinLifetime;
+            _coin.SetActive(true);
         }
 
         private void ClearCoin()
         {
             if (_coin != null)
-                Object.Destroy(_coin);
-            if (_coinMaterial != null)
-                Object.Destroy(_coinMaterial);
-            
-            _coin = null;
-            _coinMaterial = null;
+                _coin.SetActive(false);
         }
 
         private void ApplyPowerup(BallPowerup powerup, Vector3 position, int shotId, int depth)

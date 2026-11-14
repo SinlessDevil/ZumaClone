@@ -34,6 +34,9 @@ namespace Code.Infrastructure.Installers
         [SerializeField] private CoroutineRunner _coroutineRunner;
         [SerializeField] private LoadingCurtain _curtain;
         [SerializeField] private TimeService _timeService;
+        [SerializeField] private AudioSource _musicSource;
+        [SerializeField] private AudioSource[] _soundSources2D;
+        [SerializeField] private AudioSource[] _soundSources3D;
         
         private RuntimePlatform Platform => Application.platform;
 
@@ -94,8 +97,8 @@ namespace Code.Infrastructure.Installers
 
         private void BindAudioVibration()
         {
-            Container.Bind<ISoundService>().To<SoundService>().AsSingle();
-            Container.Bind<IMusicService>().To<MusicService>().AsSingle();
+            Container.Bind<ISoundService>().To<SoundService>().AsSingle().WithArguments(_soundSources2D, _soundSources3D);
+            Container.Bind<IMusicService>().To<MusicService>().AsSingle().WithArguments(_musicSource);
             Container.Bind<IVibrationService>().To<VibrationService>().AsSingle();
         }
 
@@ -152,10 +155,8 @@ namespace Code.Infrastructure.Installers
         private void CacheDataAudios()
         {
             Container.Resolve<ISoundService>().Cache2DSounds();
-            Container.Resolve<ISoundService>().CreateSoundsPool();
 
             Container.Resolve<IMusicService>().CacheMusic();
-            Container.Resolve<IMusicService>().CreateMusicRoot();
         }
     }
 }

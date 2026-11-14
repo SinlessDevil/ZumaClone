@@ -10,18 +10,12 @@ namespace Code.Services.SFX.Music
         private readonly IAudioVibrationStaticDataService _audioVibrationStaticDataService;
         private readonly Dictionary<MusicType, SoundData> _cachedMusic = new();
         
-        private AudioSource _musicSource;
+        private readonly AudioSource _musicSource;
 
-        public MusicService(IAudioVibrationStaticDataService staticDataService)
+        public MusicService(IAudioVibrationStaticDataService staticDataService, AudioSource musicSource)
         {
             _audioVibrationStaticDataService = staticDataService;
-        }
-
-        public void CreateMusicRoot()
-        {
-            var go = new GameObject("[MusicPlayer]");
-            Object.DontDestroyOnLoad(go);
-            _musicSource = go.AddComponent<AudioSource>();
+            _musicSource = musicSource;
         }
 
         public void CacheMusic()

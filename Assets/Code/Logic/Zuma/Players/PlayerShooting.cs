@@ -19,6 +19,7 @@ namespace Code.Logic.Zuma.Players
 
         [SerializeField] private Transform _spawnPointBall;
         [SerializeField] private MeshRenderer _spareBallIndicator;
+        [SerializeField] private LineRenderer _accuracyBeam;
 
         private const float ShootSpeed = 9.6f;
         private const float BallSpawnDuration = 0.12f;
@@ -28,8 +29,6 @@ namespace Code.Logic.Zuma.Players
         private Ball _spareBall;
         private Ball _currentBall;
         private List<Color> _fallbackColors;
-        private LineRenderer _accuracyBeam;
-        private Material _accuracyMaterial;
 
         private Vector3 _savedStartPoint;
         private Vector3 _savedEndPoint;
@@ -70,8 +69,7 @@ namespace Code.Logic.Zuma.Players
         public void Dispose()
         {
             UnsubscribeEvents();
-            if (_accuracyMaterial != null)
-                Destroy(_accuracyMaterial);
+            _accuracyBeam.enabled = false;
         }
 
         private void Update()
@@ -83,28 +81,12 @@ namespace Code.Logic.Zuma.Players
 
         private void LateUpdate()
         {
-            if (_currentBall == null || !_ballChainController.HasAccuracy)
-            {
-                if (_accuracyBeam != null)
-                    _accuracyBeam.enabled = false;
+            _accuracyBeam.enabled = _currentBall != null && _ballChainController.HasAccuracy;
+            if (!_accuracyBeam.enabled)
                 return;
-            }
-
-            if (_accuracyBeam == null)
-            {
-                Shader shader = Shader.Find("Sprites/Default");
-                if (shader == null)
-                    return;
-                _accuracyMaterial = new Material(shader);
-                _accuracyBeam = gameObject.AddComponent<LineRenderer>();
-                _accuracyBeam.sharedMaterial = _accuracyMaterial;
-                _accuracyBeam.widthMultiplier = 0.035f;
-                _accuracyBeam.startColor = _accuracyBeam.endColor = Color.yellow;
-            }
 
             Vector3 start = _spawnPointBall.position;
             Vector3 end = _ballChainController.AccuracyEnd(start, start + _rotationTransform.forward * 30f);
-            _accuracyBeam.enabled = true;
             _accuracyBeam.SetPosition(0, start);
             _accuracyBeam.SetPosition(1, end);
         }
