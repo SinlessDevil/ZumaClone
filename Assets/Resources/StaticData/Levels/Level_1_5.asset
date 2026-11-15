@@ -1,0 +1,120 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_1_5
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Golden Coil
+  LevelId: 5
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: 4.3}
+      - {x: 11.032232, y: 0, z: 2.0092454}
+      - {x: 11.0644655, y: 0, z: -0.28150952}
+      - {x: 10, y: 0, z: -1.8}
+      - {x: 9.0131645, y: 0, z: -3.2077484}
+      - {x: 6.6634874, y: 0, z: -4.165937}
+      - {x: 5, y: 0, z: -4.6}
+      - {x: 2.6777558, y: 0, z: -5.205956}
+      - {x: -0.60526896, y: 0, z: -4.7589455}
+      - {x: -3, y: 0, z: -4.6}
+      - {x: -4.811943, y: 0, z: -4.479736}
+      - {x: -7.4993286, y: 0, z: -4.8225384}
+      - {x: -9, y: 0, z: -3.8}
+      - {x: -10.020988, y: 0, z: -3.1043115}
+      - {x: -10.973161, y: 0, z: -1.4351841}
+      - {x: -11, y: 0, z: -0.2}
+      - {x: -11.029145, y: 0, z: 1.1413243}
+      - {x: -10.104715, y: 0, z: 3.0386825}
+      - {x: -9, y: 0, z: 3.8}
+      - {x: -7.5104766, y: 0, z: 4.826509}
+      - {x: -4.8089776, y: 0, z: 4.4}
+      - {x: -3, y: 0, z: 4.4}
+      - {x: -0.8895259, y: 0, z: 4.4}
+      - {x: 2.0376413, y: 0, z: 4.476691}
+      - {x: 4, y: 0, z: 3.7}
+      - {x: 5.054474, y: 0, z: 3.282645}
+      - {x: 6.6791425, y: 0, z: 2.4877272}
+      - {x: 7, y: 0, z: 1.4}
+      - {x: 7.2523613, y: 0, z: 0.54448026}
+      - {x: 6.6749268, y: 0, z: -0.81684166}
+      - {x: 6, y: 0, z: -1.4}
+      - {x: 5.3055058, y: 0, z: -2.0000648}
+      - {x: 3.9133568, y: 0, z: -1.9095598}
+      - {x: 3, y: 0, z: -2}
+      - {x: 1.8058399, y: 0, z: -2.1182451}
+      - {x: 0.40291995, y: 0, z: -2.0591226}
+      - {x: -1, y: 0, z: -2}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.005191326, y: 0, z: -0.21018958}
+        m_Extent: {x: 11.005861, y: 0, z: 4.698041}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 0.3, y: 0, z: 0}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 32
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_5_5
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Heart of the Caldera
+  LevelId: 5
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: 4.2}
+      - {x: 11.1693735, y: 0, z: 2.8785238}
+      - {x: 11.338747, y: 0, z: 1.5570481}
+      - {x: 11, y: 0, z: 0.5}
+      - {x: 10.527457, y: 0, z: -0.97455215}
+      - {x: 9.313673, y: 0, z: -2.880327}
+      - {x: 8, y: 0, z: -3.7}
+      - {x: 6.451822, y: 0, z: -4.665994}
+      - {x: 3.821417, y: 0, z: -4.5884647}
+      - {x: 2, y: 0, z: -4.7}
+      - {x: -0.097997904, y: 0, z: -4.828471}
+      - {x: -2.9273648, y: 0, z: -4.749691}
+      - {x: -5, y: 0, z: -4.4}
+      - {x: -6.544222, y: 0, z: -4.139462}
+      - {x: -8.911697, y: 0, z: -4.0260987}
+      - {x: -10, y: 0, z: -2.9}
+      - {x: -10.8192005, y: 0, z: -2.0523496}
+      - {x: -11.246507, y: 0, z: -0.25275087}
+      - {x: -11, y: 0, z: 0.9}
+      - {x: -10.750163, y: 0, z: 2.068324}
+      - {x: -9.543073, y: 0, z: 3.4174204}
+      - {x: -8.5, y: 0, z: 4}
+      - {x: -7.047838, y: 0, z: 4.811065}
+      - {x: -4.6632133, y: 0, z: 4.7179365}
+      - {x: -3, y: 0, z: 4.7}
+      - {x: -0.9678533, y: 0, z: 4.6780844}
+      - {x: 1.9045762, y: 0, z: 4.652131}
+      - {x: 3.7, y: 0, z: 3.7}
+      - {x: 4.600349, y: 0, z: 3.222536}
+      - {x: 5.972839, y: 0, z: 2.2187552}
+      - {x: 6, y: 0, z: 1.2}
+      - {x: 6.023853, y: 0, z: 0.30533183}
+      - {x: 4.876365, y: 0, z: -0.6547394}
+      - {x: 4.1, y: 0, z: -1.1}
+      - {x: 3.0453928, y: 0, z: -1.7048378}
+      - {x: 1.3150629, y: 0, z: -1.7094152}
+      - {x: 0.1, y: 0, z: -1.75}
+      - {x: -1.0143337, y: 0, z: -1.7872202}
+      - {x: -2.3071668, y: 0, z: -1.59361}
+      - {x: -3.6, y: 0, z: -1.4}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.06305313, y: 0, z: -0.02278018}
+        m_Extent: {x: 11.132523, y: 0, z: 4.735176}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 0.1, y: 0, z: 0.1}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 36
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

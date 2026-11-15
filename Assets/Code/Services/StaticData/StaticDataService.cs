@@ -52,6 +52,8 @@ namespace Code.Services.StaticData
             
             _chapterStaticDatas = Resources
                 .LoadAll<ChapterStaticData>(ResourcePath.ChaptersStaticDataPath)
+                .Where(chapter => chapter.Levels.Count > 0)
+                .OrderBy(chapter => chapter.ChapterId)
                 .ToList();
         }
 
@@ -59,30 +61,16 @@ namespace Code.Services.StaticData
 
         public LevelStaticData ForLevel(int chapterId, int levelId)
         {
-            if (_chapterStaticDatas.Count == 0)
-                throw new InvalidOperationException("No chapters available.");
-
-            int realChapterIndex = (chapterId - 1) % _chapterStaticDatas.Count;
-            var chapter = _chapterStaticDatas[realChapterIndex];
-
-            if (chapter.Levels.Count == 0)
-                throw new InvalidOperationException($"Chapter {realChapterIndex + 1} has no levels.");
-
-            if (levelId < 1 || levelId > chapter.Levels.Count)
-                throw new ArgumentOutOfRangeException(nameof(levelId), $"Level {levelId} is out of range: 1 - {chapter.Levels.Count}");
-
-            var level = chapter.Levels[levelId - 1];
-            return level;
+            LevelStaticData level = ForChapter(chapterId).Levels.Find(item => item.LevelId == levelId);
+            return level != null ? level : throw new ArgumentOutOfRangeException(nameof(levelId),
+                $"Chapter {chapterId} has no level with ID {levelId}.");
         }
         
         public ChapterStaticData ForChapter(int chapterId)
         {
-            if (_chapterStaticDatas.Count == 0)
-                throw new InvalidOperationException("No chapters available.");
-
-            int realChapterIndex = (chapterId - 1) % _chapterStaticDatas.Count;
-
-            return _chapterStaticDatas[realChapterIndex];
+            ChapterStaticData chapter = _chapterStaticDatas.Find(item => item.ChapterId == chapterId);
+            return chapter != null ? chapter : throw new ArgumentOutOfRangeException(nameof(chapterId),
+                $"There is no playable chapter with ID {chapterId}.");
         }
 
         public BallChainDTO GetBallChainDTO()

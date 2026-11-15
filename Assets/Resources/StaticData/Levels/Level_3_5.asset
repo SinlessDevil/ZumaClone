@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_3_5
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Broken Crown
+  LevelId: 5
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: -4.6}
+      - {x: 10.888615, y: 0, z: -2.5596569}
+      - {x: 10.777229, y: 0, z: -0.5193138}
+      - {x: 10, y: 0, z: 1}
+      - {x: 9.410589, y: 0, z: 2.1521697}
+      - {x: 8.157882, y: 0, z: 3.521891}
+      - {x: 7, y: 0, z: 4.1}
+      - {x: 5.9180236, y: 0, z: 4.6402106}
+      - {x: 4.1832643, y: 0, z: 4.8497705}
+      - {x: 3, y: 0, z: 4.6}
+      - {x: 1.9730582, y: 0, z: 4.383227}
+      - {x: 1.0495714, y: 0, z: 2.8}
+      - {x: 0, y: 0, z: 2.8}
+      - {x: -1.0495714, y: 0, z: 2.8}
+      - {x: -1.9787368, y: 0, z: 4.3578815}
+      - {x: -3, y: 0, z: 4.6}
+      - {x: -4.170914, y: 0, z: 4.8775973}
+      - {x: -5.846483, y: 0, z: 4.642782}
+      - {x: -7, y: 0, z: 4.3}
+      - {x: -8.312788, y: 0, z: 3.9098887}
+      - {x: -10.45601, y: 0, z: 3.3568513}
+      - {x: -11, y: 0, z: 2.1}
+      - {x: -11.479771, y: 0, z: 0.9915234}
+      - {x: -10.740054, y: 0, z: -0.84542185}
+      - {x: -10, y: 0, z: -1.8}
+      - {x: -9.160886, y: 0, z: -2.8823528}
+      - {x: -7.3417926, y: 0, z: -3.7257872}
+      - {x: -6, y: 0, z: -4}
+      - {x: -4.523045, y: 0, z: -4.301835}
+      - {x: -2.4830894, y: 0, z: -3.7700846}
+      - {x: -1, y: 0, z: -3.5}
+      - {x: -0.083620906, y: 0, z: -3.3331187}
+      - {x: 0.95818955, y: 0, z: -3.0165594}
+      - {x: 2, y: 0, z: -2.7}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: -0.0762825, y: 0, z: 0.061244488}
+        m_Extent: {x: 11.0762825, y: 0, z: 4.6612444}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 0, y: 0, z: 0.5}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 34
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

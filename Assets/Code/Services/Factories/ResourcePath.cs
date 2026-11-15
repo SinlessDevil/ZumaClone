@@ -2,6 +2,8 @@ namespace Code.Services.Factories
 {
     public static class ResourcePath
     {
+        public const string LevelPath = "Levels/Level";
+        public const string LevelsStaticDataPath = "StaticData/Levels";
         public const string PlayerPath = "Players/Player";
         public const string BallPath = "Balls/Ball";
         public const string ZumaCoinPath = "Balls/ZumaCoin";

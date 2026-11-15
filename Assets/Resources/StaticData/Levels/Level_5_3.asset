@@ -1,0 +1,120 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_5_3
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Ember Labyrinth
+  LevelId: 3
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: 4.7}
+      - {x: 8.971909, y: 0, z: 4.5166106}
+      - {x: 6.9438167, y: 0, z: 4.3332214}
+      - {x: 5.2, y: 0, z: 4.3}
+      - {x: 3.2494307, y: 0, z: 4.2628403}
+      - {x: 0.6505778, y: 0, z: 4.536701}
+      - {x: -1.3, y: 0, z: 4.5}
+      - {x: -3.4947426, y: 0, z: 4.4587045}
+      - {x: -6.6577897, y: 0, z: 5.0229454}
+      - {x: -8.6, y: 0, z: 4}
+      - {x: -9.412507, y: 0, z: 3.5720599}
+      - {x: -10.573026, y: 0, z: 2.5154057}
+      - {x: -10.5, y: 0, z: 1.6}
+      - {x: -10.42233, y: 0, z: 0.626364}
+      - {x: -9.060223, y: 0, z: -0.4211883}
+      - {x: -8.1, y: 0, z: -0.6}
+      - {x: -6.484334, y: 0, z: -0.9008681}
+      - {x: -4.608407, y: 0, z: 1.0624686}
+      - {x: -3, y: 0, z: 1.4}
+      - {x: -1.5308028, y: 0, z: 1.7083175}
+      - {x: 0.5116279, y: 0, z: 1.7958275}
+      - {x: 2, y: 0, z: 1.6}
+      - {x: 3.401744, y: 0, z: 1.4155704}
+      - {x: 5.816863, y: 0, z: 1.4378304}
+      - {x: 6.5, y: 0, z: 0.2}
+      - {x: 6.950062, y: 0, z: -0.61550266}
+      - {x: 6.3490486, y: 0, z: -2.1319163}
+      - {x: 5.7, y: 0, z: -2.8}
+      - {x: 4.6748285, y: 0, z: -3.8552365}
+      - {x: 2.4526584, y: 0, z: -3.9670107}
+      - {x: 1, y: 0, z: -4.2}
+      - {x: -1.0743461, y: 0, z: -4.5327}
+      - {x: -3.9015522, y: 0, z: -4.5005836}
+      - {x: -6, y: 0, z: -4.4}
+      - {x: -7.2079515, y: 0, z: -4.3421}
+      - {x: -8.603975, y: 0, z: -4.12105}
+      - {x: -10, y: 0, z: -3.9}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.2483573, y: 0, z: 0.11555982}
+        m_Extent: {x: 10.751642, y: 0, z: 4.58444}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: -0.6, y: 0, z: -0.8}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 32
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

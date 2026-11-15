@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_2_3
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Jade Horseshoe
+  LevelId: 3
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: 3.6}
+      - {x: 9.614849, y: 0, z: 4.033208}
+      - {x: 8.229697, y: 0, z: 4.4664154}
+      - {x: 7, y: 0, z: 4.6}
+      - {x: 4.9114304, y: 0, z: 4.826885}
+      - {x: 2.097441, y: 0, z: 4.5197563}
+      - {x: 0, y: 0, z: 4.4}
+      - {x: -2.104273, y: 0, z: 4.279854}
+      - {x: -5.0585136, y: 0, z: 4.620385}
+      - {x: -7, y: 0, z: 3.8}
+      - {x: -8.097046, y: 0, z: 3.3364375}
+      - {x: -9.648397, y: 0, z: 2.337882}
+      - {x: -10, y: 0, z: 1.2}
+      - {x: -10.348015, y: 0, z: 0.073729396}
+      - {x: -9.78066, y: 0, z: -1.716727}
+      - {x: -9, y: 0, z: -2.6}
+      - {x: -8.144093, y: 0, z: -3.568412}
+      - {x: -6.2711115, y: 0, z: -3.9661732}
+      - {x: -5, y: 0, z: -4.2}
+      - {x: -3.2294576, y: 0, z: -4.525699}
+      - {x: -0.79628265, y: 0, z: -4.219455}
+      - {x: 1, y: 0, z: -4.1}
+      - {x: 2.8082147, y: 0, z: -3.9797516}
+      - {x: 5.42888, y: 0, z: -4.3031516}
+      - {x: 7, y: 0, z: -3.4}
+      - {x: 7.7802677, y: 0, z: -2.9514666}
+      - {x: 8.290134, y: 0, z: -1.9757333}
+      - {x: 8.8, y: 0, z: -1}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.4476614, y: 0, z: 0.1679709}
+        m_Extent: {x: 10.552339, y: 0, z: 4.5133896}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 0.7, y: 0, z: 1}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 29
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

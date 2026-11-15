@@ -12,11 +12,98 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
   m_Name: Level_2
   m_EditorClassIdentifier: 
-  LevelName: Zuma
+  LevelName: Courtyard Loop
   LevelId: 2
   LevelTypeId: 0
-  LevelHolder: {fileID: 986213291232290063, guid: e252e9ad4265ed94f9a71b89ba0bd7ae, type: 3}
+  Geometry:
+    Path:
+      points:
+      - {x: -2.3093605, y: 0, z: -5.6943483}
+      - {x: -2.540898, y: 0, z: -4.6330905}
+      - {x: -1.028128, y: 0, z: -4.063574}
+      - {x: -0.36865488, y: 0, z: -3.8873925}
+      - {x: 0.33988523, y: 0, z: -3.6981022}
+      - {x: 2.554272, y: 0, z: -4.4074764}
+      - {x: 2.993928, y: 0, z: -3.7414265}
+      - {x: 3.433585, y: 0, z: -3.0753756}
+      - {x: 3.227995, y: 0, z: -2.5499098}
+      - {x: 2.6302032, y: 0, z: -2.1552393}
+      - {x: 1.9754927, y: 0, z: -1.7229902}
+      - {x: 0.31884354, y: 0, z: -2.0922413}
+      - {x: -0.57542825, y: 0, z: -2.1080449}
+      - {x: -1.2006525, y: 0, z: -2.1190937}
+      - {x: -2.9103997, y: 0, z: -0.35216832}
+      - {x: -3.5219183, y: 0, z: 0.78077507}
+      - {x: -4.1492114, y: 0, z: 1.9429414}
+      - {x: -2.941309, y: 0, z: 4.597185}
+      - {x: -2.7068331, y: 0, z: 4.945531}
+      - {x: -2.4644098, y: 0, z: 5.3056836}
+      - {x: -0.07600917, y: 0, z: 5.809072}
+      - {x: 0.45041284, y: 0, z: 5.94407}
+      - {x: 1.2886786, y: 0, z: 6.159038}
+      - {x: 2.904901, y: 0, z: 4.888735}
+      - {x: 3.2764125, y: 0, z: 4.428063}
+      - {x: 3.599949, y: 0, z: 4.02688}
+      - {x: 3.6012752, y: 0, z: 2.0176494}
+      - {x: 3.435902, y: 0, z: 1.4904561}
+      - {x: 3.323422, y: 0, z: 1.1318799}
+      - {x: 0.66092473, y: 0, z: -0.9820835}
+      - {x: -0.00568863, y: 0, z: -0.8583922}
+      - {x: -0.60951596, y: 0, z: -0.746351}
+      - {x: -2.7770393, y: 0, z: 1.6120377}
+      - {x: -2.5332994, y: 0, z: 2.230495}
+      - {x: -2.2564607, y: 0, z: 2.9329367}
+      - {x: 0.24384007, y: 0, z: 3.7815819}
+      - {x: 0.24384007, y: 0, z: 3.7815819}
+      isClosed: 0
+      space: 2
+      controlMode: 0
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0, y: 0, z: 0}
+        m_Extent: {x: 0, y: 0, z: 0}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 69
+      flipNormals: 0
+    PlayerPosition: {x: 0, y: 0, z: 1.49}
+    Start:
+      Offset: {x: -0.00014336222, y: 0, z: 0.14777493}
+      Rotation: {x: 0, y: 0.29435602, z: 0, w: 0.9556959}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70301074, z: 0, w: 0.71117926}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0
+    MinVertexSpacing: 0.054
   LevelConfig:
     CountItem: 20
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
     RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
     ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

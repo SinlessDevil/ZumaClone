@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using Code.Logic.Zuma.Level;
 using Code.Services.BallController;
 using Code.Services.Factories.Game;
 using Code.Services.Factories.UIFactory;
@@ -112,14 +113,10 @@ namespace Code.Infrastructure.StateMachine.Game.States
 
         private void InitLevelHolder()
         {
-            var levelStaticData = _levelService.GetCurrentLevelStaticData();
-            var levelHolder = _gameFactory.CreateLevelHolder(levelStaticData);
+            LevelStaticData levelStaticData = _levelService.GetCurrentLevelStaticData();
+            ChapterStaticData chapter = _staticDataService.ForChapter(_levelService.GetCurrentChapter());
+            LevelHolder levelHolder = _gameFactory.CreateLevelHolder(levelStaticData, chapter.Theme);
             _levelService.SetLevelHolder(levelHolder);
-            
-            levelHolder.RoadMeshCreator.TriggerUpdate();
-            levelHolder.RoadMeshCreator.MeshHolder.transform.SetParent(levelHolder.transform);
-            levelHolder.RoadMeshCreator.MeshHolder.transform.position = new Vector3(0f, -0.11f, 0f);
-            levelHolder.RoadMeshCreator.MeshHolder.transform.rotation = Quaternion.Euler(-0.6f, 0f, 0f);
         }
 
         private void InitProviders()

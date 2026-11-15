@@ -12,6 +12,6 @@ namespace Code.Services.Factories.Game
         
         Ball CreateBall(Vector3 position, Quaternion rotation);
         Player CreatePlayer(Vector3 position, Quaternion rotation);
-        public LevelHolder CreateLevelHolder(LevelStaticData levelStaticData);
+        public LevelHolder CreateLevelHolder(LevelStaticData levelStaticData, LevelThemeStaticData theme = null);
     }
 }

@@ -11,6 +11,7 @@ using Code.Services.Factories.Game;
 using Code.Services.Finish;
 using Code.Services.Input;
 using Code.Services.Levels;
+using Code.Services.Factories;
 using Code.Services.LocalProgress;
 using Code.Services.Providers.Balls;
 using Code.Services.Providers.Widgets;
@@ -49,7 +50,9 @@ namespace Tests.PlayMode
         {
             _root = new GameObject(nameof(BallChainGameplayTests));
             LevelStaticData levelAsset = Resources.Load<LevelStaticData>("StaticData/Levels/Level_1");
-            _level = Object.Instantiate(levelAsset.LevelHolder, _root.transform).GetComponent<LevelHolder>();
+            _level = Object.Instantiate(Resources.Load<GameObject>(ResourcePath.LevelPath), _root.transform)
+                .GetComponent<LevelHolder>();
+            new LevelGeometryService().Apply(_level, levelAsset);
             _level.PathCreator.bezierPath = new BezierPath(new[] { Vector3.zero, Vector3.right * 30f }, false, PathSpace.xz);
 
             _scoreData = ScriptableObject.CreateInstance<LevelScoreStaticData>();

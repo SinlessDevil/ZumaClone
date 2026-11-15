@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_4_4
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Midnight Serpent
+  LevelId: 4
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: -3.3}
+      - {x: 9.27082, y: 0, z: -3.872857}
+      - {x: 7.54164, y: 0, z: -4.4457145}
+      - {x: 6, y: 0, z: -4.5}
+      - {x: 4.1763015, y: 0, z: -4.5642176}
+      - {x: 1.8245918, y: 0, z: -3.4705787}
+      - {x: 0, y: 0, z: -3.5}
+      - {x: -1.529507, y: 0, z: -3.524663}
+      - {x: -3.470364, y: 0, z: -4.5146503}
+      - {x: -5, y: 0, z: -4.5}
+      - {x: -6.535801, y: 0, z: -4.4852905}
+      - {x: -8.894602, y: 0, z: -4.4662995}
+      - {x: -10, y: 0, z: -3.4}
+      - {x: -10.691269, y: 0, z: -2.7331815}
+      - {x: -10.999265, y: 0, z: -1.2395711}
+      - {x: -10.8, y: 0, z: -0.3}
+      - {x: -10.569629, y: 0, z: 0.7862455}
+      - {x: -9.3422985, y: 0, z: 1.8764441}
+      - {x: -8.5, y: 0, z: 2.6}
+      - {x: -7.5826554, y: 0, z: 3.3880222}
+      - {x: -6.205328, y: 0, z: 4.501592}
+      - {x: -5, y: 0, z: 4.6}
+      - {x: -3.6281562, y: 0, z: 4.7120028}
+      - {x: -2.0750668, y: 0, z: 3.060755}
+      - {x: -0.7, y: 0, z: 3}
+      - {x: 0.8850538, y: 0, z: 2.9299672}
+      - {x: 2.8149462, y: 0, z: 4.470033}
+      - {x: 4.4, y: 0, z: 4.4}
+      - {x: 5.775067, y: 0, z: 4.339245}
+      - {x: 7.2375336, y: 0, z: 3.5696225}
+      - {x: 8.7, y: 0, z: 2.8}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.07015896, y: 0, z: 0.051362753}
+        m_Extent: {x: 10.929841, y: 0, z: 4.5540857}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 0.2, y: 0, z: 0.4}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 33
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

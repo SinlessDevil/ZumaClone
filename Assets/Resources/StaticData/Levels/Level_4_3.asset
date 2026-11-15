@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_4_3
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Obsidian Eye
+  LevelId: 3
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: -11, y: 0, z: -2.5}
+      - {x: -10.39777, y: 0, z: -3.352423}
+      - {x: -9.79554, y: 0, z: -4.204846}
+      - {x: -9, y: 0, z: -4.5}
+      - {x: -7.8717766, y: 0, z: -4.9185834}
+      - {x: -6.1906195, y: 0, z: -4.374717}
+      - {x: -5, y: 0, z: -4.2}
+      - {x: -3.4804032, y: 0, z: -3.9770064}
+      - {x: -1.5349923, y: 0, z: -3.1519487}
+      - {x: 0, y: 0, z: -3.1}
+      - {x: 1.8190958, y: 0, z: -3.0384362}
+      - {x: 4.1831093, y: 0, z: -4.108667}
+      - {x: 6, y: 0, z: -4}
+      - {x: 7.242328, y: 0, z: -3.9256973}
+      - {x: 9.108664, y: 0, z: -3.7685728}
+      - {x: 10, y: 0, z: -2.9}
+      - {x: 10.74087, y: 0, z: -2.1780508}
+      - {x: 11.275297, y: 0, z: -0.59715176}
+      - {x: 11, y: 0, z: 0.4}
+      - {x: 10.643936, y: 0, z: 1.6896969}
+      - {x: 8.900339, y: 0, z: 2.8089962}
+      - {x: 7.7, y: 0, z: 3.4}
+      - {x: 5.868032, y: 0, z: 4.3019953}
+      - {x: 3.0375063, y: 0, z: 4.7351594}
+      - {x: 1, y: 0, z: 4.6}
+      - {x: -0.5714749, y: 0, z: 4.4957547}
+      - {x: -2.7112834, y: 0, z: 3.9053233}
+      - {x: -4, y: 0, z: 3}
+      - {x: -4.8052373, y: 0, z: 2.434321}
+      - {x: -5.4026184, y: 0, z: 1.4171605}
+      - {x: -6, y: 0, z: 0.4}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.036743164, y: 0, z: -0.015258789}
+        m_Extent: {x: 11.036743, y: 0, z: 4.639537}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: -1.1, y: 0, z: 0.4}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 31
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_4_5
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Black Halo
+  LevelId: 5
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: -11, y: 0, z: -4.4}
+      - {x: -11.224681, y: 0, z: -2.8205793}
+      - {x: -11.449362, y: 0, z: -1.2411586}
+      - {x: -11, y: 0, z: 0}
+      - {x: -10.521415, y: 0, z: 1.321876}
+      - {x: -9.194234, y: 0, z: 2.8582418}
+      - {x: -8, y: 0, z: 3.6}
+      - {x: -6.6895995, y: 0, z: 4.413911}
+      - {x: -4.5333667, y: 0, z: 4.6315155}
+      - {x: -3, y: 0, z: 4.8}
+      - {x: -1.21052, y: 0, z: 4.9966264}
+      - {x: 1.221072, y: 0, z: 4.976252}
+      - {x: 3, y: 0, z: 4.7}
+      - {x: 4.8569975, y: 0, z: 4.411624}
+      - {x: 7.568798, y: 0, z: 4.1178923}
+      - {x: 9, y: 0, z: 2.9}
+      - {x: 9.888995, y: 0, z: 2.143503}
+      - {x: 10.779227, y: 0, z: 0.56461287}
+      - {x: 10.7, y: 0, z: -0.6}
+      - {x: 10.619244, y: 0, z: -1.7870883}
+      - {x: 9.524806, y: 0, z: -3.2954564}
+      - {x: 8.5, y: 0, z: -3.9}
+      - {x: 6.9442806, y: 0, z: -4.8177347}
+      - {x: 4.3062077, y: 0, z: -4.3893127}
+      - {x: 2.5, y: 0, z: -4.4}
+      - {x: 0.39468646, y: 0, z: -4.412457}
+      - {x: -2.657973, y: 0, z: -4.919528}
+      - {x: -4.5, y: 0, z: -3.9}
+      - {x: -5.3452444, y: 0, z: -3.432173}
+      - {x: -6.4937053, y: 0, z: -2.2615194}
+      - {x: -6.4, y: 0, z: -1.3}
+      - {x: -6.297038, y: 0, z: -0.24349678}
+      - {x: -5.048519, y: 0, z: 0.42825162}
+      - {x: -3.8, y: 0, z: 1.1}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: -0.27725744, y: 0, z: 0.19660687}
+        m_Extent: {x: 10.982182, y: 0, z: 4.7336054}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 1, y: 0, z: 0.8}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 35
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

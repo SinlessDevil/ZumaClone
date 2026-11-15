@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfa6b612230e74841b612a99264a0799, type: 3}
+  m_Name: Chapter_5
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.ChapterStaticData
+  ChapterId: 5
+  TempleId: 5
+  Theme: {fileID: 11400000, guid: 62675c87468128640829805cd0821f50, type: 2}
+  Levels:
+  - {fileID: 11400000, guid: aa5f26ab092577949a2be760dc59cf0b, type: 2}
+  - {fileID: 11400000, guid: a5243bea528bc164098a61b972d7bf7f, type: 2}
+  - {fileID: 11400000, guid: b9ce2ab9721b2d7459973d9db96c12e8, type: 2}
+  - {fileID: 11400000, guid: 07d9ce54702b4e44f97f7e4609bd105e, type: 2}
+  - {fileID: 11400000, guid: 33d50d5fcc4a93d4995e7e308b731ed1, type: 2}
+  RetiredLevelIds: 

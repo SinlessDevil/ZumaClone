@@ -125,13 +125,11 @@ namespace Code.Services.BallController
             foreach (Feed feed in _feeds)
                 for (int i = 0; i < feed.Track.Path.path.NumPoints; i++)
                     _field.Encapsulate(feed.Track.Path.path.GetPoint(i));
-            if (holder.CoinPositions != null)
-                foreach (Transform position in holder.CoinPositions)
-                    if (position != null)
-                        _field.Encapsulate(position.position);
+            foreach (Pose coin in holder.CoinSpawns)
+                _field.Encapsulate(holder.transform.TransformPoint(coin.position));
             _field.Expand(2f);
 
-            if (holder.CoinPositions != null && holder.CoinPositions.Any(position => position != null) &&
+            if (holder.CoinSpawns.Length > 0 &&
                 _config.CoinInterval > 0f && _config.CoinLifetime > 0f)
             {
                 GameObject prefab = Resources.Load<GameObject>(ResourcePath.ZumaCoinPath);
@@ -328,13 +326,10 @@ namespace Code.Services.BallController
             if (_coin.activeSelf || Time.time < _nextCoinTime)
                 return;
 
-            Transform[] positions = _levelService.GetLevelHolder().CoinPositions;
-            Transform marker = positions[_coinIndex++ % positions.Length];
+            Pose[] positions = _levelService.GetLevelHolder().CoinSpawns;
+            Pose marker = positions[_coinIndex++ % positions.Length];
             _nextCoinTime = Time.time + _config.CoinInterval;
-            if (marker == null)
-                return;
-
-            _coin.transform.SetPositionAndRotation(marker.position, marker.rotation);
+            _coin.transform.SetLocalPositionAndRotation(marker.position, marker.rotation);
             _coinExpiresAt = Time.time + _config.CoinLifetime;
             _coin.SetActive(true);
         }

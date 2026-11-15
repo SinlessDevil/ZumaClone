@@ -13,7 +13,12 @@ MonoBehaviour:
   m_Name: ChapterStaticData
   m_EditorClassIdentifier: 
   ChapterId: 1
+  TempleId: 1
+  Theme: {fileID: 11400000, guid: 488c9c0fc21e8fd46ad69cfe5542ddef, type: 2}
   Levels:
   - {fileID: 11400000, guid: 5eb134ae70d5f334cbdfacbf6c1ff667, type: 2}
   - {fileID: 11400000, guid: e9e5c04d86cf98e4582a31ad66f2d5c8, type: 2}
   - {fileID: 11400000, guid: 771ba407a64421041b4b93be6aa552db, type: 2}
+  - {fileID: 11400000, guid: 815d4596426ebe641954b8135657cc7d, type: 2}
+  - {fileID: 11400000, guid: eb5e6d74b12ebd54f956ea75ba201503, type: 2}
+  RetiredLevelIds:

@@ -1,6 +1,7 @@
-﻿using Code.Logic.Zuma.Balls;
+using Code.Logic.Zuma.Balls;
 using Code.Logic.Zuma.Level;
 using Code.Logic.Zuma.Players;
+using Code.Services.Levels;
 using Code.StaticData.Levels;
 using UnityEngine;
 using Zenject;
@@ -9,9 +10,11 @@ namespace Code.Services.Factories.Game
 {
     public class GameFactory : Factory, IGameFactory
     {
-        public GameFactory(IInstantiator instantiator) : base(instantiator)
+        private readonly ILevelGeometryService _levelGeometry;
+
+        public GameFactory(IInstantiator instantiator, ILevelGeometryService levelGeometry) : base(instantiator)
         {
-            
+            _levelGeometry = levelGeometry;
         }
         public Player Player { get; private set; }
         
@@ -28,10 +31,19 @@ namespace Code.Services.Factories.Game
             return player;
         }
         
-        public LevelHolder CreateLevelHolder(LevelStaticData levelStaticData)
+        public LevelHolder CreateLevelHolder(LevelStaticData levelStaticData, LevelThemeStaticData theme = null)
         {
-            GameObject levelHolder = Instantiate(levelStaticData.LevelHolder);
-            return levelHolder.GetComponent<LevelHolder>();
+            LevelHolder level = Instantiate(ResourcePath.LevelPath).GetComponent<LevelHolder>();
+            try
+            {
+                _levelGeometry.Apply(level, levelStaticData, theme);
+                return level;
+            }
+            catch
+            {
+                Object.Destroy(level.gameObject);
+                throw;
+            }
         }
     }
 }

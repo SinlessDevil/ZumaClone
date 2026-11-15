@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_2_2
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Twin Vines
+  LevelId: 2
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: -11, y: 0, z: 3}
+      - {x: -10.006801, y: 0, z: 3.8570344}
+      - {x: -9.013601, y: 0, z: 4.714069}
+      - {x: -8, y: 0, z: 4.6}
+      - {x: -6.8165045, y: 0, z: 4.4668117}
+      - {x: -5.8520703, y: 0, z: 2.8320916}
+      - {x: -5, y: 0, z: 2}
+      - {x: -3.7236981, y: 0, z: 0.75362396}
+      - {x: -2.4655132, y: 0, z: -1.3828121}
+      - {x: -1, y: 0, z: -2.4}
+      - {x: 0.06175089, y: 0, z: -3.1369433}
+      - {x: 1.724128, y: 0, z: -3.793722}
+      - {x: 3, y: 0, z: -4}
+      - {x: 4.4834347, y: 0, z: -4.239836}
+      - {x: 6.7026114, y: 0, z: -4.45821}
+      - {x: 8, y: 0, z: -3.7}
+      - {x: 8.95554, y: 0, z: -3.1415708}
+      - {x: 9.970221, y: 0, z: -1.7063514}
+      - {x: 10, y: 0, z: -0.6}
+      - {x: 10.032539, y: 0, z: 0.6089008}
+      - {x: 8.963967, y: 0, z: 2.1697485}
+      - {x: 8, y: 0, z: 2.9}
+      - {x: 7.2112308, y: 0, z: 3.497531}
+      - {x: 6.005615, y: 0, z: 3.5987654}
+      - {x: 4.8, y: 0, z: 3.7}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: -0.49963713, y: 0, z: 0.19267678}
+        m_Extent: {x: 10.500362, y: 0, z: 4.4175787}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: -0.8, y: 0, z: 1.2}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 27
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

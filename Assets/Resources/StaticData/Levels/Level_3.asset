@@ -12,11 +12,84 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
   m_Name: Level_3
   m_EditorClassIdentifier: 
-  LevelName: Zuma
+  LevelName: Sun Gate
   LevelId: 3
   LevelTypeId: 0
-  LevelHolder: {fileID: 986213291232290063, guid: e252e9ad4265ed94f9a71b89ba0bd7ae, type: 3}
+  Geometry:
+    Path:
+      points:
+      - {x: -11, y: 0, z: -4}
+      - {x: -9.95, y: 0, z: -2.6}
+      - {x: -8.9, y: 0, z: -1.2}
+      - {x: -8, y: 0, z: 0}
+      - {x: -7.1, y: 0, z: 1.2}
+      - {x: -6.3185744, y: 0, z: 3.284904}
+      - {x: -5, y: 0, z: 4}
+      - {x: -2.6212978, y: 0, z: 5.29003}
+      - {x: 1.3348522, y: 0, z: 5.068389}
+      - {x: 4, y: 0, z: 4.6}
+      - {x: 5.6140437, y: 0, z: 4.3163385}
+      - {x: 7.939706, y: 0, z: 3.6495507}
+      - {x: 9, y: 0, z: 2.4}
+      - {x: 9.781481, y: 0, z: 1.4790292}
+      - {x: 10.406811, y: 0, z: -0.36272025}
+      - {x: 10, y: 0, z: -1.5}
+      - {x: 9.624103, y: 0, z: -2.5508575}
+      - {x: 8.0690155, y: 0, z: -3.379367}
+      - {x: 7, y: 0, z: -3.7}
+      - {x: 5.8491516, y: 0, z: -4.0451775}
+      - {x: 4.424576, y: 0, z: -3.7725887}
+      - {x: 3, y: 0, z: -3.5}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: -0.4360113, y: 0, z: 0.48362446}
+        m_Extent: {x: 10.563989, y: 0, z: 4.4836245}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 0, y: 0, z: 0.4}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
   LevelConfig:
     CountItem: 25
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
     RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
     ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

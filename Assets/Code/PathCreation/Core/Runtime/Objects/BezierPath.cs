@@ -43,6 +43,18 @@ namespace Code.PathCreation
 
         #region Constructors
 
+        public BezierPath(BezierPath source)
+        {
+            points = new List<Vector3>(source.points);
+            perAnchorNormalsAngle = new List<float>(source.perAnchorNormalsAngle);
+            isClosed = source.isClosed;
+            space = source.space;
+            controlMode = source.controlMode;
+            autoControlLength = source.autoControlLength;
+            globalNormalsAngle = source.globalNormalsAngle;
+            flipNormals = source.flipNormals;
+        }
+
         /// <summary> Creates a two-anchor path centred around the given centre point </summary>
         ///<param name="isClosed"> Should the end point connect back to the start point? </param>
         ///<param name="space"> Determines if the path is in 3d space, or clamped to the xy/xz plane </param>

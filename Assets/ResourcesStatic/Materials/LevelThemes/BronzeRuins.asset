@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdae1dff452d35d498d897076bb51add, type: 3}
+  m_Name: BronzeRuins
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelThemeStaticData
+  DisplayName: Bronze Ruins
+  Ground: {fileID: 2100000, guid: 529f74251b32df24a90c4b73cd9aa544, type: 2}
+  Track: {fileID: 2100000, guid: 09abcae741bb2114a9c2978a5c5752a7, type: 2}
+  TrackRepeatLength: 3.25

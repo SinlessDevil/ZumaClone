@@ -83,7 +83,7 @@ namespace Code.PathCreation
                 pathSplitData.minMax.Max - pathSplitData.minMax.Min);
 
             // Figure out up direction for path
-            up = (bounds.size.z > bounds.size.y) ? Vector3.up : -Vector3.forward;
+            up = space == PathSpace.xz || bounds.size.z > bounds.size.y ? Vector3.up : -Vector3.forward;
             Vector3 lastRotationAxis = up;
 
             // Loop through the data and assign to arrays.

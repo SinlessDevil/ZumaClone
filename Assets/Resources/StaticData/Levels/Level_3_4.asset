@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_3_4
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Foundry Switchback
+  LevelId: 4
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: -11, y: 0, z: -4.5}
+      - {x: -8.9, y: 0, z: -4.465}
+      - {x: -6.8, y: 0, z: -4.4300003}
+      - {x: -5, y: 0, z: -4.4}
+      - {x: -3.1999998, y: 0, z: -4.37}
+      - {x: -0.80024886, y: 0, z: -4.3021426}
+      - {x: 1, y: 0, z: -4.3}
+      - {x: 3.1002128, y: 0, z: -4.2975006}
+      - {x: 5.9734764, y: 0, z: -4.951454}
+      - {x: 8, y: 0, z: -4.4}
+      - {x: 8.94822, y: 0, z: -4.141972}
+      - {x: 10.519449, y: 0, z: -3.641802}
+      - {x: 10.8, y: 0, z: -2.7}
+      - {x: 11.018358, y: 0, z: -1.966979}
+      - {x: 10.357568, y: 0, z: -0.79064655}
+      - {x: 9.7, y: 0, z: -0.4}
+      - {x: 8.227825, y: 0, z: 0.47458664}
+      - {x: 5.712243, y: 0, z: -0.6794355}
+      - {x: 4, y: 0, z: -0.7}
+      - {x: 1.8992944, y: 0, z: -0.72523004}
+      - {x: -0.99085474, y: 0, z: -1.113951}
+      - {x: -3, y: 0, z: -0.5}
+      - {x: -4.018811, y: 0, z: -0.18867359}
+      - {x: -5.687163, y: 0, z: 0.38165176}
+      - {x: -6, y: 0, z: 1.4}
+      - {x: -6.2209463, y: 0, z: 2.1192238}
+      - {x: -5.5896225, y: 0, z: 3.2326183}
+      - {x: -5, y: 0, z: 3.7}
+      - {x: -3.9486105, y: 0, z: 4.533415}
+      - {x: -1.9401177, y: 0, z: 4.4360886}
+      - {x: -0.6, y: 0, z: 4.5}
+      - {x: 1.174328, y: 0, z: 4.5846195}
+      - {x: 3.237164, y: 0, z: 4.2923098}
+      - {x: 5.3, y: 0, z: 4}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: -0.07872629, y: 0, z: -0.05315399}
+        m_Extent: {x: 10.921274, y: 0, z: 4.5679855}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: -0.5, y: 0, z: 1.4}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 32
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

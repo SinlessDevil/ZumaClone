@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_3_1
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Bronze Causeway
+  LevelId: 1
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: -3.8}
+      - {x: 9.6066475, y: 0, z: -4.1088586}
+      - {x: 8.213295, y: 0, z: -4.4177175}
+      - {x: 7, y: 0, z: -4.4}
+      - {x: 5.476056, y: 0, z: -4.3777466}
+      - {x: 3.5241046, y: 0, z: -3.497541}
+      - {x: 2, y: 0, z: -3.5}
+      - {x: 0.17000222, y: 0, z: -3.5029526}
+      - {x: -2.1700022, y: 0, z: -4.5970473}
+      - {x: -4, y: 0, z: -4.6}
+      - {x: -5.5241046, y: 0, z: -4.602459}
+      - {x: -7.7379375, y: 0, z: -4.5544577}
+      - {x: -9, y: 0, z: -3.7}
+      - {x: -9.937436, y: 0, z: -3.0653248}
+      - {x: -11.101307, y: 0, z: -1.6275358}
+      - {x: -11, y: 0, z: -0.5}
+      - {x: -10.88027, y: 0, z: 0.8325783}
+      - {x: -9.173272, y: 0, z: 2.1569347}
+      - {x: -8, y: 0, z: 2.8}
+      - {x: -7.065802, y: 0, z: 3.3120296}
+      - {x: -5.782901, y: 0, z: 3.3560147}
+      - {x: -4.5, y: 0, z: 3.4}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: -0.0030918121, y: 0, z: -0.60004044}
+        m_Extent: {x: 11.003092, y: 0, z: 4.0000405}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: -2, y: 0, z: 1.1}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 26
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

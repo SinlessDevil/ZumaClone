@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_4_2
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Slate Terraces
+  LevelId: 2
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: 4.5}
+      - {x: 10.801387, y: 0, z: 3.366287}
+      - {x: 10.602774, y: 0, z: 2.232574}
+      - {x: 10, y: 0, z: 1.5}
+      - {x: 9.342729, y: 0, z: 0.7011921}
+      - {x: 7.994807, y: 0, z: 0.08365406}
+      - {x: 7, y: 0, z: -0.2}
+      - {x: 5.55634, y: 0, z: -0.6116378}
+      - {x: 3.5, y: 0, z: -0.34}
+      - {x: 2, y: 0, z: -0.4}
+      - {x: 0.5, y: 0, z: -0.46}
+      - {x: -1.5073239, y: 0, z: -0.4402569}
+      - {x: -3, y: 0, z: -0.6}
+      - {x: -4.21132, y: 0, z: -0.729633}
+      - {x: -5.894701, y: 0, z: -0.7877363}
+      - {x: -7, y: 0, z: -1.3}
+      - {x: -8.062929, y: 0, z: -1.7926269}
+      - {x: -10.282597, y: 0, z: -2.6630569}
+      - {x: -10, y: 0, z: -3.8}
+      - {x: -9.718984, y: 0, z: -4.9305882}
+      - {x: -7.361807, y: 0, z: -4.5139475}
+      - {x: -6.2, y: 0, z: -4.6}
+      - {x: -4.191921, y: 0, z: -4.7487335}
+      - {x: -1.5098894, y: 0, z: -4.3218393}
+      - {x: 0.5, y: 0, z: -4.2}
+      - {x: 2.450109, y: 0, z: -4.0817842}
+      - {x: 4.7250547, y: 0, z: -3.9408922}
+      - {x: 7, y: 0, z: -3.8}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.48767996, y: 0, z: -0.06553817}
+        m_Extent: {x: 10.51232, y: 0, z: 4.5655384}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: 0.7, y: 0, z: 2.6}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 29
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

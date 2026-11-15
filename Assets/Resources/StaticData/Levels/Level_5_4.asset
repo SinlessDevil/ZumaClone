@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_5_4
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Firebird
+  LevelId: 4
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: -11, y: 0, z: -4.5}
+      - {x: -10.404446, y: 0, z: -2.6992304}
+      - {x: -9.808892, y: 0, z: -0.89846087}
+      - {x: -9, y: 0, z: 0.5}
+      - {x: -8.272772, y: 0, z: 1.7572746}
+      - {x: -7.28244, y: 0, z: 3.6181293}
+      - {x: -6, y: 0, z: 4.3}
+      - {x: -4.937482, y: 0, z: 4.8649387}
+      - {x: -3.1539772, y: 0, z: 4.9412284}
+      - {x: -2, y: 0, z: 4.6}
+      - {x: -1.0966468, y: 0, z: 4.33288}
+      - {x: -0.43700618, y: 0, z: 2.7970543}
+      - {x: 0.5, y: 0, z: 2.7}
+      - {x: 1.8214259, y: 0, z: 2.563128}
+      - {x: 3.1724706, y: 0, z: 4.549347}
+      - {x: 4.5, y: 0, z: 4.6}
+      - {x: 5.7526436, y: 0, z: 4.647795}
+      - {x: 7.4239273, y: 0, z: 3.8865633}
+      - {x: 8.4, y: 0, z: 3.1}
+      - {x: 9.378305, y: 0, z: 2.3116364}
+      - {x: 10.784845, y: 0, z: 0.85355556}
+      - {x: 10.7, y: 0, z: -0.4}
+      - {x: 10.616716, y: 0, z: -1.630473}
+      - {x: 9.051656, y: 0, z: -2.8557792}
+      - {x: 8, y: 0, z: -3.5}
+      - {x: 6.9452376, y: 0, z: -4.146124}
+      - {x: 5.2368507, y: 0, z: -4.514182}
+      - {x: 4, y: 0, z: -4.5}
+      - {x: 2.4135041, y: 0, z: -4.4818087}
+      - {x: 0.65675205, y: 0, z: -3.7909043}
+      - {x: -1.1, y: 0, z: -3.1}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: -0.14816761, y: 0, z: 0.15207362}
+        m_Extent: {x: 10.851832, y: 0, z: 4.6524687}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: -0.2, y: 0, z: 0.3}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 34
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}

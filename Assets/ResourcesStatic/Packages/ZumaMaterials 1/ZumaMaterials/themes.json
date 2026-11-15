@@ -1,7 +1,0 @@
-{
-  "SandstoneTemple": {"label":"Sandstone Temple","seed":906,"palette":["5e5139","95805b","c0ab77"],"track":["514936","857653","b9a67a"],"roughness":0.79,"detail":0.87,"cracks":0.5,"ornaments":0.48,"width":1.0,"depth":0.040,"edge":0.17,"style":"sandstone"},
-  "VolcanicTemple": {"label":"Volcanic Temple","seed":902,"palette":["361b25","713638","a56852"],"track":["3e2226","80453e","b87e64"],"roughness":0.84,"detail":1.07,"cracks":0.69,"ornaments":0.29,"width":1.0,"depth":0.043,"edge":0.16,"style":"volcanic"},
-  "DarkStoneTemple": {"label":"Dark Stone Temple","seed":911,"palette":["19222c","394854","687e87"],"track":["18232d","394c59","85999c"],"roughness":0.73,"detail":1.0,"cracks":0.25,"ornaments":0.18,"width":1.0,"depth":0.052,"edge":0.20,"style":"slate"},
-  "MossJadeSanctuary": {"label":"Moss & Jade Sanctuary","seed":935,"palette":["26372c","54654b","8c9972"],"track":["25352d","4b6753","94a27f"],"roughness":0.80,"detail":0.92,"cracks":0.63,"ornaments":0.46,"width":1.0,"depth":0.045,"edge":0.19,"style":"jade"},
-  "BronzeRuins": {"label":"Bronze Ruins","seed":953,"palette":["392920","75513b","b58558"],"track":["362923","71533e","ba9062"],"roughness":0.77,"detail":0.98,"cracks":0.56,"ornaments":0.62,"width":1.0,"depth":0.046,"edge":0.16,"style":"bronze"}
-}

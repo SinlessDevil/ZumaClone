@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Code.Logic.Zuma.Level;
@@ -47,10 +48,10 @@ namespace Code.Services.Levels
         public int GetCurrentChapter() => (_gauntletLevel ?? Progress.CurrentProgress).ChapterId;
 
         public int GetCurrentLevelIndex() =>
-            GetCurrentLevel() - 1;
-        
-        public int GetCurrentChapterIndex() => 
-            GetCurrentChapter() - 1;
+            _staticDataService.ForChapter(GetCurrentChapter()).Levels.FindIndex(level => level.LevelId == GetCurrentLevel());
+
+        public int GetCurrentChapterIndex() =>
+            Math.Max(0, GetAllChapters().FindIndex(chapter => chapter.ChapterId == GetCurrentChapter()));
 
         public LevelContainer GetCurrentLevelContainer()
         {
@@ -75,36 +76,16 @@ namespace Code.Services.Levels
         
         public List<ChapterStaticData> GetAllChapters()
         {
-            HashSet<int> addedChapters = new HashSet<int>();
-            List<ChapterStaticData> chapters = new List<ChapterStaticData>();
-
-            var currentChapter = _persistenceProgressService.PlayerData.PlayerLevelData.CurrentProgress.ChapterId;
-            var lastChapter = _persistenceProgressService.PlayerData.PlayerLevelData.LastProgress.ChapterId;
-            
-            foreach (var completedLevel in _persistenceProgressService.PlayerData.PlayerLevelData.LevelsComleted)
+            RepairAdventureProgress();
+            HashSet<int> visible = new HashSet<int>(Progress.LevelsComleted.Select(level => level.ChapterId))
             {
-                int chapterId = completedLevel.ChapterId;
-
-                if (addedChapters.Add(chapterId))
-                {
-                    chapters.Add(_staticDataService.ForChapter(chapterId));
-                }
-            }
-            
-            if (addedChapters.Add(currentChapter))
-            {
-                chapters.Add(_staticDataService.ForChapter(currentChapter));
-            }
-            
-            if (addedChapters.Add(lastChapter))
-            {
-                chapters.Add(_staticDataService.ForChapter(lastChapter));
-            }
-
-            return chapters.OrderBy(chapter => chapter.ChapterId).ToList();
+                Progress.CurrentProgress.ChapterId,
+                Progress.LastProgress.ChapterId,
+                GetCurrentChapter()
+            };
+            return _staticDataService.Chapters.Where(chapter => visible.Contains(chapter.ChapterId)).ToList();
         }
 
-        
         public void LevelsComplete()
         {
             if (Mode != ZumaMode.Adventure)
@@ -132,33 +113,20 @@ namespace Code.Services.Levels
                 completed.LevelId != playerData.LastProgress.LevelId)
                 return;
 
-            playerData.LastProgress.LevelId++;
-            
-            var currentChapter = _staticDataService.ForChapter(playerData.LastProgress.ChapterId);
-            
-            if (playerData.LastProgress.LevelId > currentChapter.Levels.Count)
+            LevelContainer next = GetNextLevel(playerData.LastProgress);
+            playerData.AdventureComplete = next == null;
+            if (next != null)
             {
-                if (playerData.LastProgress.ChapterId >= _staticDataService.Chapters.Count)
+                if (next.ChapterId != playerData.LastProgress.ChapterId)
                 {
-                    playerData.LastProgress.LevelId = currentChapter.Levels.Count;
-                    playerData.AdventureComplete = true;
+                    playerData.StageCheckpoint = new LevelContainer { ChapterId = next.ChapterId, LevelId = next.LevelId };
                 }
-                else
-                {
-                    playerData.LastProgress.ChapterId++;
-                    playerData.LastProgress.LevelId = 1;
-                    playerData.StageCheckpoint = new LevelContainer
-                    {
-                        ChapterId = playerData.LastProgress.ChapterId,
-                        LevelId = 1
-                    };
-                }
+                playerData.LastProgress = next;
             }
 
-            playerData.CurrentProgress.ChapterId = playerData.LastProgress.ChapterId;
-            playerData.CurrentProgress.LevelId = playerData.LastProgress.LevelId;
+            SetUpCurrentLevel(playerData.LastProgress.LevelId, playerData.LastProgress.ChapterId);
         }
-        
+
         public bool VisitLevel()
         {
             if (Mode != ZumaMode.Adventure || IsGauntletUnlocked(GetCurrentChapter(), GetCurrentLevel()))
@@ -173,8 +141,9 @@ namespace Code.Services.Levels
         }
 
         public bool IsGauntletUnlocked(int chapter, int level) =>
-            IsLevelCompleted(chapter, level) || Progress.VisitedLevels?.Any(item =>
-                item.ChapterId == chapter && item.LevelId == level) == true;
+            LevelExists(chapter, level) &&
+            (IsLevelCompleted(chapter, level) || Progress.VisitedLevels?.Any(item =>
+                item.ChapterId == chapter && item.LevelId == level) == true);
 
         public bool SelectGauntlet(ZumaMode mode, int chapter, int level, bool random)
         {
@@ -187,7 +156,8 @@ namespace Code.Services.Levels
                 foreach (LevelContainer item in Progress.LevelsComleted.Concat(
                              Progress.VisitedLevels ?? Enumerable.Empty<LevelContainer>()))
                 {
-                    if (!unlocked.Any(existing => existing.ChapterId == item.ChapterId && existing.LevelId == item.LevelId))
+                    if (LevelExists(item.ChapterId, item.LevelId) &&
+                        !unlocked.Any(existing => existing.ChapterId == item.ChapterId && existing.LevelId == item.LevelId))
                         unlocked.Add(item);
                 }
 
@@ -222,21 +192,27 @@ namespace Code.Services.Levels
             if (Progress.DeluxeProgressVersion == 0)
             {
                 Progress.AdventureLives = StartingLives;
-                int finalChapter = _staticDataService.Chapters.Count;
-                if (finalChapter > 0 && Progress.LastProgress.ChapterId > finalChapter)
+                ChapterStaticData lastChapter = _staticDataService.Chapters.Last();
+                if (Progress.LastProgress.ChapterId > lastChapter.ChapterId)
                 {
-                    int finalLevel = _staticDataService.ForChapter(finalChapter).Levels.Count;
-                    Progress.LastProgress = new LevelContainer { ChapterId = finalChapter, LevelId = finalLevel };
-                    Progress.AdventureComplete = IsLevelCompleted(finalChapter, finalLevel);
+                    int finalLevel = lastChapter.Levels.Last().LevelId;
+                    Progress.LastProgress = new LevelContainer { ChapterId = lastChapter.ChapterId, LevelId = finalLevel };
+                    Progress.AdventureComplete = IsLevelCompleted(lastChapter.ChapterId, finalLevel);
                 }
 
-                if (finalChapter > 0 && Progress.CurrentProgress.ChapterId > finalChapter)
+                if (Progress.CurrentProgress.ChapterId > lastChapter.ChapterId)
                     SetUpCurrentLevel(Progress.LastProgress.LevelId, Progress.LastProgress.ChapterId);
 
-                Progress.StageCheckpoint = new LevelContainer { ChapterId = Progress.LastProgress.ChapterId };
+                ChapterStaticData checkpointChapter = FindClosestChapter(Progress.LastProgress.ChapterId);
+                Progress.StageCheckpoint = new LevelContainer
+                {
+                    ChapterId = checkpointChapter.ChapterId,
+                    LevelId = checkpointChapter.Levels[0].LevelId
+                };
                 Progress.DeluxeProgressVersion = 1;
             }
 
+            RepairAdventureProgress();
             if (CanContinueAdventure)
                 return;
 
@@ -321,6 +297,62 @@ namespace Code.Services.Levels
         public void Cleanup()
         {
             _levelHolder = null;
+        }
+
+        private bool LevelExists(int chapterId, int levelId) =>
+            _staticDataService.Chapters.Exists(chapter => chapter.ChapterId == chapterId &&
+                chapter.Levels.Exists(level => level.LevelId == levelId));
+
+        private void RepairAdventureProgress()
+        {
+            PlayerLevelData progress = Progress;
+            progress.CurrentProgress = RepairLevel(progress.CurrentProgress);
+            LevelContainer last = RepairLevel(progress.LastProgress);
+            if (last != progress.LastProgress)
+            {
+                progress.AdventureComplete = false;
+                progress.LastProgress = last;
+            }
+            progress.StageCheckpoint = RepairLevel(progress.StageCheckpoint);
+
+            if (progress.AdventureComplete && GetNextLevel(last) is LevelContainer next)
+            {
+                progress.AdventureComplete = false;
+                progress.LastProgress = next;
+                if (next.ChapterId != last.ChapterId)
+                    progress.StageCheckpoint = new LevelContainer { ChapterId = next.ChapterId, LevelId = next.LevelId };
+                if (progress.CurrentProgress.ChapterId == last.ChapterId && progress.CurrentProgress.LevelId == last.LevelId)
+                    SetUpCurrentLevel(next.LevelId, next.ChapterId);
+            }
+        }
+
+        private LevelContainer RepairLevel(LevelContainer saved)
+        {
+            int chapterId = saved?.ChapterId ?? 1;
+            ChapterStaticData chapter = FindClosestChapter(chapterId);
+            if (chapter.ChapterId != chapterId || saved == null)
+                return new LevelContainer { ChapterId = chapter.ChapterId, LevelId = chapter.Levels[0].LevelId };
+            if (chapter.Levels.Exists(level => level.LevelId == saved.LevelId))
+                return saved;
+
+            LevelStaticData closest = chapter.Levels.OrderBy(level => Math.Abs((long)level.LevelId - saved.LevelId)).First();
+            return new LevelContainer { ChapterId = chapterId, LevelId = closest.LevelId };
+        }
+
+        private ChapterStaticData FindClosestChapter(int chapterId) =>
+            _staticDataService.Chapters.OrderBy(chapter => Math.Abs((long)chapter.ChapterId - chapterId)).First();
+
+        private LevelContainer GetNextLevel(LevelContainer current)
+        {
+            ChapterStaticData chapter = _staticDataService.ForChapter(current.ChapterId);
+            int index = chapter.Levels.FindIndex(level => level.LevelId == current.LevelId);
+            if (index + 1 < chapter.Levels.Count)
+                return new LevelContainer { ChapterId = current.ChapterId, LevelId = chapter.Levels[index + 1].LevelId };
+
+            ChapterStaticData next = _staticDataService.Chapters.Find(item => item.ChapterId > current.ChapterId);
+            return next != null
+                ? new LevelContainer { ChapterId = next.ChapterId, LevelId = next.Levels[0].LevelId }
+                : null;
         }
     }
 }

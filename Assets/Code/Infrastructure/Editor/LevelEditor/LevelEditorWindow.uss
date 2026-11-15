@@ -1,0 +1,168 @@
+.level-editor {
+    flex-grow: 1;
+}
+
+.editor-toolbar, .editor-workspace, .metadata, .map-workspace, .canvas-toolbar {
+    flex-direction: row;
+}
+
+.editor-toolbar, .metadata, .canvas-toolbar {
+    align-items: center;
+    padding: 4px 6px;
+}
+
+.editor-toolbar {
+    background-color: rgba(8, 12, 15, 0.33);
+    min-height: 42px;
+    align-items: stretch;
+}
+
+.toolbar-slot {
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 100px;
+    margin: 2px 3px;
+}
+
+.toolbar-slot > .unity-base-field, .toolbar-slot > Button {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.level-picker .unity-base-popup-field__input {
+    padding-left: 10px;
+    -unity-font-style: bold;
+}
+
+.create-level {
+    background-color: rgb(43, 83, 70);
+    color: rgb(227, 246, 234);
+}
+
+.create-level:hover {
+    background-color: rgb(54, 104, 86);
+}
+
+.delete-level {
+    background-color: rgb(125, 47, 50);
+    color: rgb(255, 230, 230);
+}
+
+.delete-level:hover {
+    background-color: rgb(151, 56, 60);
+}
+
+.editor-workspace, .level-workspace, .map-workspace, .map-panel, .list {
+    flex-grow: 1;
+}
+
+.chapter-sidebar {
+    width: 171px;
+    flex-shrink: 0;
+    padding: 6px;
+    background-color: rgba(0, 0, 0, 0.14);
+}
+
+.level-workspace, .map-panel {
+    min-width: 0;
+    min-height: 0;
+}
+
+.chapter-sidebar Button {
+    -unity-text-align: middle-left;
+    padding-left: 7px;
+}
+
+.chapter-button {
+    align-items: flex-start;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 4px;
+}
+
+.chapter-detail {
+    color: rgb(163, 194, 190);
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.chapter-sidebar .selected-chapter {
+    background-color: rgba(59, 126, 113, 0.54);
+}
+
+.section-title {
+    -unity-font-style: bold;
+    margin: 4px;
+}
+
+.metadata {
+    flex-wrap: wrap;
+}
+
+.level-name {
+    flex-grow: 1;
+    min-width: 140px;
+}
+
+.level-id {
+    width: 80px;
+}
+
+.chapter-field {
+    min-width: 110px;
+}
+
+.metadata .unity-base-field__label {
+    min-width: 22px;
+}
+
+.map-canvas {
+    flex-grow: 1;
+    overflow: hidden;
+    background-color: rgb(26, 33, 37);
+    -unity-background-image-tint-color: rgb(136, 141, 148);
+    background-repeat: repeat;
+    background-size: 132px 132px;
+}
+
+.map-hint, .warning {
+    white-space: normal;
+    margin: 4px 8px;
+}
+
+.warning {
+    color: rgb(232, 164, 103);
+}
+
+.surface-sidebar {
+    width: 183px;
+    flex-shrink: 0;
+    padding: 6px;
+    background-color: rgba(0, 0, 0, 0.14);
+}
+
+.texture-field {
+    margin-top: 5px;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.texture-preview {
+    height: 58px;
+    background-color: rgba(0, 0, 0, 0.22);
+    margin: 3px 0 8px;
+}
+
+.theme-preview {
+    height: 102px;
+    background-color: rgba(0, 0, 0, 0.22);
+    margin: 2px 0 7px;
+}
+
+.creation-form {
+    padding: 9px;
+}
+
+.creation-form > Button {
+    margin-top: 10px;
+}

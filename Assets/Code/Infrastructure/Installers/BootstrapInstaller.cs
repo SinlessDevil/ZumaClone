@@ -74,6 +74,7 @@ namespace Code.Infrastructure.Installers
             Container.BindInterfacesTo<BallProvider>().AsSingle();
             Container.BindInterfacesTo<WidgetProvider>().AsSingle();
             Container.BindInterfacesTo<LevelService>().AsSingle();
+            Container.BindInterfacesTo<LevelGeometryService>().AsSingle();
             Container.BindInterfacesTo<BallChainController>().AsSingle();
             Container.BindInterfacesTo<LevelLocalProgressService>().AsSingle();
             

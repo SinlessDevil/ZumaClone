@@ -8,6 +8,7 @@ using Code.StaticData.Levels;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Tests.EditMode
 {
@@ -17,6 +18,7 @@ namespace Tests.EditMode
         private IPersistenceProgressService _persistenceProgress;
         private IStaticDataService _staticData;
         private ITimeService _timeService;
+        private ChapterStaticData _chapter;
 
         [SetUp]
         public void SetUp()
@@ -35,18 +37,27 @@ namespace Tests.EditMode
                 }
             });
 
-            _staticData.ForChapter(1).Returns(new ChapterStaticData
+            _chapter = ScriptableObject.CreateInstance<ChapterStaticData>();
+            _chapter.ChapterId = 1;
+            for (int id = 1; id <= 3; id++)
             {
-                ChapterId = 1,
-                Levels = new List<LevelStaticData>
-                {
-                    new() { LevelId = 1 },
-                    new() { LevelId = 2 },
-                    new() { LevelId = 3 },
-                }
-            });
+                LevelStaticData level = ScriptableObject.CreateInstance<LevelStaticData>();
+                level.LevelId = id;
+                _chapter.Levels.Add(level);
+            }
+
+            _staticData.ForChapter(1).Returns(_chapter);
+            _staticData.Chapters.Returns(new List<ChapterStaticData> { _chapter });
 
             _levelService = new LevelService(_persistenceProgress, _staticData, _timeService);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            foreach (LevelStaticData level in _chapter.Levels)
+                Object.DestroyImmediate(level);
+            Object.DestroyImmediate(_chapter);
         }
 
         [Test]

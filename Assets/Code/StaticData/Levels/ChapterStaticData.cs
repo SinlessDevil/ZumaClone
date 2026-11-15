@@ -8,6 +8,8 @@ namespace Code.StaticData.Levels
     {
         public int ChapterId;
         public int TempleId = 1;
+        public LevelThemeStaticData Theme;
         public List<LevelStaticData> Levels = new();
+        [HideInInspector] public List<int> RetiredLevelIds = new();
     }
 }

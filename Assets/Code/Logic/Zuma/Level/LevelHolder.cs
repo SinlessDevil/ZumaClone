@@ -25,7 +25,6 @@ namespace Code.Logic.Zuma.Level
     public class LevelHolder : MonoBehaviour
     {
         [field: SerializeField] public Transform SpawnPositionPlayer { get; private set; }
-        [field: SerializeField] public Transform[] CoinPositions { get; private set; }
         [field: SerializeField] public Vector2[] PrimaryTunnels { get; private set; }
         [field: SerializeField] public LevelTrack[] AdditionalTracks { get; private set; }
         [field: SerializeField] public PathCreator PathCreator { get; private set; }
@@ -34,5 +33,13 @@ namespace Code.Logic.Zuma.Level
         [field: SerializeField] public ParticleSystemHolder LoseParticleSystemHolder { get; private set; }
         [field: SerializeField] public LevelStart LevelStart { get; private set; }
         [field: SerializeField] public LevelEnd LevelEnd { get; private set; }
+        [field: SerializeField] public MeshRenderer FieldRenderer { get; private set; }
+        public Pose[] CoinSpawns { get; private set; } = Array.Empty<Pose>();
+
+        public void SetTrackData(Vector2[] tunnels, Pose[] coinSpawns)
+        {
+            PrimaryTunnels = tunnels ?? Array.Empty<Vector2>();
+            CoinSpawns = coinSpawns ?? Array.Empty<Pose>();
+        }
     }
 }

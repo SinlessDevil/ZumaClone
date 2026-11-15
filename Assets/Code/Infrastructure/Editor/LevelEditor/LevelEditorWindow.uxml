@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="LevelEditorWindow.uss" />
+    <ui:VisualElement name="levelEditor" class="level-editor">
+        <ui:VisualElement class="editor-toolbar">
+            <ui:VisualElement name="levelPicker" class="toolbar-slot level-picker" />
+            <ui:Button name="createButton" text="+ Create" class="toolbar-slot create-level" />
+            <ui:Button name="deleteButton" text="Delete" class="toolbar-slot delete-level" />
+        </ui:VisualElement>
+        <ui:VisualElement class="editor-workspace">
+            <ui:VisualElement class="chapter-sidebar">
+                <ui:Label text="Chapters" class="section-title" />
+                <ui:ScrollView name="chapterList" class="list" />
+                <ui:Button name="createChapterButton" text="New chapter" />
+            </ui:VisualElement>
+            <ui:VisualElement name="workspace" class="level-workspace" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

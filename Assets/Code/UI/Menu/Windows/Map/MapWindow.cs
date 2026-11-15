@@ -29,7 +29,6 @@ namespace Code.UI.Menu.Windows.Map
         [SerializeField] private Button _survivalButton;
         [SerializeField] private Button _randomButton;
 
-        private int _currentChapterIndex;
         private ZumaMode _selectedMode;
 
         private List<ItemLevel> _levelPool = new();
@@ -80,8 +79,6 @@ namespace Code.UI.Menu.Windows.Map
             _practiceButton.onClick.AddListener(SelectPractice);
             _survivalButton.onClick.AddListener(SelectSurvival);
             _randomButton.onClick.AddListener(StartRandom);
-            
-            _currentChapterIndex = _levelService.GetCurrentChapterIndex();
 
             UpdateLevelUI();
         }
@@ -149,7 +146,6 @@ namespace Code.UI.Menu.Windows.Map
 
         private void UpdateLevelUI()
         {
-            _currentChapterIndex = _chapterNavigator.CurrentChapterIndex;
             SetNameChapter();
             _randomButton.interactable = _selectedMode != ZumaMode.Adventure;
 
@@ -159,34 +155,34 @@ namespace Code.UI.Menu.Windows.Map
             
             foreach (var level in currentChapter.Levels)
             {
-                int levelIndex = currentChapter.Levels.IndexOf(level) + 1;
-                int chapterIndex = _currentChapterIndex + 1;
+                int levelId = level.LevelId;
+                int chapterId = currentChapter.ChapterId;
 
                 ItemLevel levelItem = GetPooledItemLevel();
-                levelItem.Initialize(levelIndex, chapterIndex);
+                levelItem.Initialize(levelId, chapterId);
 
                 if (_selectedMode != ZumaMode.Adventure)
                 {
-                    if (_levelService.IsGauntletUnlocked(chapterIndex, levelIndex))
+                    if (_levelService.IsGauntletUnlocked(chapterId, levelId))
                         levelItem.SetUnlockedNonCompleted();
                     else
                         levelItem.SetLocked();
                     continue;
                 }
 
-                if (_levelService.IsLevelCurrent(chapterIndex, levelIndex))
+                if (_levelService.IsLevelCurrent(chapterId, levelId))
                 {
                     levelItem.SetCurrent();
                     continue;
                 }
 
-                if (_levelService.IsLastCompletedLevel(chapterIndex, levelIndex))
+                if (_levelService.IsLastCompletedLevel(chapterId, levelId))
                 {
                     levelItem.SetUnlockedNonCompleted();
                     continue;
                 }
 
-                if (_levelService.IsLevelCompleted(chapterIndex, levelIndex))
+                if (_levelService.IsLevelCompleted(chapterId, levelId))
                 {
                     levelItem.SetCompleted();
                     continue;
@@ -200,9 +196,8 @@ namespace Code.UI.Menu.Windows.Map
 
         private void SetNameChapter()
         {
-            int currentChapter = _currentChapterIndex + 1;
             ChapterStaticData stage = _chapterNavigator.CurrentChapter;
-            _chapterName.text = $"Temple {stage.TempleId}  ·  Stage {currentChapter}  ·  {_selectedMode}";
+            _chapterName.text = $"Temple {stage.TempleId}  ·  Stage {stage.ChapterId}  ·  {_selectedMode}";
         }
 
         private ItemLevel GetPooledItemLevel()

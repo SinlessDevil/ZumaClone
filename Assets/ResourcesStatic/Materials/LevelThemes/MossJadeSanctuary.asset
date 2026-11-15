@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdae1dff452d35d498d897076bb51add, type: 3}
+  m_Name: MossJadeSanctuary
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelThemeStaticData
+  DisplayName: Moss & Jade Sanctuary
+  Ground: {fileID: 2100000, guid: 86165fd371e5c4e47a1094663be2ce2c, type: 2}
+  Track: {fileID: 2100000, guid: 54d574eb496aa81479b668e0440e8ad4, type: 2}
+  TrackRepeatLength: 3.25

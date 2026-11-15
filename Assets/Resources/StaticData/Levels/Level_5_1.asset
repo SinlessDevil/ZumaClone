@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91de38510dc8c31408d1878387c1c8af, type: 3}
+  m_Name: Level_5_1
+  m_EditorClassIdentifier: Game::Code.StaticData.Levels.LevelStaticData
+  LevelName: Ashfall
+  LevelId: 1
+  LevelTypeId: 0
+  Geometry:
+    Path:
+      points:
+      - {x: 11, y: 0, z: -4.1}
+      - {x: 10.009956, y: 0, z: -3.3067088}
+      - {x: 9.019912, y: 0, z: -2.5134175}
+      - {x: 8, y: 0, z: -2.5}
+      - {x: 6.9938564, y: 0, z: -2.4867635}
+      - {x: 5.9637704, y: 0, z: -3.7107832}
+      - {x: 5, y: 0, z: -4}
+      - {x: 3.5529883, y: 0, z: -4.4342318}
+      - {x: 1.5105976, y: 0, z: -4.6222534}
+      - {x: 0, y: 0, z: -4.6}
+      - {x: -1.81994, y: 0, z: -4.5731893}
+      - {x: -4.3039064, y: 0, z: -4.360429}
+      - {x: -6, y: 0, z: -3.7}
+      - {x: -7.3491235, y: 0, z: -3.1746752}
+      - {x: -9.49467, y: 0, z: -2.356739}
+      - {x: -10, y: 0, z: -1}
+      - {x: -10.40133, y: 0, z: 0.0775131}
+      - {x: -9.764319, y: 0, z: 1.8409795}
+      - {x: -9, y: 0, z: 2.7}
+      - {x: -8.140882, y: 0, z: 3.6655653}
+      - {x: -6.2870264, y: 0, z: 4.1818357}
+      - {x: -5, y: 0, z: 4.3}
+      - {x: -3.4767008, y: 0, z: 4.4398575}
+      - {x: -1.7383504, y: 0, z: 3.8699288}
+      - {x: 0, y: 0, z: 3.3}
+      isClosed: 0
+      space: 2
+      controlMode: 3
+      autoControlLength: 0.3
+      boundsUpToDate: 0
+      bounds:
+        m_Center: {x: 0.43803596, y: 0, z: -0.14017892}
+        m_Extent: {x: 10.561964, y: 0, z: 4.461582}
+      perAnchorNormalsAngle:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      globalNormalsAngle: 0
+      flipNormals: 0
+    PlayerPosition: {x: -0.3, y: 0, z: 0.3}
+    Start:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+    End:
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    CoinSpawns: []
+    Tunnels: []
+    FieldTexture: {fileID: 0}
+    RoadTexture: {fileID: 0}
+    RoadHalfWidth: 0.3
+    RoadThickness: 0.15
+    RoadTextureTiling: 1
+    FlattenRoad: 0
+    MaxAngleError: 0.3
+    MinVertexSpacing: 0.055
+  LevelConfig:
+    CountItem: 28
+    ZumaTargetScore: 0
+    AceTime: 0
+    PowerupEvery: 12
+    PowerupDuration: 4
+    ExplosionRadius: 1.4
+    CoinInterval: 8
+    CoinLifetime: 4
+    RandomConfig: {fileID: 11400000, guid: 8bc340323a4ff0a408e2e6c30a9ddab6, type: 2}
+    ScoreConfig: {fileID: 11400000, guid: 329da03c3f00da642897f0f858bd66dc, type: 2}
