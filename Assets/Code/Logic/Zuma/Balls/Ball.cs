@@ -6,6 +6,7 @@ namespace Code.Logic.Zuma.Balls
 {
     public class Ball : Item
     {
+        private const float BaseEmission = 0.65f;
         private static readonly Quaternion HeadingOffset = Quaternion.Euler(0f, 90f, 0f);
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
@@ -17,6 +18,7 @@ namespace Code.Logic.Zuma.Balls
         [SerializeField] private BallRotator _ballRotator;
         [SerializeField] private BallIntersectionTracker _ballIntersectionTracker;
         [SerializeField] private MeshRenderer _meshRenderer;
+        [SerializeField] private BallPowerupPulse _powerupPulse;
         [SerializeField] private ParticleSystemHolder _particleSystem;
 
         private BallStaticData _appearance;
@@ -65,6 +67,7 @@ namespace Code.Logic.Zuma.Balls
             Powerup = powerup;
             _powerupExpiresAt = Time.time + lifetime;
             RefreshAppearance();
+            _powerupPulse.SetPulsing(powerup != BallPowerup.None);
         }
 
         public void UpdatePowerup()
@@ -175,11 +178,21 @@ namespace Code.Logic.Zuma.Balls
             RefreshAppearance();
         }
 
+        internal void SetPowerupHighlight(float pulse, float peakEmission)
+        {
+            if (!_meshRenderer.enabled)
+                return;
+
+            Color glow = Color.Lerp(Color, Color.white, pulse) * Mathf.Lerp(BaseEmission, peakEmission, pulse);
+            _appearanceProperties.SetColor(EmissionColorId, glow);
+            _meshRenderer.SetPropertyBlock(_appearanceProperties);
+        }
+
         private void RefreshAppearance()
         {
             _appearanceProperties ??= new MaterialPropertyBlock();
             _appearanceProperties.SetColor(BaseColorId, Color);
-            _appearanceProperties.SetColor(EmissionColorId, Color * 0.65f);
+            _appearanceProperties.SetColor(EmissionColorId, Color * BaseEmission);
             if (_appearance != null)
             {
                 BallTextureSet textures = _appearance.GetTextures(Color, Powerup);

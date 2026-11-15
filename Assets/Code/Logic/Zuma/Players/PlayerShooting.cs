@@ -12,6 +12,7 @@ using Zenject;
 
 namespace Code.Logic.Zuma.Players
 {
+    [DefaultExecutionOrder(50)]
     public class PlayerShooting : MonoBehaviour
     {
         private const float SwitchBallDistance = 0.5f;
@@ -23,6 +24,7 @@ namespace Code.Logic.Zuma.Players
         [SerializeField] private LineRenderer _accuracyBeam;
 
         private const float ShootSpeed = 9.6f;
+        private const float AccuracyShootSpeedMultiplier = 1.5f;
         private const float BallSpawnDuration = 0.12f;
         private const float ShootCooldown = 0.18f;
         private float _shootTimer = 0f;
@@ -143,7 +145,8 @@ namespace Code.Logic.Zuma.Players
             if (_shootTimer > 0f)
                 return;
 
-            _shootTimer = _ballChainController.HasAccuracy ? ShootCooldown * 0.5f : ShootCooldown;
+            bool hasAccuracy = _ballChainController.HasAccuracy;
+            _shootTimer = hasAccuracy ? ShootCooldown * 0.5f : ShootCooldown;
             Vector3 direction = target - _rotationTransform.position;
             direction = new Vector3(direction.x, 0, direction.z).normalized;
 
@@ -161,7 +164,8 @@ namespace Code.Logic.Zuma.Players
             shotBall.transform.SetParent(null);
             shotBall.transform.SetPositionAndRotation(startPoint, Ball.RotationForHeading(_rotationTransform.rotation));
             _ballChainController.RegisterShot(shotBall);
-            shotBall.BallMover.StartMoveToDirection(direction, ShootSpeed);
+            float speed = hasAccuracy ? ShootSpeed * AccuracyShootSpeedMultiplier : ShootSpeed;
+            shotBall.BallMover.StartMoveToDirection(direction, speed);
             shotBall.SetInteractive(true);
 
             _currentBall = _spareBall;
