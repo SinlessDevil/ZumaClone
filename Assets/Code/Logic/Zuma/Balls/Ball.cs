@@ -25,7 +25,6 @@ namespace Code.Logic.Zuma.Balls
         private MaterialPropertyBlock _appearanceProperties;
         private int _index;
         private bool _isInteractive;
-        private float _powerupExpiresAt;
         private Vector3 _chainEntryStart;
         private Quaternion _chainEntryRotation;
         private float _chainEntryDuration;
@@ -62,19 +61,13 @@ namespace Code.Logic.Zuma.Balls
         }
         public BallPowerup Powerup { get; private set; }
 
-        public void SetPowerup(BallPowerup powerup, float lifetime = 0f)
+        public void SetPowerup(BallPowerup powerup)
         {
             Powerup = powerup;
-            _powerupExpiresAt = Time.time + lifetime;
             RefreshAppearance();
             _powerupPulse.SetPulsing(powerup != BallPowerup.None);
         }
 
-        public void UpdatePowerup()
-        {
-            if (Powerup != BallPowerup.None && Time.time >= _powerupExpiresAt)
-                SetPowerup(BallPowerup.None);
-        }
         public int Index => _index;
 
         public void SetTrackVisibility(bool visible)

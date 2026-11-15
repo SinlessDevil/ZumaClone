@@ -357,7 +357,7 @@ namespace Tests.PlayMode
             _levelData.LevelConfig.ExplosionRadius = 1.6f;
             yield return Spawn(Color.blue, Color.green, Color.red, Color.red, Color.yellow);
             Ball[] balls = ActiveBalls();
-            balls[2].SetPowerup(BallPowerup.Explosion, 5f);
+            balls[2].SetPowerup(BallPowerup.Explosion);
             InsertBehind(balls[2], Color.red);
 
             yield return AdvanceUntil(() => _progress.Score >= 4 * ScorePerBall);
@@ -366,9 +366,10 @@ namespace Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator PowerupPulse_ChangesEmissionAndResetsWhenPowerupExpires()
+        public IEnumerator UnmatchedPowerup_KeepsPulsingPastSixSecondsAndActivatesOnMatch()
         {
-            Ball ball = CreateBall(Vector3.zero, Color.green);
+            yield return Spawn(Color.green, Color.green, Color.blue);
+            Ball ball = ActiveBalls()[0];
             BallPowerupPulse pulse = ball.GetComponent<BallPowerupPulse>();
             MeshRenderer renderer = ball.transform.Find("Graphics/Sphere").GetComponent<MeshRenderer>();
             MaterialPropertyBlock block = new();
@@ -376,7 +377,8 @@ namespace Tests.PlayMode
             Color normalEmission = block.GetColor("_EmissionColor");
             Assert.That(pulse.enabled, Is.False);
 
-            ball.SetPowerup(BallPowerup.Accuracy, 0.7f);
+            ball.SetPowerup(BallPowerup.Accuracy);
+            float previousExpiry = Time.time + 6.2f;
             renderer.GetPropertyBlock(block);
             float peakRed = block.GetColor("_EmissionColor").r;
             Assert.That(pulse.enabled, Is.True);
@@ -387,19 +389,23 @@ namespace Tests.PlayMode
             Assert.That(block.GetColor("_EmissionColor").r, Is.LessThan(peakRed - 0.2f));
             Assert.That(block.GetColor("_BaseColor"), Is.EqualTo(Color.green));
 
-            yield return new WaitForSeconds(0.5f);
-            ball.UpdatePowerup();
+            yield return AdvanceUntil(() => Time.time >= previousExpiry);
+            Assert.That(ball.Powerup, Is.EqualTo(BallPowerup.Accuracy));
+            Assert.That(pulse.enabled, Is.True);
+
+            InsertBehind(ball, Color.green);
+            yield return AdvanceUntil(() => _chain.HasAccuracy);
+            Assert.That(ball.Powerup, Is.EqualTo(BallPowerup.None));
             renderer.GetPropertyBlock(block);
             Assert.That(pulse.enabled, Is.False);
             Assert.That(block.GetColor("_EmissionColor"), Is.EqualTo(normalEmission));
-            Object.Destroy(ball.gameObject);
         }
 
         private IEnumerator MatchPowerup(BallPowerup powerup)
         {
             yield return Spawn(Color.red, Color.red, Color.green, Color.blue);
             Ball target = ActiveBalls()[0];
-            target.SetPowerup(powerup, 5f);
+            target.SetPowerup(powerup);
             InsertBehind(target, Color.red);
             yield return AdvanceUntil(() => _progress.Score >= 3 * ScorePerBall);
             Assert.That(ActiveBalls().Length, Is.EqualTo(2));

@@ -21,7 +21,6 @@ MonoBehaviour:
     ZumaTargetScore: 0
     AceTime: 0
     PowerupEvery: 12
-    PowerupLifetime: 6
     PowerupDuration: 4
     ExplosionRadius: 1.4
     CoinInterval: 8

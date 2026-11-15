@@ -1,4 +1,5 @@
 using Code.Logic.Zuma.Level;
+using Code.PathCreation;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,59 +8,69 @@ namespace Code.Infrastructure.Editor
     [CustomEditor(typeof(LevelHolder))]
     public class LevelHolderEditor : UnityEditor.Editor
     {
-        private LevelHolder _levelHolder;
-        private SerializedProperty pathCreatorProp;
-        private SerializedProperty levelStartProp;
-        private SerializedProperty levelEndProp;
-
-        private void OnEnable()
-        {
-            _levelHolder = (LevelHolder)target;
-            pathCreatorProp = serializedObject.FindProperty("<PathCreator>k__BackingField");
-            levelStartProp = serializedObject.FindProperty("<LevelStart>k__BackingField");
-            levelEndProp = serializedObject.FindProperty("<LevelEnd>k__BackingField");
-        }
+        private const float HeadingSampleDistance = 0.15f;
+        private static readonly Quaternion StartYawOffset = Quaternion.Euler(0f, 30f, 0f);
+        private static readonly Quaternion EndYawOffset = Quaternion.Euler(0f, 90f, 0f);
 
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
             DrawDefaultInspector();
 
             if (GUILayout.Button("Update Start & End Positions"))
             {
-                UpdateStartAndEndPositions();
+                UpdateStartAndEndPositions(true);
             }
-
-            serializedObject.ApplyModifiedProperties();
         }
 
-        private void UpdateStartAndEndPositions()
+        private void UpdateStartAndEndPositions(bool updatePositions)
         {
-            if (_levelHolder.PathCreator == null)
+            LevelHolder level = (LevelHolder)target;
+            if (level.PathCreator == null)
             {
-                Debug.LogWarning("PathCreator is not assigned!");
+                Debug.LogWarning("PathCreator is not assigned!", level);
                 return;
             }
 
-            var path = _levelHolder.PathCreator.path;
-            if (path == null)
-            {
-                Debug.LogWarning("Path is null in PathCreator!");
+            VertexPath path = level.PathCreator.path;
+            if (level.LevelStart != null)
+                AlignGate(level.LevelStart.transform, path, true, updatePositions);
+
+            if (level.LevelEnd != null)
+                AlignGate(level.LevelEnd.transform, path, false, updatePositions);
+
+            if (level.AdditionalTracks == null)
                 return;
+
+            foreach (LevelTrack track in level.AdditionalTracks)
+            {
+                if (track?.Path != null && track.End != null)
+                    AlignGate(track.End.transform, track.Path.path, false, updatePositions);
+            }
+        }
+
+        private static void AlignGate(Transform gate, VertexPath path, bool isStart, bool updatePosition)
+        {
+            if (path == null || path.length <= Mathf.Epsilon)
+                return;
+
+            float sampleDistance = Mathf.Min(HeadingSampleDistance, path.length);
+            float sampleFromStart = isStart ? sampleDistance : path.length - sampleDistance;
+            Vector3 endpoint = path.GetPoint(isStart ? 0 : path.NumPoints - 1);
+            Vector3 sample = path.GetPointAtDistance(sampleFromStart, EndOfPathInstruction.Stop);
+            Vector3 heading = Vector3.ProjectOnPlane(isStart ? sample - endpoint : endpoint - sample, Vector3.up);
+
+            Undo.RecordObject(gate, "Align Track Gate");
+            if (updatePosition)
+                gate.position = endpoint;
+
+            // Apply each gate model's yaw offset relative to the track.
+            if (heading.sqrMagnitude > 0.000001f)
+            {
+                Quaternion headingRotation = Quaternion.LookRotation(heading);
+                gate.rotation = headingRotation * (isStart ? StartYawOffset : EndYawOffset);
             }
 
-            if (_levelHolder.LevelStart != null)
-            {
-                _levelHolder.LevelStart.transform.position = path.GetPoint(0);
-                _levelHolder.LevelStart.transform.rotation = Quaternion.LookRotation(path.GetDirection(0));
-            }
-
-            if (_levelHolder.LevelEnd != null)
-            {
-                int lastIndex = path.NumPoints - 1;
-                _levelHolder.LevelEnd.transform.position = path.GetPoint(lastIndex);
-                _levelHolder.LevelEnd.transform.rotation = Quaternion.LookRotation(path.GetDirection(lastIndex));
-            }
+            PrefabUtility.RecordPrefabInstancePropertyModifications(gate);
         }
     }
 }

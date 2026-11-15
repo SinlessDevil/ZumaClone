@@ -405,7 +405,7 @@ namespace Code.Services.BallController
             _hits.RegisterChainBall(ball);
             ball.SetTrackVisibility(tail.IsExposed(distance));
             if (!finiteFeed && _config.PowerupEvery > 0 && (feed.Spawned + 1) % _config.PowerupEvery == 0)
-                ball.SetPowerup((BallPowerup)feed.Random.Next(1, 5), _config.PowerupLifetime);
+                ball.SetPowerup((BallPowerup)feed.Random.Next(1, 5));
             ball.SetIndex(tail.Count);
             
             tail.AddBall(ball, distance);
@@ -447,8 +447,6 @@ namespace Code.Services.BallController
                 }
 
                 segment.UpdatePositions(Time.deltaTime);
-                foreach (Ball ball in segment.Balls)
-                    ball.UpdatePowerup();
             }
         }
 
