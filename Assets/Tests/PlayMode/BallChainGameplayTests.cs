@@ -14,6 +14,7 @@ using Code.Services.Levels;
 using Code.Services.LocalProgress;
 using Code.Services.Providers.Balls;
 using Code.Services.Providers.Widgets;
+using Code.Services.Random;
 using Code.Services.Timer;
 using Code.StaticData.Levels;
 using Code.UI;
@@ -41,6 +42,7 @@ namespace Tests.PlayMode
         private IFinishService _finish;
         private IInputService _input;
         private ITimeService _timer;
+        private Player _player;
 
         [SetUp]
         public void SetUp()
@@ -75,10 +77,9 @@ namespace Tests.PlayMode
             _progress = new LevelLocalProgressService();
 
             IGameFactory factory = Substitute.For<IGameFactory>();
-            Player player = Object.Instantiate(Resources.Load<Player>("Players/Player"), _root.transform);
-            player.GetComponent<PlayerAiming>().Constructor(_input, null);
-            player.PlayerShooting.Constructor(_input, balls, null, null, null);
-            factory.Player.Returns(player);
+            _player = Object.Instantiate(Resources.Load<Player>("Players/Player"), _root.transform);
+            _player.GetComponent<PlayerAiming>().Constructor(_input, null);
+            factory.Player.Returns(_player);
 
             _settings = new BallChainDTO
             {
@@ -99,6 +100,7 @@ namespace Tests.PlayMode
 
             _chain = new BallChainController(balls, widgets, levels, _progress, _finish, _input, factory, _timer);
             _chain.Initialize(_level.PathCreator, _settings);
+            _player.PlayerShooting.Constructor(_input, balls, new RandomService(levels), _chain, null);
         }
 
         [TearDown]
@@ -282,6 +284,131 @@ namespace Tests.PlayMode
             _finish.DidNotReceive().Win();
             _input.Received(1).Cleanup();
             _timer.Received(1).StopTimer();
+        }
+
+        [UnityTest]
+        public IEnumerator AccuracyMatch_ShowsBeamToFirstHitUntilEffectExpires()
+        {
+            _levelData.LevelConfig.PowerupDuration = 1f;
+            _player.Initialize();
+            _player.PlayerShooting.Activate(new List<Color> { Color.green, Color.red });
+            LineRenderer beam = _player.GetComponent<LineRenderer>();
+            Assert.That(beam.enabled, Is.False);
+
+            yield return MatchPowerup(BallPowerup.Accuracy);
+            Assert.That(_chain.HasAccuracy, Is.True);
+            Ball target = ActiveBalls()[^1];
+            _player.transform.SetPositionAndRotation(target.transform.position - Vector3.right * 3f,
+                Quaternion.LookRotation(Vector3.right, Vector3.up));
+            yield return AdvanceUntil(() => beam.enabled);
+
+            Vector3 muzzle = _player.transform.Find("SpawnPointBall").position;
+            Vector3 end = beam.GetPosition(1);
+            Assert.That(Vector3.Distance(beam.GetPosition(0), muzzle), Is.LessThan(0.001f));
+            Assert.That(Vector3.Distance(end, muzzle), Is.GreaterThan(1f));
+            Assert.That(Vector3.Distance(end, target.transform.position), Is.LessThan(_settings.CollisionThreshold + 0.15f));
+            yield return AdvanceUntil(() => !_chain.HasAccuracy && !beam.enabled);
+        }
+
+        [UnityTest]
+        public IEnumerator SlowdownMatch_SlowsWithoutStoppingAndRestoresBaseSpeed()
+        {
+            _levelData.LevelConfig.PowerupDuration = 1.3f;
+            yield return MatchPowerup(BallPowerup.Slowdown);
+            Ball survivor = ActiveBalls()[0];
+
+            float settleAt = Time.time + 0.15f;
+            yield return AdvanceUntil(() => Time.time >= settleAt);
+            float started = Time.time;
+            float position = survivor.transform.position.x;
+            yield return AdvanceUntil(() => Time.time >= started + 0.3f);
+            float slowed = (survivor.transform.position.x - position) / (Time.time - started);
+            Assert.That(slowed, Is.EqualTo(_settings.MoveSpeed * 0.45f).Within(0.2f));
+
+            float restoredAt = Time.time + 1.4f;
+            yield return AdvanceUntil(() => Time.time >= restoredAt);
+            started = Time.time;
+            position = survivor.transform.position.x;
+            yield return AdvanceUntil(() => Time.time >= started + 0.3f);
+            float restored = (survivor.transform.position.x - position) / (Time.time - started);
+            Assert.That(restored, Is.EqualTo(_settings.MoveSpeed).Within(0.2f));
+        }
+
+        [UnityTest]
+        public IEnumerator ReverseMatch_RetreatsPastTheEntranceAndResumesForward()
+        {
+            _levelData.LevelConfig.PowerupDuration = 0.9f;
+            yield return MatchPowerup(BallPowerup.Reverse);
+            Ball[] remaining = ActiveBalls();
+            Ball front = remaining[0];
+            Ball rear = remaining[1];
+            float start = front.transform.position.x;
+            MeshRenderer rearRenderer = rear.transform.Find("Graphics/Sphere").GetComponent<MeshRenderer>();
+            Assert.That(rearRenderer.enabled, Is.True);
+
+            yield return AdvanceUntil(() => !rearRenderer.enabled && front.transform.position.x < start - 0.25f);
+            Assert.That(_chain.ActiveItems, Does.Contain(rear));
+            yield return AdvanceUntil(() => rearRenderer.enabled && rear.transform.position.x > 0.15f);
+        }
+
+        [UnityTest]
+        public IEnumerator ExplosionMatch_RemovesNearbyDifferentColorAndSparesDistantBalls()
+        {
+            _levelData.LevelConfig.ExplosionRadius = 1.6f;
+            yield return Spawn(Color.blue, Color.green, Color.red, Color.red, Color.yellow);
+            Ball[] balls = ActiveBalls();
+            balls[2].SetPowerup(BallPowerup.Explosion);
+            InsertBehind(balls[2], Color.red);
+
+            yield return AdvanceUntil(() => _progress.Score >= 4 * ScorePerBall);
+            Assert.That(ActiveBalls(), Is.EqualTo(new[] { balls[0], balls[4] }));
+            Assert.That(_progress.Score, Is.EqualTo(4 * ScorePerBall));
+        }
+
+        [UnityTest]
+        public IEnumerator UnmatchedPowerup_KeepsPulsingPastSixSecondsAndActivatesOnMatch()
+        {
+            yield return Spawn(Color.green, Color.green, Color.blue);
+            Ball ball = ActiveBalls()[0];
+            BallPowerupPulse pulse = ball.GetComponent<BallPowerupPulse>();
+            MeshRenderer renderer = ball.transform.Find("Graphics/Sphere").GetComponent<MeshRenderer>();
+            MaterialPropertyBlock block = new();
+            renderer.GetPropertyBlock(block);
+            Color normalEmission = block.GetColor("_EmissionColor");
+            Assert.That(pulse.enabled, Is.False);
+
+            ball.SetPowerup(BallPowerup.Accuracy);
+            float previousExpiry = Time.time + 6.2f;
+            renderer.GetPropertyBlock(block);
+            float peakRed = block.GetColor("_EmissionColor").r;
+            Assert.That(pulse.enabled, Is.True);
+            Assert.That(peakRed, Is.GreaterThan(0.8f));
+
+            yield return new WaitForSeconds(0.25f);
+            renderer.GetPropertyBlock(block);
+            Assert.That(block.GetColor("_EmissionColor").r, Is.LessThan(peakRed - 0.2f));
+            Assert.That(block.GetColor("_BaseColor"), Is.EqualTo(Color.green));
+
+            yield return AdvanceUntil(() => Time.time >= previousExpiry);
+            Assert.That(ball.Powerup, Is.EqualTo(BallPowerup.Accuracy));
+            Assert.That(pulse.enabled, Is.True);
+
+            InsertBehind(ball, Color.green);
+            yield return AdvanceUntil(() => _chain.HasAccuracy);
+            Assert.That(ball.Powerup, Is.EqualTo(BallPowerup.None));
+            renderer.GetPropertyBlock(block);
+            Assert.That(pulse.enabled, Is.False);
+            Assert.That(block.GetColor("_EmissionColor"), Is.EqualTo(normalEmission));
+        }
+
+        private IEnumerator MatchPowerup(BallPowerup powerup)
+        {
+            yield return Spawn(Color.red, Color.red, Color.green, Color.blue);
+            Ball target = ActiveBalls()[0];
+            target.SetPowerup(powerup);
+            InsertBehind(target, Color.red);
+            yield return AdvanceUntil(() => _progress.Score >= 3 * ScorePerBall);
+            Assert.That(ActiveBalls().Length, Is.EqualTo(2));
         }
 
         private IEnumerator Spawn(params Color[] colors)

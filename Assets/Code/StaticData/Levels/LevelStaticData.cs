@@ -29,7 +29,6 @@ namespace Code.StaticData.Levels
         public int ZumaTargetScore;
         [Min(0f)] public float AceTime;
         [Min(0)] public int PowerupEvery = 12;
-        [Min(0f)] public float PowerupLifetime = 6f;
         [Min(0f)] public float PowerupDuration = 4f;
         [Min(0f)] public float ExplosionRadius = 1.4f;
         [Min(0f)] public float CoinInterval = 8f;

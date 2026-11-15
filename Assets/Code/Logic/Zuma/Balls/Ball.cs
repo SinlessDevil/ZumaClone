@@ -6,6 +6,7 @@ namespace Code.Logic.Zuma.Balls
 {
     public class Ball : Item
     {
+        private const float BaseEmission = 0.65f;
         private static readonly Quaternion HeadingOffset = Quaternion.Euler(0f, 90f, 0f);
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
@@ -17,13 +18,13 @@ namespace Code.Logic.Zuma.Balls
         [SerializeField] private BallRotator _ballRotator;
         [SerializeField] private BallIntersectionTracker _ballIntersectionTracker;
         [SerializeField] private MeshRenderer _meshRenderer;
+        [SerializeField] private BallPowerupPulse _powerupPulse;
         [SerializeField] private ParticleSystemHolder _particleSystem;
 
         private BallStaticData _appearance;
         private MaterialPropertyBlock _appearanceProperties;
         private int _index;
         private bool _isInteractive;
-        private float _powerupExpiresAt;
         private Vector3 _chainEntryStart;
         private Quaternion _chainEntryRotation;
         private float _chainEntryDuration;
@@ -60,18 +61,13 @@ namespace Code.Logic.Zuma.Balls
         }
         public BallPowerup Powerup { get; private set; }
 
-        public void SetPowerup(BallPowerup powerup, float lifetime = 0f)
+        public void SetPowerup(BallPowerup powerup)
         {
             Powerup = powerup;
-            _powerupExpiresAt = Time.time + lifetime;
             RefreshAppearance();
+            _powerupPulse.SetPulsing(powerup != BallPowerup.None);
         }
 
-        public void UpdatePowerup()
-        {
-            if (Powerup != BallPowerup.None && Time.time >= _powerupExpiresAt)
-                SetPowerup(BallPowerup.None);
-        }
         public int Index => _index;
 
         public void SetTrackVisibility(bool visible)
@@ -175,11 +171,21 @@ namespace Code.Logic.Zuma.Balls
             RefreshAppearance();
         }
 
+        internal void SetPowerupHighlight(float pulse, float peakEmission)
+        {
+            if (!_meshRenderer.enabled)
+                return;
+
+            Color glow = Color.Lerp(Color, Color.white, pulse) * Mathf.Lerp(BaseEmission, peakEmission, pulse);
+            _appearanceProperties.SetColor(EmissionColorId, glow);
+            _meshRenderer.SetPropertyBlock(_appearanceProperties);
+        }
+
         private void RefreshAppearance()
         {
             _appearanceProperties ??= new MaterialPropertyBlock();
             _appearanceProperties.SetColor(BaseColorId, Color);
-            _appearanceProperties.SetColor(EmissionColorId, Color * 0.65f);
+            _appearanceProperties.SetColor(EmissionColorId, Color * BaseEmission);
             if (_appearance != null)
             {
                 BallTextureSet textures = _appearance.GetTextures(Color, Powerup);

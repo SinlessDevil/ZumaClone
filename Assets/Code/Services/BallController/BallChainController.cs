@@ -366,7 +366,7 @@ namespace Code.Services.BallController
 
         private void TrySpawn()
         {
-            if (_state.FeedClosed)
+            if (_state.FeedClosed || Time.time < _reverseUntil)
                 return;
 
             foreach (Feed feed in _feeds)
@@ -405,7 +405,7 @@ namespace Code.Services.BallController
             _hits.RegisterChainBall(ball);
             ball.SetTrackVisibility(tail.IsExposed(distance));
             if (!finiteFeed && _config.PowerupEvery > 0 && (feed.Spawned + 1) % _config.PowerupEvery == 0)
-                ball.SetPowerup((BallPowerup)feed.Random.Next(1, 5), _config.PowerupLifetime);
+                ball.SetPowerup((BallPowerup)feed.Random.Next(1, 5));
             ball.SetIndex(tail.Count);
             
             tail.AddBall(ball, distance);
@@ -421,7 +421,8 @@ namespace Code.Services.BallController
             float speed = _settings.MoveSpeed;
             if (Time.time < _slowUntil)
                 speed *= 0.45f;
-            bool reversing = Time.time < Mathf.Max(_state.MeterReverseUntil, _reverseUntil);
+            bool reversing = Time.time < _reverseUntil;
+            bool meterReversing = Time.time < _state.MeterReverseUntil;
             for (int i = _segments.Count - 1; i >= 0; i--)
             {
                 ChainSegment segment = _segments[i];
@@ -430,6 +431,8 @@ namespace Code.Services.BallController
                 if (_state.HasLost)
                     segmentSpeed = _settings.MoveSpeed * _settings.LoseSpeedMultiplier;
                 else if (reversing)
+                    segmentSpeed = -speed * 2f;
+                else if (meterReversing)
                     segmentSpeed = -Mathf.Min(speed * 2f, Mathf.Max(0f, segment.TailLogicalDistance) / Time.deltaTime);
                 else if (hasBack)
                     segmentSpeed = segment.GetBall(segment.Count - 1).Color == _segments[i + 1].GetBall(0).Color
@@ -444,8 +447,6 @@ namespace Code.Services.BallController
                 }
 
                 segment.UpdatePositions(Time.deltaTime);
-                foreach (Ball ball in segment.Balls)
-                    ball.UpdatePowerup();
             }
         }
 
