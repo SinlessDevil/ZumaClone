@@ -246,7 +246,7 @@ namespace Code.Services.BallController
         private void AdvanceProjectiles()
         {
             for (int i = 0; i < _projectiles.Count; i++)
-                if (_projectiles[i].BallMover.Step(Time.deltaTime))
+                if (_projectiles[i].AdvanceProjectile(Time.deltaTime))
                     _projectiles.RemoveAt(i--);
         }
 

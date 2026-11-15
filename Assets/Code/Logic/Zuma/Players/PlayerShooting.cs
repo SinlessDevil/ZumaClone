@@ -90,7 +90,7 @@ namespace Code.Logic.Zuma.Players
         public void Activate(List<Color> colors)
         {
             _fallbackColors = colors;
-            SetUpFirstBalls(colors, transform);
+            SetUpFirstBalls(colors);
             PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
             SetIndicatorSpareBall();
         }
@@ -159,42 +159,43 @@ namespace Code.Logic.Zuma.Players
             Ball shotBall = _currentBall;
             shotBall.Dispose();
             shotBall.transform.SetParent(null);
-            shotBall.transform.position = startPoint;
+            shotBall.transform.SetPositionAndRotation(startPoint, Ball.RotationForHeading(_rotationTransform.rotation));
             _ballChainController.RegisterShot(shotBall);
             shotBall.BallMover.StartMoveToDirection(direction, ShootSpeed);
-            shotBall.BallRotator.StartRotate();
             shotBall.SetInteractive(true);
 
             _currentBall = _spareBall;
             PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
-            SetUpSpareBall(transform);
+            SetUpSpareBall();
             SetIndicatorSpareBall();
 
         }
 
-        private void SetUpSpareBall(Transform parent)
+        private void SetUpSpareBall()
         {
             Color spareColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, _currentBall);
             if (spareColor.a == 0f)
                 spareColor = _randomService.GetColorByCurrentItems(_fallbackColors, _currentBall.Color);
-            _spareBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
-            _spareBall.SetColor(spareColor);
-            _spareBall.transform.SetParent(parent, false);
+            _spareBall = CreateAmmoBall(spareColor);
         }
 
-        private void SetUpFirstBalls(List<Color> colors, Transform parent)
+        private void SetUpFirstBalls(List<Color> colors)
         {
             Color currentColor = _randomService.GetColorByCurrentItems(colors, null);
-            _currentBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
-            _currentBall.SetColor(currentColor);
-            _currentBall.transform.SetParent(parent, false);
+            _currentBall = CreateAmmoBall(currentColor);
 
             Color spareColor = _randomService.GetColorByCurrentItems(colors, _currentBall.Color);
-            _spareBall = _ballProvider.GetBall(Vector3.zero, Quaternion.identity);
-            _spareBall.SetColor(spareColor);
-            _spareBall.transform.SetParent(parent, false);
+            _spareBall = CreateAmmoBall(spareColor);
         }
         
+        private Ball CreateAmmoBall(Color color)
+        {
+            Ball ball = _ballProvider.GetBall(Vector3.zero, Ball.RotationForHeading(Quaternion.identity));
+            ball.SetColor(color);
+            ball.transform.SetParent(_rotationTransform, false);
+            return ball;
+        }
+
         private void PlayAnimationReloading(Ball ball, Vector3 localTargetPos)
         {
             ball.transform.DOKill();

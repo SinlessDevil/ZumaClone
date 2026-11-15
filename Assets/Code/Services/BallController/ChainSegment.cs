@@ -84,7 +84,7 @@ namespace Code.Services.BallController
             direction.y = 0f;
 
             Quaternion rotation = direction.sqrMagnitude > 0.0001f
-                ? Quaternion.LookRotation(direction, Vector3.up)
+                ? Ball.RotationForHeading(Quaternion.LookRotation(direction, Vector3.up))
                 : fallbackRotation;
             return new Pose(position, rotation);
         }

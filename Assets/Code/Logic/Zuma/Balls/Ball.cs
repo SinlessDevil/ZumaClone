@@ -6,6 +6,7 @@ namespace Code.Logic.Zuma.Balls
 {
     public class Ball : Item
     {
+        private static readonly Quaternion HeadingOffset = Quaternion.Euler(0f, 90f, 0f);
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
         private static readonly int NormalMapId = Shader.PropertyToID("_BumpMap");
@@ -102,6 +103,7 @@ namespace Code.Logic.Zuma.Balls
 
             PreviousChainPosition = transform.position;
             transform.SetPositionAndRotation(pose.position, pose.rotation);
+            _ballRotator.SpinOnChain(pose.position - PreviousChainPosition);
         }
 
         public bool IsInteractive => _isInteractive;
@@ -111,6 +113,18 @@ namespace Code.Logic.Zuma.Balls
             _appearance = appearance;
             _meshRenderer.sharedMaterial = appearance.Material;
             _ballIntersectionTracker.Initialize(this);
+        }
+
+        internal static Quaternion RotationForHeading(Quaternion heading) => heading * HeadingOffset;
+
+        public bool AdvanceProjectile(float deltaTime)
+        {
+            Vector3 start = transform.position;
+            if (_ballMover.Step(deltaTime))
+                return true;
+
+            _ballRotator.SpinInFlight(transform.position - start);
+            return false;
         }
 
         public void Dispose()
@@ -133,6 +147,7 @@ namespace Code.Logic.Zuma.Balls
             _bestGap = 0;
             SetTrackVisibility(true);
             gameObject.SetActive(true);
+            _ballRotator.ResetRotation();
         }
 
         public void Deactivate()

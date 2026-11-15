@@ -122,7 +122,34 @@ namespace Tests.PlayMode
             Assert.That(balls.Select(ball => ball.Index), Is.EqualTo(new[] { 0, 1, 2 }));
             Assert.That(balls[0].transform.position.x, Is.GreaterThan(balls[1].transform.position.x));
             Assert.That(balls[1].transform.position.x, Is.GreaterThan(balls[2].transform.position.x));
+            Assert.That(Vector3.Angle(balls[0].transform.forward, Vector3.back), Is.LessThan(0.1f));
             _timer.Received(1).StartTimer();
+        }
+
+        [Test]
+        public void ChainBall_SpinsAroundZByDistanceAndResetsOnReuse()
+        {
+            Ball ball = CreateBall(Vector3.zero);
+            Transform graphics = ball.transform.Find("Graphics");
+            Quaternion rest = graphics.localRotation;
+            Quaternion heading = Quaternion.Euler(0f, 135f, 0f);
+
+            ball.MoveAlongChain(new Pose(Vector3.right, heading), 0.1f);
+            Quaternion firstSpin = rest * Quaternion.Euler(0f, 0f, 90f);
+            Assert.That(Quaternion.Angle(graphics.localRotation, firstSpin), Is.LessThan(0.01f));
+            Assert.That(Quaternion.Angle(ball.transform.rotation, heading), Is.LessThan(0.01f));
+
+            ball.MoveAlongChain(new Pose(Vector3.right, heading), 0.5f);
+            Assert.That(Quaternion.Angle(graphics.localRotation, firstSpin), Is.LessThan(0.01f));
+
+            ball.MoveAlongChain(new Pose(Vector3.right * 0.5f, heading), 0.3f);
+            Quaternion reverseSpin = rest * Quaternion.Euler(0f, 0f, 135f);
+            Assert.That(Quaternion.Angle(graphics.localRotation, reverseSpin), Is.LessThan(0.01f));
+
+            ball.Deactivate();
+            ball.Activate(Vector3.left * 8f, Quaternion.identity);
+            Assert.That(Quaternion.Angle(graphics.localRotation, rest), Is.LessThan(0.01f));
+            Object.Destroy(ball.gameObject);
         }
 
         [UnityTest]
