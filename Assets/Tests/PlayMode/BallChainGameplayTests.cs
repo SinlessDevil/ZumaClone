@@ -107,6 +107,8 @@ namespace Tests.PlayMode
         public void TearDown()
         {
             _chain?.StopBallSpawning();
+            foreach (Ball ammo in _player.GetComponentsInChildren<Ball>())
+                ammo.Dispose();
             Object.Destroy(_root);
             Object.Destroy(_levelData);
             Object.Destroy(_scoreData);
@@ -284,6 +286,59 @@ namespace Tests.PlayMode
             _finish.DidNotReceive().Win();
             _input.Received(1).Cleanup();
             _timer.Received(1).StopTimer();
+        }
+
+        [Test]
+        public void ChainColorSampling_AtZeroPercentSwitchesUnlessThereIsOnlyOneColor()
+        {
+            System.Random random = new(11);
+            (Color, float)[] palette = { (Color.blue, 25f), (Color.red, 25f) };
+            Assert.That(RandomService.Sample(palette, random, Color.blue, 0f), Is.EqualTo(Color.red));
+            Assert.That(RandomService.Sample(palette, random, Color.red, 100f), Is.EqualTo(Color.red));
+            Assert.That(RandomService.Sample(new[] { (Color.blue, 25f) }, random, Color.blue, 0f),
+                Is.EqualTo(Color.blue));
+        }
+
+        [UnityTest]
+        public IEnumerator ContinuousFeed_CanRepeatLastColorFromOpeningSequence()
+        {
+            LevelRandomConfigStaticData config = Object.Instantiate(
+                Resources.Load<LevelRandomConfigStaticData>("StaticData/Random/LevelRandomConfig_Base"));
+            try
+            {
+                config.RepeatColorPercent = 100f;
+                _levelData.LevelConfig.RandomConfig = config;
+                _settings.ZumaTargetScore = 1000;
+                Color first = config.Items[0].ItemColor;
+                Color second = config.Items[1].ItemColor;
+                _chain.StartBallSpawning(new List<Color> { first, second }, 27);
+
+                yield return AdvanceUntil(() => _chain.ActiveItems.Count == 4);
+
+                Assert.That(ActiveBalls().Select(ball => ball.Color),
+                    Is.EqualTo(new[] { first, second, second, second }));
+            }
+            finally
+            {
+                Object.Destroy(config);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator LastBallOfColorMatched_RefreshesBothLoadedShotsInPlace()
+        {
+            yield return Spawn(Color.red, Color.red, Color.green);
+            _player.Initialize();
+            _player.PlayerShooting.Activate(new List<Color> { Color.red });
+            Ball[] ammo = _player.GetComponentsInChildren<Ball>();
+            Assert.That(ammo.Length, Is.EqualTo(2));
+            Assert.That(ammo.Select(ball => ball.Color), Is.All.EqualTo(Color.red));
+
+            InsertBehind(ActiveBalls()[0], Color.red);
+            yield return AdvanceUntil(() => ammo.All(ball => ball.Color == Color.green));
+
+            Assert.That(_player.GetComponentsInChildren<Ball>(), Is.EqualTo(ammo));
+            Assert.That(ActiveBalls().Select(ball => ball.Color), Is.EqualTo(new[] { Color.green }));
         }
 
         [UnityTest]

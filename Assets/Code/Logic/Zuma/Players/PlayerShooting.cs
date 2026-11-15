@@ -32,6 +32,7 @@ namespace Code.Logic.Zuma.Players
         private Ball _spareBall;
         private Ball _currentBall;
         private List<Color> _fallbackColors;
+        private readonly List<Color> _activeColors = new();
 
         private Vector3 _savedStartPoint;
         private Vector3 _savedEndPoint;
@@ -79,6 +80,9 @@ namespace Code.Logic.Zuma.Players
 
         private void LateUpdate()
         {
+            if (_currentBall != null && _spareBall != null)
+                RefreshAmmoColors();
+
             _accuracyBeam.enabled = _currentBall != null && _ballChainController.HasAccuracy;
             if (!_accuracyBeam.enabled)
                 return;
@@ -175,11 +179,28 @@ namespace Code.Logic.Zuma.Players
 
         }
 
+        private void RefreshAmmoColors()
+        {
+            _ballChainController.GetActiveColors(_activeColors);
+            if (_activeColors.Count == 0)
+                return;
+
+            if (!_activeColors.Contains(_currentBall.Color))
+                _currentBall.SetColor(_randomService.GetColorByCurrentItems(_activeColors, null));
+
+            if (!_activeColors.Contains(_spareBall.Color))
+            {
+                _spareBall.SetColor(_randomService.GetColorByCurrentItems(_activeColors, null));
+                SetIndicatorSpareBall();
+            }
+        }
+
         private void SetUpSpareBall()
         {
-            Color spareColor = _randomService.GetColorByCurrentItems(_ballChainController.ActiveItems, _currentBall);
+            _ballChainController.GetActiveColors(_activeColors);
+            Color spareColor = _randomService.GetColorByCurrentItems(_activeColors, null);
             if (spareColor.a == 0f)
-                spareColor = _randomService.GetColorByCurrentItems(_fallbackColors, _currentBall.Color);
+                spareColor = _randomService.GetColorByCurrentItems(_fallbackColors, null);
             _spareBall = CreateAmmoBall(spareColor);
         }
 
@@ -188,7 +209,7 @@ namespace Code.Logic.Zuma.Players
             Color currentColor = _randomService.GetColorByCurrentItems(colors, null);
             _currentBall = CreateAmmoBall(currentColor);
 
-            Color spareColor = _randomService.GetColorByCurrentItems(colors, _currentBall.Color);
+            Color spareColor = _randomService.GetColorByCurrentItems(colors, null);
             _spareBall = CreateAmmoBall(spareColor);
         }
         

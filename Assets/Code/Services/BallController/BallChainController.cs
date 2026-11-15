@@ -33,6 +33,7 @@ namespace Code.Services.BallController
             public float NextTime;
             public bool Closed;
             public System.Random Random;
+            public Color? PreviousColor;
         }
 
         private readonly List<ChainSegment> _segments = new();
@@ -136,6 +137,20 @@ namespace Code.Services.BallController
                 GameObject prefab = Resources.Load<GameObject>(ResourcePath.ZumaCoinPath);
                 _coin = Object.Instantiate(prefab, holder.transform);
                 _coin.transform.localScale = new Vector3(_settings.CollisionThreshold, 0.04f, _settings.CollisionThreshold);
+            }
+        }
+
+        public void GetActiveColors(List<Color> colors)
+        {
+            colors.Clear();
+            foreach (ChainSegment segment in _segments)
+            {
+                for (int i = 0; i < segment.Count; i++)
+                {
+                    Color color = segment.GetBall(i).Color;
+                    if (!colors.Contains(color))
+                        colors.Add(color);
+                }
             }
         }
 
@@ -401,7 +416,12 @@ namespace Code.Services.BallController
             float distance = tail.HeadLogicalDistance - minimumHead;
             Pose pose = ChainSegment.GetTrackPose(feed.Track.Path.path, distance, Quaternion.identity);
             Ball ball = _ballProvider.GetBall(pose.position, pose.rotation);
-            ball.SetColor(starting && feed == _feeds[0] ? _openingColors[feed.Spawned] : RandomService.Sample(_palette, feed.Random));
+            Color color = starting && feed == _feeds[0]
+                ? _openingColors[feed.Spawned]
+                : RandomService.Sample(_palette, feed.Random, feed.PreviousColor,
+                    _config.RandomConfig?.RepeatColorPercent ?? LevelRandomConfigStaticData.DefaultRepeatColorPercent);
+            ball.SetColor(color);
+            feed.PreviousColor = color;
             _hits.RegisterChainBall(ball);
             ball.SetTrackVisibility(tail.IsExposed(distance));
             if (!finiteFeed && _config.PowerupEvery > 0 && (feed.Spawned + 1) % _config.PowerupEvery == 0)

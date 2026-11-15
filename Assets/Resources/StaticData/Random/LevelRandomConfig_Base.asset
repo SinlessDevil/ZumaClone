@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ab0042e0730c844ba78c5c1a6be6423, type: 3}
   m_Name: LevelRandomConfig_Base
   m_EditorClassIdentifier: 
+  RepeatColorPercent: 41
   Items:
   - {fileID: 11400000, guid: dd724af7be82d7e4a9fa2511de2dadd5, type: 2}
   - {fileID: 11400000, guid: ca24ad574f5dd9146b397e304839e1c6, type: 2}
@@ -19,10 +20,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 40a87fdd7a21383468b9ec3f24e21f95, type: 2}
   ItemProbabilities:
   - Item: {fileID: 11400000, guid: dd724af7be82d7e4a9fa2511de2dadd5, type: 2}
-    Probability: 40
+    Probability: 25
   - Item: {fileID: 11400000, guid: ca24ad574f5dd9146b397e304839e1c6, type: 2}
-    Probability: 30
+    Probability: 25
   - Item: {fileID: 11400000, guid: eebbf6239373baf4b807e11e84d1207f, type: 2}
-    Probability: 10
+    Probability: 25
   - Item: {fileID: 11400000, guid: 40a87fdd7a21383468b9ec3f24e21f95, type: 2}
-    Probability: 20
+    Probability: 25

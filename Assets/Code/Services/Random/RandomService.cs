@@ -26,7 +26,16 @@ namespace Code.Services.Random
                 throw new InvalidOperationException("A level needs a positive opening count and at least one weighted ball color.");
 
             System.Random opening = new(UnityEngine.Random.Range(0, int.MaxValue));
-            return Enumerable.Range(0, config.CountItem).Select(_ => Sample(palette, opening)).ToList();
+            List<Color> colors = new(config.CountItem);
+            Color? previous = null;
+            for (int i = 0; i < config.CountItem; i++)
+            {
+                Color color = Sample(palette, opening, previous, config.RandomConfig.RepeatColorPercent);
+                colors.Add(color);
+                previous = color;
+            }
+
+            return colors;
         }
 
         public Color GetColorByCurrentItems(List<Item> items, Item currentItem)
@@ -55,16 +64,39 @@ namespace Code.Services.Random
                 .ToList();
         }
 
-        public static Color Sample(IReadOnlyList<(Color color, float weight)> palette, System.Random random)
+        public static Color Sample(IReadOnlyList<(Color color, float weight)> palette, System.Random random,
+            Color? previous, float repeatPercent)
         {
-            double roll = random.NextDouble() * palette.Sum(entry => entry.weight);
+            double totalWeight = 0d;
+            bool includesPrevious = false;
+            Color fallbackColor = palette[0].color;
             foreach ((Color color, float weight) in palette)
             {
+                if (previous.HasValue && color == previous.Value)
+                {
+                    includesPrevious = true;
+                    continue;
+                }
+
+                totalWeight += weight;
+                fallbackColor = color;
+            }
+
+            if (includesPrevious && (totalWeight == 0d || random.NextDouble() * 100d < repeatPercent))
+                return previous.Value;
+
+            double roll = random.NextDouble() * totalWeight;
+            foreach ((Color color, float weight) in palette)
+            {
+                if (previous.HasValue && color == previous.Value)
+                    continue;
+
                 roll -= weight;
                 if (roll < 0d)
                     return color;
             }
-            return palette[^1].color;
+
+            return fallbackColor;
         }
 
         private Color SelectColorFromAvailable(IEnumerable<Color> colors, Color? excludeColor)

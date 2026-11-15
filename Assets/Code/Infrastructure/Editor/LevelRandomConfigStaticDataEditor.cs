@@ -6,11 +6,13 @@ namespace Code.Infrastructure.Editor
     [CustomEditor(typeof(LevelRandomConfigStaticData))]
     public class LevelRandomConfigStaticDataEditor : UnityEditor.Editor
     {
+        private SerializedProperty _repeatColorPercentProperty;
         private SerializedProperty _itemsProperty;
         private SerializedProperty _itemProbabilitiesProperty;
 
         private void OnEnable()
         {
+            _repeatColorPercentProperty = serializedObject.FindProperty(nameof(LevelRandomConfigStaticData.RepeatColorPercent));
             _itemsProperty = serializedObject.FindProperty("Items");
             _itemProbabilitiesProperty = serializedObject.FindProperty("ItemProbabilities");
         }
@@ -19,6 +21,7 @@ namespace Code.Infrastructure.Editor
         {
             serializedObject.Update();
 
+            EditorGUILayout.PropertyField(_repeatColorPercentProperty);
             EditorGUILayout.PropertyField(_itemsProperty);
 
             EnsureProbabilityListMatchesItems();

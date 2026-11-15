@@ -14,6 +14,7 @@ namespace Code.Services.BallController
         public List<Item> ActiveItems { get; }
         public CancellationToken AttemptToken { get; }
         public bool HasAccuracy { get; }
+        public void GetActiveColors(List<Color> colors);
         public bool IsOutsideField(Vector3 position);
         public Vector3 AccuracyEnd(Vector3 start, Vector3 end);
         public void Initialize(PathCreator pathCreator, BallChainDTO ballChainDTO);
