@@ -53,6 +53,12 @@ namespace Code.Services.Levels
             road.flattenSurface = geometry.FlattenRoad;
             road.SurfaceTexture = geometry.RoadTexture;
             road.TriggerUpdate();
+
+            if (data.GroundDecorations != null)
+            {
+                GameObject decorations = UnityEngine.Object.Instantiate(data.GroundDecorations, level.transform, false);
+                decorations.name = data.GroundDecorations.name;
+            }
         }
 
         private static void SetGatePose(Transform root, Transform target, Pose pose)

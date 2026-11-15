@@ -82,6 +82,7 @@ MonoBehaviour:
     FlattenRoad: 0
     MaxAngleError: 0.3
     MinVertexSpacing: 0.055
+  GroundDecorations: {fileID: 795816161516395619, guid: ea0e1a0d9a22c744a95b86ce92b59903, type: 3}
   LevelConfig:
     CountItem: 26
     ZumaTargetScore: 0

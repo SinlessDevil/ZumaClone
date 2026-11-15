@@ -10,6 +10,7 @@ namespace Code.StaticData.Levels
         public int LevelId;
         public LevelTypeId LevelTypeId;
         public LevelGeometry Geometry = new LevelGeometry();
+        public GameObject GroundDecorations;
         public LevelConfig LevelConfig = new LevelConfig();
     }
 
