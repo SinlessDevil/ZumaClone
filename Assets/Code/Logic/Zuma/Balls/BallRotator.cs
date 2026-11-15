@@ -11,6 +11,12 @@ namespace Code.Logic.Zuma.Balls
         private float _rotationSpeed = 360f;
 
         private CancellationTokenSource _cts;
+        private Quaternion _restRotation;
+
+        private void Awake()
+        {
+            _restRotation = _rotationTransform.localRotation;
+        }
 
         public void StartRotate()
         {
@@ -29,6 +35,7 @@ namespace Code.Logic.Zuma.Balls
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
+            _rotationTransform.localRotation = _restRotation;
         }
 
         private async UniTaskVoid RotateAsync(CancellationToken token)

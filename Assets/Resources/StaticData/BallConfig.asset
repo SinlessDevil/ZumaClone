@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1f4dac332966a4e8b76ffd948c8475, type: 3}
+  m_Name: BallConfig
+  m_EditorClassIdentifier: Game::Code.StaticData.BallStaticData
+  Material: {fileID: 2100000, guid: 5ded629015146624e8fd3bcd267fd185, type: 2}
+  DefaultTextures:
+    BaseColor: {fileID: 2800000, guid: abf4d3da6d5877a44b6705ff589a0b0b, type: 3}
+    Normal: {fileID: 2800000, guid: c36cd1841deb32e4ba81b3b40fb91da9, type: 3}
+    RuneMask: {fileID: 2800000, guid: 417bf972333473b4dbd76b95de1d8ca4, type: 3}
+  Colors:
+  - Item: {fileID: 11400000, guid: eebbf6239373baf4b807e11e84d1207f, type: 2}
+    Textures:
+      BaseColor: {fileID: 2800000, guid: abf4d3da6d5877a44b6705ff589a0b0b, type: 3}
+      Normal: {fileID: 2800000, guid: c36cd1841deb32e4ba81b3b40fb91da9, type: 3}
+      RuneMask: {fileID: 2800000, guid: 417bf972333473b4dbd76b95de1d8ca4, type: 3}
+  - Item: {fileID: 11400000, guid: ca24ad574f5dd9146b397e304839e1c6, type: 2}
+    Textures:
+      BaseColor: {fileID: 2800000, guid: f7efa1266c634c04ba194be12a76ed8e, type: 3}
+      Normal: {fileID: 2800000, guid: b5904edf066b63b40952d2fe78164e41, type: 3}
+      RuneMask: {fileID: 2800000, guid: fb38c9287fc8fc9479dea58bf8720e38, type: 3}
+  - Item: {fileID: 11400000, guid: dd724af7be82d7e4a9fa2511de2dadd5, type: 2}
+    Textures:
+      BaseColor: {fileID: 2800000, guid: 4c95f778a50351d4198d6f303956e9bf, type: 3}
+      Normal: {fileID: 2800000, guid: cc9702e8215f09e4a969c5ff512e06af, type: 3}
+      RuneMask: {fileID: 2800000, guid: cefe4e7d5f5aaf14090340a089cb6502, type: 3}
+  - Item: {fileID: 11400000, guid: 40a87fdd7a21383468b9ec3f24e21f95, type: 2}
+    Textures:
+      BaseColor: {fileID: 2800000, guid: 97be9518dc666ea41bcdf2b5f3b9af58, type: 3}
+      Normal: {fileID: 2800000, guid: f1a4ef5f878bf3943ae3a2634b8b4f58, type: 3}
+      RuneMask: {fileID: 2800000, guid: 5d0b716b3d6f46a40abf3bb41488df06, type: 3}
+  Powerups:
+  - Powerup: 1
+    Textures:
+      BaseColor: {fileID: 2800000, guid: 602a3a17d4fc7e34fafb85724d5009ec, type: 3}
+      Normal: {fileID: 2800000, guid: 051a958f59464a9428fda9e31af77b7c, type: 3}
+      RuneMask: {fileID: 2800000, guid: b55e50375eb0ab9438c0d8afd7970c6a, type: 3}
+  - Powerup: 2
+    Textures:
+      BaseColor: {fileID: 2800000, guid: 46d51a63a7d174e4faa4f1c78de35d52, type: 3}
+      Normal: {fileID: 2800000, guid: 17b19c5cff4497e46806268a8a269102, type: 3}
+      RuneMask: {fileID: 2800000, guid: a8f46d8a2b694a040a13e4f21a59f147, type: 3}
+  - Powerup: 3
+    Textures:
+      BaseColor: {fileID: 2800000, guid: 7fe9409763073a841a66fe18799b3735, type: 3}
+      Normal: {fileID: 2800000, guid: a49b3b4af509538409aacb7d7cb075d1, type: 3}
+      RuneMask: {fileID: 2800000, guid: 129f286c42ab4454d94fe845e8065150, type: 3}
+  - Powerup: 4
+    Textures:
+      BaseColor: {fileID: 2800000, guid: 4c8def2ea7aa1eb41b7880c07e6fc2bf, type: 3}
+      Normal: {fileID: 2800000, guid: d300e7870d8d19f4b9b792696c4bf8b4, type: 3}
+      RuneMask: {fileID: 2800000, guid: af4ccca6fb910c14ba16e152daed9383, type: 3}

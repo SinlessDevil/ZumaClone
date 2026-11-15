@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Code.Logic.Zuma.Balls;
 using Code.Services.Factories.Game;
+using Code.Services.StaticData;
 using UnityEngine;
 
 namespace Code.Services.Providers.Balls
@@ -13,10 +14,14 @@ namespace Code.Services.Providers.Balls
         private List<Ball> _pool;
         
         private readonly IGameFactory _gameFactory;
+        private readonly IStaticDataService _staticData;
 
-        public BallProvider(IGameFactory gameFactory)
+        public BallProvider(
+            IGameFactory gameFactory, 
+            IStaticDataService staticData)
         {
             _gameFactory = gameFactory;
+            _staticData = staticData;
         }
         
         public void CreatePoolBall()
@@ -26,7 +31,6 @@ namespace Code.Services.Providers.Balls
             for (int i = 0; i < InitialCount; i++)
             {
                 var ball = CreateObject(Vector3.zero, Quaternion.identity);
-                ball.Initialize();
                 ball.Deactivate();
             }
         }
@@ -51,7 +55,6 @@ namespace Code.Services.Providers.Balls
             }
 
             Ball newBall = CreateObject(position, rotation);
-            newBall.Initialize();
             newBall.Activate(position, rotation);
             return newBall;
         }
@@ -63,7 +66,8 @@ namespace Code.Services.Providers.Balls
         
         private Ball CreateObject(Vector3 position, Quaternion rotation)
         {
-            var createdObject = _gameFactory.CreateBall(position, rotation);
+            Ball createdObject = _gameFactory.CreateBall(position, rotation);
+            createdObject.Initialize(_staticData.BallConfig);
             _pool.Add(createdObject);
             return createdObject;
         }

@@ -1,23 +1,30 @@
+using Code.StaticData;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Code.Logic.Zuma.Balls
 {
     public class Ball : Item
     {
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
+        private static readonly int NormalMapId = Shader.PropertyToID("_BumpMap");
+        private static readonly int EmissionMapId = Shader.PropertyToID("_EmissionMap");
+        private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
+
         [SerializeField] private BallMover _ballMover;
         [SerializeField] private BallRotator _ballRotator;
         [SerializeField] private BallIntersectionTracker _ballIntersectionTracker;
         [SerializeField] private MeshRenderer _meshRenderer;
         [SerializeField] private ParticleSystemHolder _particleSystem;
-        [Space(10)] [Header("Debug")] 
-        [SerializeField] private Text _text;
 
+        private BallStaticData _appearance;
+        private MaterialPropertyBlock _appearanceProperties;
         private int _index;
         private bool _isInteractive;
         private float _powerupExpiresAt;
         private Vector3 _chainEntryStart;
+        private Quaternion _chainEntryRotation;
         private float _chainEntryDuration;
         private float _chainEntryRemaining;
         private readonly System.Collections.Generic.HashSet<(int, int)> _passedGaps = new();
@@ -56,15 +63,7 @@ namespace Code.Logic.Zuma.Balls
         {
             Powerup = powerup;
             _powerupExpiresAt = Time.time + lifetime;
-            _text.text = powerup switch
-            {
-                BallPowerup.Slowdown => "S",
-                BallPowerup.Reverse => "R",
-                BallPowerup.Explosion => "X",
-                BallPowerup.Accuracy => "A",
-                _ => ""
-            };
-            _text.gameObject.SetActive(powerup != BallPowerup.None);
+            RefreshAppearance();
         }
 
         public void UpdatePowerup()
@@ -77,7 +76,6 @@ namespace Code.Logic.Zuma.Balls
         public void SetTrackVisibility(bool visible)
         {
             _meshRenderer.enabled = visible;
-            _text.enabled = visible;
         }
 
         public void SetChainPosition(Vector3 position)
@@ -88,25 +86,30 @@ namespace Code.Logic.Zuma.Balls
         public void BeginChainEntry(float duration)
         {
             _chainEntryStart = transform.position;
+            _chainEntryRotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
             _chainEntryDuration = _chainEntryRemaining = duration;
         }
 
-        public void MoveAlongChain(Vector3 position, float deltaTime)
+        public void MoveAlongChain(Pose pose, float deltaTime)
         {
             if (IsEnteringChain)
             {
                 _chainEntryRemaining = Mathf.Max(0f, _chainEntryRemaining - deltaTime);
-                float progress = 1f - _chainEntryRemaining / _chainEntryDuration;
-                position = Vector3.Lerp(_chainEntryStart, position, Mathf.SmoothStep(0f, 1f, progress));
+                float progress = Mathf.SmoothStep(0f, 1f, 1f - _chainEntryRemaining / _chainEntryDuration);
+                pose.position = Vector3.Lerp(_chainEntryStart, pose.position, progress);
+                pose.rotation = Quaternion.Slerp(_chainEntryRotation, pose.rotation, progress);
             }
 
-            SetChainPosition(position);
+            PreviousChainPosition = transform.position;
+            transform.SetPositionAndRotation(pose.position, pose.rotation);
         }
 
         public bool IsInteractive => _isInteractive;
         
-        public void Initialize()
+        public void Initialize(BallStaticData appearance)
         {
+            _appearance = appearance;
+            _meshRenderer.sharedMaterial = appearance.Material;
             _ballIntersectionTracker.Initialize(this);
         }
 
@@ -152,9 +155,25 @@ namespace Code.Logic.Zuma.Balls
 
         public override void SetColor(Color color)
         {
-            _meshRenderer.material.color = color;
-            _color = color;
-            _particleSystem.SetColor(_color);
+            base.SetColor(color);
+            _particleSystem.SetColor(color);
+            RefreshAppearance();
+        }
+
+        private void RefreshAppearance()
+        {
+            _appearanceProperties ??= new MaterialPropertyBlock();
+            _appearanceProperties.SetColor(BaseColorId, Color);
+            _appearanceProperties.SetColor(EmissionColorId, Color * 0.65f);
+            if (_appearance != null)
+            {
+                BallTextureSet textures = _appearance.GetTextures(Color, Powerup);
+                _appearanceProperties.SetTexture(BaseMapId, textures.BaseColor);
+                _appearanceProperties.SetTexture(NormalMapId, textures.Normal);
+                _appearanceProperties.SetTexture(EmissionMapId, textures.RuneMask);
+            }
+
+            _meshRenderer.SetPropertyBlock(_appearanceProperties);
         }
 
         public void PlayDestroyAnimation(System.Action onComplete)

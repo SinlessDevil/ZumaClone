@@ -17,10 +17,12 @@ namespace Code.Services.StaticData
         private Dictionary<WindowTypeId, WindowConfig> _windowConfigs;
         private List<ChapterStaticData> _chapterStaticDatas = new();
         private BallChainStaticData _ballChainConfig;
+        private BallStaticData _ballConfig;
         
         public GameStaticData GameConfig => _gameStaticData;
         public BalanceStaticData Balance => _balanceStaticData;
         public BallChainStaticData BallChainConfig => _ballChainConfig;
+        public BallStaticData BallConfig => _ballConfig;
         public List<ChapterStaticData> Chapters => _chapterStaticDatas;
         
         public void LoadData()
@@ -30,6 +32,10 @@ namespace Code.Services.StaticData
             
             _balanceStaticData = Resources
                 .Load<BalanceStaticData>(ResourcePath.GameBalancePath);
+
+            _ballConfig = Resources.Load<BallStaticData>(ResourcePath.BallConfigPath);
+            if (_ballConfig == null)
+                throw new InvalidOperationException("Ball appearance config is missing.");
 
             _ballChainConfig = Resources
                 .Load<BallChainStaticData>(ResourcePath.BallChainConfigPath);

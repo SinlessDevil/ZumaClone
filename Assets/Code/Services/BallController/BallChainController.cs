@@ -399,8 +399,8 @@ namespace Code.Services.BallController
             float minimumHead = tail.Count * _settings.SpacingBalls;
             tail.SetHeadLogicalDistance(Mathf.Max(minimumHead, tail.HeadLogicalDistance));
             float distance = tail.HeadLogicalDistance - minimumHead;
-            Vector3 point = feed.Track.Path.path.GetPointAtDistance(distance, EndOfPathInstruction.Stop);
-            Ball ball = _ballProvider.GetBall(point, Quaternion.identity);
+            Pose pose = ChainSegment.GetTrackPose(feed.Track.Path.path, distance, Quaternion.identity);
+            Ball ball = _ballProvider.GetBall(pose.position, pose.rotation);
             ball.SetColor(starting && feed == _feeds[0] ? _openingColors[feed.Spawned] : RandomService.Sample(_palette, feed.Random));
             _hits.RegisterChainBall(ball);
             ball.SetTrackVisibility(tail.IsExposed(distance));

@@ -50,7 +50,7 @@ namespace Code.Services.BallController
             if (_balls.Count == 0) 
                 return;
 
-            var path = _pathCreator.path;
+            VertexPath path = _pathCreator.path;
 
             for (int i = 0; i < _balls.Count; i++)
             {
@@ -70,10 +70,23 @@ namespace Code.Services.BallController
                 _visualDistances[i] = newVisual;
                 _velocities[i] = vel;
 
-                _balls[i].SetTrackVisibility(IsExposed(newVisual));
-                _balls[i].MoveAlongChain(path.GetPointAtDistance(
-                    Mathf.Max(newVisual, 0f), EndOfPathInstruction.Stop), deltaTime);
+                Ball ball = _balls[i];
+                ball.SetTrackVisibility(IsExposed(newVisual));
+                ball.MoveAlongChain(GetTrackPose(path, newVisual, ball.transform.rotation), deltaTime);
             }
+        }
+
+        internal static Pose GetTrackPose(VertexPath path, float distance, Quaternion fallbackRotation)
+        {
+            float clampedDistance = Mathf.Clamp(distance, 0f, path.length);
+            Vector3 position = path.GetPointAtDistance(clampedDistance, EndOfPathInstruction.Stop);
+            Vector3 direction = path.GetDirectionAtDistance(clampedDistance, EndOfPathInstruction.Stop);
+            direction.y = 0f;
+
+            Quaternion rotation = direction.sqrMagnitude > 0.0001f
+                ? Quaternion.LookRotation(direction, Vector3.up)
+                : fallbackRotation;
+            return new Pose(position, rotation);
         }
 
         public bool IsExposed(float distance) => distance >= 0f && (Track?.IsExposed(distance) ?? true);

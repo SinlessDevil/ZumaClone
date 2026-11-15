@@ -12,6 +12,7 @@ namespace Code.Services.StaticData
         BalanceStaticData Balance { get; }
         List<ChapterStaticData> Chapters { get; }
         BallChainStaticData BallChainConfig { get; }
+        BallStaticData BallConfig { get; }
         void LoadData();
         WindowConfig ForWindow(WindowTypeId windowTypeId);
         LevelStaticData ForLevel(int chapterId, int levelId);
