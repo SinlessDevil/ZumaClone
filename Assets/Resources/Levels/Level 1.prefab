@@ -5134,6 +5134,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <SpawnPositionPlayer>k__BackingField: {fileID: 7623168684272311727}
+  <CoinPositions>k__BackingField: []
+  <PrimaryTunnels>k__BackingField: []
+  <AdditionalTracks>k__BackingField: []
   <PathCreator>k__BackingField: {fileID: 8052812836336350627}
   <RoadMeshCreator>k__BackingField: {fileID: 1279005569042813515}
   <DefaultParticleSystemHolder>k__BackingField: {fileID: 6014163241253095817}
@@ -44944,10 +44947,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9124926749831479564}
     m_Modifications:
-    - target: {fileID: 442599453279287083, guid: 80ad32820f8e4894d9827750f763209c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.35
-      objectReference: {fileID: 0}
     - target: {fileID: 507181770166104292, guid: 80ad32820f8e4894d9827750f763209c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.24384007

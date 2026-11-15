@@ -1,4 +1,3 @@
-using Code.PathCreation;
 using UnityEngine;
 
 namespace Code.Logic.Zuma.Players
@@ -8,7 +7,6 @@ namespace Code.Logic.Zuma.Players
         [SerializeField] private Transform _rotationTransform;
         [SerializeField] private PlayerAiming _playerAiming;
         [SerializeField] private PlayerShooting _playerShooting;
-        [SerializeField] private PlayerAnimator _playerAnimator;
         
         private void OnValidate()
         {
@@ -25,12 +23,11 @@ namespace Code.Logic.Zuma.Players
         }
 
         public PlayerShooting PlayerShooting => _playerShooting;
-        public PlayerAnimator PlayerAnimator => _playerAnimator;
         
-        public void Initialize(PathCreator pathCreator)
+        public void Initialize()
         {
             _playerAiming.Initialize(_rotationTransform);
-            _playerShooting.Initialize(_rotationTransform, pathCreator, _playerAnimator);
+            _playerShooting.Initialize(_rotationTransform);
         }
         
         private void Dispose()

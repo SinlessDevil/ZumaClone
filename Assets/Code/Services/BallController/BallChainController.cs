@@ -107,7 +107,7 @@ namespace Code.Services.BallController
             _win = new WinBallChainHandler(settings, pathCreator, _particles, _widgets, _state, _inputService,
                 _timeService, _finishService, _progress, _levelService);
             _lose = new LoseBallChainHandler(_state, _timeService, _levelService,
-                _inputService, _gameFactory, _finishService);
+                _inputService, _finishService);
             _hits = new AttachingBallChainHandler(settings, _segments, _widgets, _levelService, _progress, _state);
             _hits.PowerupTriggered += ApplyPowerup;
             LevelHolder holder = _levelService.GetLevelHolder();

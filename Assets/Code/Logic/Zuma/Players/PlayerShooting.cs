@@ -7,7 +7,6 @@ using Code.Services.Input;
 using Code.Services.Providers.Balls;
 using Code.Services.Random;
 using DG.Tweening;
-using Code.PathCreation;
 using UnityEngine;
 using Zenject;
 
@@ -16,6 +15,8 @@ namespace Code.Logic.Zuma.Players
     public class PlayerShooting : MonoBehaviour
     {
         private const float SwitchBallDistance = 0.5f;
+        private const int SpareBallMaterialIndex = 1;
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
         [SerializeField] private Transform _spawnPointBall;
         [SerializeField] private MeshRenderer _spareBallIndicator;
@@ -34,7 +35,7 @@ namespace Code.Logic.Zuma.Players
         private Vector3 _savedEndPoint;
 
         private Transform _rotationTransform;
-        private PlayerAnimator _playerAnimator;
+        private MaterialPropertyBlock _spareBallProperties;
 
         private IBallProvider _ballProvider;
         private IInputService _inputService;
@@ -55,13 +56,10 @@ namespace Code.Logic.Zuma.Players
             _ballChainController = ballChainController;
         }
 
-        public void Initialize(
-            Transform rotationTransform,
-            PathCreator pathCreator,
-            PlayerAnimator playerAnimator)
+        public void Initialize(Transform rotationTransform)
         {
             _rotationTransform = rotationTransform;
-            _playerAnimator = playerAnimator;
+            _spareBallProperties = new MaterialPropertyBlock();
 
             SubscribeEvents();
         }
@@ -75,8 +73,6 @@ namespace Code.Logic.Zuma.Players
         private void Update()
         {
             _shootTimer = Mathf.Max(0f, _shootTimer - Time.deltaTime);
-            if (_shootTimer == 0f && _currentBall != null)
-                _playerAnimator.PlayOpenEyeAnimation();
         }
 
         private void LateUpdate()
@@ -169,8 +165,6 @@ namespace Code.Logic.Zuma.Players
             shotBall.BallRotator.StartRotate();
             shotBall.SetInteractive(true);
 
-            _playerAnimator.PlayCloseEyeAnimation();
-
             _currentBall = _spareBall;
             PlayAnimationReloading(_currentBall, _spawnPointBall.localPosition);
             SetUpSpareBall(transform);
@@ -216,7 +210,9 @@ namespace Code.Logic.Zuma.Players
 
         private void SetIndicatorSpareBall()
         {
-            _spareBallIndicator.material.color = _spareBall.Color;
+            _spareBallIndicator.GetPropertyBlock(_spareBallProperties, SpareBallMaterialIndex);
+            _spareBallProperties.SetColor(BaseColorId, _spareBall.Color);
+            _spareBallIndicator.SetPropertyBlock(_spareBallProperties, SpareBallMaterialIndex);
         }
 
         private void OnDrawGizmos()

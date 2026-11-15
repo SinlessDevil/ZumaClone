@@ -132,7 +132,7 @@ namespace Code.Infrastructure.StateMachine.Game.States
         {
             var levelHolder = _levelService.GetLevelHolder();
             var player = _gameFactory.CreatePlayer(levelHolder.SpawnPositionPlayer.position, Quaternion.identity);
-            player.Initialize(levelHolder.PathCreator);
+            player.Initialize();
         }
 
         private void InitHud()
