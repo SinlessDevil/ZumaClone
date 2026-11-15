@@ -13,7 +13,6 @@ namespace Code.UI.Game
         [SerializeField] private ScoreDisplayer _scoreDisplayer;
         [SerializeField] private TimeDisplayer _timeDisplayer;
         [Space(10)] [Header("Other")]
-        [SerializeField] private InputZona _inputZona;
         [SerializeField] private List<GameObject> _debugObjects;
         
         private IStaticDataService _staticDataService; 
@@ -23,8 +22,6 @@ namespace Code.UI.Game
         {
             _staticDataService = staticDataService;
         }
-        
-        public InputZona InputZona => _inputZona;
         
         public void Initialize()
         {

@@ -1,5 +1,4 @@
 using System;
-using Code.UI;
 using UnityEngine;
 
 namespace Code.Services.Input.Device
@@ -18,7 +17,7 @@ namespace Code.Services.Input.Device
         public event Action PointerDownEvent;
         public event Action PointerUpEvent;
 
-        public void UpdateInput()
+        public void UpdateInput(Func<Vector2, int, bool> allowsPointer)
         {
             int count = UnityEngine.Input.touchCount;
             if (count == 0)
@@ -33,9 +32,9 @@ namespace Code.Services.Input.Device
                 Touch touch = UnityEngine.Input.GetTouch(i);
                 if (touch.fingerId == _aimingFinger)
                 {
-                    UpdateAimingFinger(touch);
+                    UpdateAimingFinger(touch, allowsPointer);
                 }
-                else if (touch.phase == TouchPhase.Began && InputZona.Contains(touch.position, touch.fingerId))
+                else if (touch.phase == TouchPhase.Began && allowsPointer(touch.position, touch.fingerId))
                 {
                     if (aimingFingerAtStart.HasValue || _aimingFinger.HasValue)
                         AlternatePointerEvent?.Invoke(touch.position);
@@ -58,7 +57,7 @@ namespace Code.Services.Input.Device
             PointerDownEvent?.Invoke();
         }
 
-        private void UpdateAimingFinger(Touch touch)
+        private void UpdateAimingFinger(Touch touch, Func<Vector2, int, bool> allowsPointer)
         {
             Direction = touch.position - (Vector2)TouchPosition;
             TouchPosition = touch.position;
@@ -68,7 +67,7 @@ namespace Code.Services.Input.Device
 
             if (touch.phase == TouchPhase.Ended)
             {
-                if (InputZona.Contains(touch.position, touch.fingerId))
+                if (allowsPointer(touch.position, touch.fingerId))
                     TapEvent?.Invoke(touch.position);
                 PointerUpEvent?.Invoke();
                 CancelGesture();

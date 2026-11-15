@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Code.Services.BallController;
@@ -13,6 +13,7 @@ namespace Code.Services.StaticData
     public class StaticDataService : IStaticDataService
     {
         private GameStaticData _gameStaticData;
+        private GameplayInputStaticData _gameplayInputConfig;
         private BalanceStaticData _balanceStaticData;
         private Dictionary<WindowTypeId, WindowConfig> _windowConfigs;
         private List<ChapterStaticData> _chapterStaticDatas = new();
@@ -20,6 +21,7 @@ namespace Code.Services.StaticData
         private BallStaticData _ballConfig;
         
         public GameStaticData GameConfig => _gameStaticData;
+        public GameplayInputStaticData GameplayInputConfig => _gameplayInputConfig;
         public BalanceStaticData Balance => _balanceStaticData;
         public BallChainStaticData BallChainConfig => _ballChainConfig;
         public BallStaticData BallConfig => _ballConfig;
@@ -32,6 +34,10 @@ namespace Code.Services.StaticData
             
             _balanceStaticData = Resources
                 .Load<BalanceStaticData>(ResourcePath.GameBalancePath);
+
+            _gameplayInputConfig = Resources.Load<GameplayInputStaticData>(ResourcePath.GameplayInputConfigPath);
+            if (_gameplayInputConfig == null)
+                throw new InvalidOperationException("Gameplay input config is missing.");
 
             _ballConfig = Resources.Load<BallStaticData>(ResourcePath.BallConfigPath);
             if (_ballConfig == null)

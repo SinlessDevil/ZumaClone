@@ -9,6 +9,7 @@ namespace Code.Services.StaticData
     public interface IStaticDataService
     {
         GameStaticData GameConfig { get; }
+        GameplayInputStaticData GameplayInputConfig { get; }
         BalanceStaticData Balance { get; }
         List<ChapterStaticData> Chapters { get; }
         BallChainStaticData BallChainConfig { get; }

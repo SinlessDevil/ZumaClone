@@ -16,7 +16,7 @@ namespace Code.Services.Input.Device
         bool CanAim { get; }
         event Action<Vector2> AlternatePointerEvent;
 
-        void UpdateInput();
+        void UpdateInput(Func<Vector2, int, bool> allowsPointer);
         void CancelGesture();
     }
 }

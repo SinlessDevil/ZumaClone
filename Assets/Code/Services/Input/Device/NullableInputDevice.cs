@@ -18,6 +18,6 @@ namespace Code.Services.Input.Device
 
         public void CancelGesture() { }
 
-        public void UpdateInput() { }
+        public void UpdateInput(Func<Vector2, int, bool> allowsPointer) { }
     }
 }

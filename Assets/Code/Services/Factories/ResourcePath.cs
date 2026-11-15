@@ -14,6 +14,7 @@ namespace Code.Services.Factories
         public const string ItemLevelPath = "UI/Menu/ItemLevel";
         
         public const string GameConfigPath = "StaticData/Balance/GameConfig";
+        public const string GameplayInputConfigPath = "StaticData/GameplayInputConfig";
         public const string GameBalancePath = "StaticData/Balance/Balance";
         public const string WindowsStaticDataPath = "StaticData/WindowsStaticData";
         public const string ChaptersStaticDataPath = "StaticData/Chapters";
