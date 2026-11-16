@@ -2,8 +2,6 @@
 
 ![Zuma Clone banner featuring the frog and a temple track](Images/Zuma_Banner_1280x640.png)
 
-## Gameplay video
-
 https://github.com/user-attachments/assets/993a67fd-24f3-41da-877d-17d8ce7507d6
 
 Zuma Clone is a 3D Unity recreation of the classic marble shooter. Aim the frog, match three or more marbles of the same color, and clear the chain before it reaches the temple gate.
