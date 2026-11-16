@@ -87,6 +87,7 @@ namespace Code.Infrastructure.Installers
         {
             Container.BindInterfacesTo<UIFactory>().AsSingle();
             Container.BindInterfacesTo<GameFactory>().AsSingle();
+            Container.BindInterfacesTo<CoinFactory>().AsSingle();
         }
 
         private void BindFinishServices()

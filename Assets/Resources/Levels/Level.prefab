@@ -45296,7 +45296,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 5cc8cbc40070c6b49b075f25f753098d, type: 2}
     - target: {fileID: 4483584055411646839, guid: a495758cb10071549956fb3ba8a55f87, type: 3}
       propertyPath: _renderTarget
-      value:
+      value: 
       objectReference: {fileID: 2290627106368721422}
     - target: {fileID: 4483584055411646839, guid: a495758cb10071549956fb3ba8a55f87, type: 3}
       propertyPath: undersideMaterial

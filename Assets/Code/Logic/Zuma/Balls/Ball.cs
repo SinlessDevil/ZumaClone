@@ -46,6 +46,7 @@ namespace Code.Logic.Zuma.Balls
 
         public BallRotator BallRotator => _ballRotator;
         public BallMover BallMover => _ballMover;
+        internal Bounds ProjectileBounds => _meshRenderer.bounds;
         public BallIntersectionTracker BallIntersectionTracker => _ballIntersectionTracker;
 
         public Vector3 PreviousChainPosition { get; private set; }

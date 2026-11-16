@@ -33,7 +33,6 @@ namespace Code.StaticData.Levels
         [Min(0f)] public float PowerupDuration = 4f;
         [Min(0f)] public float ExplosionRadius = 1.4f;
         [Min(0f)] public float CoinInterval = 8f;
-        [Min(0f)] public float CoinLifetime = 4f;
         public LevelRandomConfigStaticData RandomConfig;
         public LevelScoreStaticData ScoreConfig;
 

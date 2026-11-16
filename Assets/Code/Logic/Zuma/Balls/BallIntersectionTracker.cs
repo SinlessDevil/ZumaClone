@@ -26,8 +26,10 @@ namespace Code.Logic.Zuma.Balls
                 _ballChainController.TryAttachBall(_ball, start, end))
                 return true;
 
+            Bounds bounds = _ball.ProjectileBounds;
+            bounds.center += end - start;
             if (!_ballChainController.AttemptToken.IsCancellationRequested &&
-                !_ballChainController.IsOutsideField(end)) 
+                !_ballChainController.IsProjectileOffscreen(bounds))
                 return false;
             
             _ballChainController.ResolveMiss(_ball);

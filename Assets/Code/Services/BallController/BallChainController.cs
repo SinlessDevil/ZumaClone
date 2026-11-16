@@ -6,7 +6,6 @@ using Code.Logic.Zuma;
 using Code.Logic.Zuma.Balls;
 using Code.Logic.Zuma.Level;
 using Code.PathCreation;
-using Code.Services.Factories;
 using Code.Services.Factories.Game;
 using Code.Services.Finish;
 using Code.Services.Input;
@@ -39,6 +38,7 @@ namespace Code.Services.BallController
         private readonly List<ChainSegment> _segments = new();
         private readonly List<Feed> _feeds = new();
         private readonly List<Ball> _projectiles = new();
+        private readonly Plane[] _projectileViewPlanes = new Plane[6];
         private readonly IBallProvider _ballProvider;
         private readonly IWidgetProvider _widgetProvider;
         private readonly ILevelService _levelService;
@@ -46,6 +46,7 @@ namespace Code.Services.BallController
         private readonly IFinishService _finishService;
         private readonly IInputService _inputService;
         private readonly IGameFactory _gameFactory;
+        private readonly ICoinFactory _coinFactory;
         private readonly ITimeService _timeService;
 
         private PathCreator _pathCreator;
@@ -62,10 +63,10 @@ namespace Code.Services.BallController
         private float _reverseUntil;
         private float _accuracyUntil;
         private LevelConfig _config;
-        private Bounds _field;
+        private Camera _projectileCamera;
+        private int _projectileViewFrame = -1;
         private WidgetBallChainProvider _widgets;
-        private GameObject _coin;
-        private float _coinExpiresAt;
+        private ZumaCoin _coin;
         private float _nextCoinTime;
         private int _coinIndex;
 
@@ -81,7 +82,8 @@ namespace Code.Services.BallController
             IFinishService finishService, 
             IInputService inputService, 
             IGameFactory gameFactory, 
-            ITimeService timeService)
+            ITimeService timeService,
+            ICoinFactory coinFactory)
         {
             _ballProvider = ballProvider;
             _widgetProvider = widgetProvider;
@@ -91,6 +93,7 @@ namespace Code.Services.BallController
             _inputService = inputService;
             _gameFactory = gameFactory;
             _timeService = timeService;
+            _coinFactory = coinFactory;
         }
 
         public void Initialize(PathCreator pathCreator, BallChainDTO settings)
@@ -121,21 +124,8 @@ namespace Code.Services.BallController
                     _feeds.Add(new Feed { Track = track });
                 }
 
-            _field = new Bounds(holder.SpawnPositionPlayer.position, Vector3.zero);
-            foreach (Feed feed in _feeds)
-                for (int i = 0; i < feed.Track.Path.path.NumPoints; i++)
-                    _field.Encapsulate(feed.Track.Path.path.GetPoint(i));
-            foreach (Pose coin in holder.CoinSpawns)
-                _field.Encapsulate(holder.transform.TransformPoint(coin.position));
-            _field.Expand(2f);
-
-            if (holder.CoinSpawns.Length > 0 &&
-                _config.CoinInterval > 0f && _config.CoinLifetime > 0f)
-            {
-                GameObject prefab = Resources.Load<GameObject>(ResourcePath.ZumaCoinPath);
-                _coin = Object.Instantiate(prefab, holder.transform);
-                _coin.transform.localScale = new Vector3(_settings.CollisionThreshold, 0.04f, _settings.CollisionThreshold);
-            }
+            if (_config.CoinInterval > 0f && holder.CoinSpawns.Length > 0)
+                _coin = _coinFactory.CreateCoin(holder.transform);
         }
 
         public void GetActiveColors(List<Color> colors)
@@ -152,11 +142,24 @@ namespace Code.Services.BallController
             }
         }
 
-        public bool IsOutsideField(Vector3 position)
+        public bool IsProjectileOffscreen(Bounds bounds)
         {
-            Vector3 min = _field.min;
-            Vector3 max = _field.max;
-            return position.x < min.x || position.x > max.x || position.z < min.z || position.z > max.z;
+            if (_projectileCamera == null || !_projectileCamera.isActiveAndEnabled)
+            {
+                _projectileCamera = Camera.main;
+                _projectileViewFrame = -1;
+            }
+
+            if (_projectileCamera == null)
+                return false;
+
+            if (_projectileViewFrame != Time.frameCount)
+            {
+                GeometryUtility.CalculateFrustumPlanes(_projectileCamera, _projectileViewPlanes);
+                _projectileViewFrame = Time.frameCount;
+            }
+
+            return !GeometryUtility.TestPlanesAABB(_projectileViewPlanes, bounds);
         }
 
         public void StartBallSpawning(List<Color> colors) =>
@@ -193,8 +196,13 @@ namespace Code.Services.BallController
             if (_hits != null)
                 _hits.PowerupTriggered -= ApplyPowerup;
             if (_coin != null)
-                Object.Destroy(_coin);
+            {
+                _coin.Hide();
+                Object.Destroy(_coin.gameObject);
+            }
             _coin = null;
+            _projectileCamera = null;
+            _projectileViewFrame = -1;
             CancelProjectiles();
             _segments.Clear();
             _feeds.Clear();
@@ -203,14 +211,21 @@ namespace Code.Services.BallController
 
         public void Update()
         {
-            if (_state == null || !_state.HasStarted || _state.HasWon ||
+            if (_state == null || !_state.HasStarted ||
                 AttemptToken.IsCancellationRequested || Time.deltaTime <= 0f)
                 return;
+
+            if (_state.HasWon)
+            {
+                AdvanceProjectiles();
+                return;
+            }
 
             if (_state.HasLost)
             {
                 MoveSegments();
                 ConsumeAtSkull();
+                AdvanceProjectiles();
                 return;
             }
 
@@ -220,17 +235,13 @@ namespace Code.Services.BallController
             MergeNeighbors();
             ConsumeAtSkull();
             
-            if (!_state.CanPlay)
-            {
-                CancelProjectiles();
-                return;
-            }
-
             AdvanceProjectiles();
+            if (!_state.CanPlay)
+                return;
 
             CloseFeedAtTarget();
             TrySpawn();
-            UpdateCoin();
+            SpawnNextCoin();
             float warning = _settings.PercentToDetectionLose / 100f;
             _mouth.TryUpdateMouthProgress(warning);
             
@@ -245,8 +256,6 @@ namespace Code.Services.BallController
             if (!_state.FeedClosed || _state.TotalBallCount != 0) 
                 return;
             
-            ClearCoin();
-            CancelProjectiles();
             _win.TryWin(0, _state.LastRemovalDistance);
         }
 
@@ -275,7 +284,7 @@ namespace Code.Services.BallController
         public void TryAttachBall(Ball newBall)
         {
             if (_state != null && _state.CanPlay && Time.timeScale > 0f)
-                _hits.TryAttachBall(newBall, newBall.transform.position, newBall.transform.position, stationaryTargets: true);
+                _hits.TryAttachBall(newBall, newBall.transform.position, newBall.transform.position, out _, stationaryTargets: true);
         }
 
         public bool TryAttachBall(Ball newBall, Vector3 start, Vector3 end)
@@ -283,61 +292,42 @@ namespace Code.Services.BallController
             if (_state == null || !_state.CanPlay || Time.timeScale <= 0f)
                 return false;
 
-            float coinTime = CoinContact(start, end);
-            if (_hits.TryAttachBall(newBall, start, end, coinTime: coinTime))
-                return true;
-
-            if (float.IsPositiveInfinity(coinTime))
-                return false;
-
-            Vector3 position = _coin.transform.position;
-            int score = Mathf.Max(_settings.Survival ? 200 : 500, _settings.ZumaTargetScore / 600 * 100);
-            _progress.AddScore(score);
-            _widgets.SetUpWidget(position, Color.yellow, $"Coin +{score}");
-            _hits.ResolveShot(newBall.ShotId, false, position);
-            ClearCoin();
-            _ballProvider.ReturnBall(newBall);
-            return true;
+            bool attached = _hits.TryAttachBall(newBall, start, end, out float contactTime);
+            TryCollectCoin(start, end, contactTime);
+            return attached;
         }
 
         public UniTask MoveParticleAlongPathAsync(ParticleSystemHolder particle) =>
             _particles.MoveParticleAlongPathAsync(particle);
 
         public Vector3 AccuracyEnd(Vector3 start, Vector3 end) =>
-            Vector3.Lerp(start, end, Mathf.Min(_hits.ContactFraction(start, end), CoinContact(start, end)));
+            Vector3.Lerp(start, end, _hits.ContactFraction(start, end));
 
-        private float CoinContact(Vector3 start, Vector3 end)
+        private void TryCollectCoin(Vector3 start, Vector3 end, float chainContactTime)
         {
-            if (_coin != null && _coin.activeSelf && AttachingBallChainHandler.TryContact(start - _coin.transform.position,
-                    end - _coin.transform.position, _settings.CollisionThreshold * 0.85f, out float time))
-                return time;
-
-            return float.PositiveInfinity;
-        }
-
-        private void UpdateCoin()
-        {
-            if (_coin == null)
+            if (_coin == null || !_coin.CanBeHit)
                 return;
 
-            if (_coin.activeSelf && Time.time >= _coinExpiresAt)
-                ClearCoin();
+            Vector3 position = _coin.transform.position;
+            if (!AttachingBallChainHandler.TryContact(start - position, end - position,
+                    _settings.CollisionThreshold * 0.85f, out float time) || time >= chainContactTime)
+                return;
 
-            if (_coin.activeSelf || Time.time < _nextCoinTime)
+            _coin.Hide();
+            _nextCoinTime = Time.time + _config.CoinInterval;
+            int score = Mathf.Max(_settings.Survival ? 200 : 500, _settings.ZumaTargetScore / 600 * 100);
+            _progress.AddScore(score);
+            _widgets.SetUpWidget(position, Color.yellow, $"Coin +{score}");
+        }
+
+        private void SpawnNextCoin()
+        {
+            if (_coin == null || _coin.gameObject.activeSelf || Time.time < _nextCoinTime)
                 return;
 
             Pose[] positions = _levelService.GetLevelHolder().CoinSpawns;
-            Pose marker = positions[_coinIndex++ % positions.Length];
-            _nextCoinTime = Time.time + _config.CoinInterval;
-            _coin.transform.SetLocalPositionAndRotation(marker.position, marker.rotation);
-            _coinExpiresAt = Time.time + _config.CoinLifetime;
-            _coin.SetActive(true);
-        }
-
-        private void ClearCoin()
-        {
-            if (_coin != null)
-                _coin.SetActive(false);
+            _coin.Show(positions[_coinIndex]);
+            _coinIndex = (_coinIndex + 1) % positions.Length;
         }
 
         private void ApplyPowerup(BallPowerup powerup, Vector3 position, int shotId, int depth)
@@ -501,7 +491,6 @@ namespace Code.Services.BallController
                     Ball ball = segment.GetBall(0);
                     _lose.TryLose(segment);
                     _state.FeedClosed = true;
-                    ClearCoin();
                     ball.Deactivate();
                     segment.RemoveBallAt(0);
                     segment.SetHeadLogicalDistance(segment.HeadLogicalDistance - _settings.SpacingBalls);
