@@ -66,14 +66,15 @@ namespace Code.Services.BallController
             }
         }
 
-        public bool TryAttachBall(Ball shot, Vector3 start, Vector3 end, bool stationaryTargets = false,
-            float coinTime = float.PositiveInfinity)
+        public bool TryAttachBall(Ball shot, Vector3 start, Vector3 end, out float contactTime,
+            bool stationaryTargets = false)
         {
             (ChainSegment targetSegment, int targetIndex, float earliest) = FindContact(start, end, stationaryTargets);
+            contactTime = earliest;
             if (!stationaryTargets)
-                TrackGaps(shot, start, Vector3.Lerp(start, end, Mathf.Min(earliest, coinTime)));
+                TrackGaps(shot, start, Vector3.Lerp(start, end, earliest));
 
-            if (targetSegment == null || coinTime < earliest)
+            if (targetSegment == null)
                 return false;
 
             Ball hit = targetSegment.GetBall(targetIndex);

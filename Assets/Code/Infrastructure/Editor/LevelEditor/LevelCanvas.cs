@@ -28,6 +28,8 @@ namespace Code.Infrastructure.Editor
         private int _pointer = -1;
         private bool _panning;
         private bool _edited;
+        private bool _addingPoints;
+        private Vector3? _insertPreview;
         private Vector2 _pointerStart;
         private Vector2 _panStart;
         private Vector3 _pointStart;
@@ -37,6 +39,7 @@ namespace Code.Infrastructure.Editor
         private BezierPath Path => Geometry.Path;
         private float Scale => Mathf.Max(1f, Mathf.Min(contentRect.width / 29f, contentRect.height / 16f)) * _zoom;
         private Vector2 Origin => contentRect.center + _pan;
+        private float RoadWidth => Mathf.Max(2f, Geometry.RoadHalfWidth * 2f * Scale);
 
         public LevelCanvas(LevelStaticData level, LevelThemeStaticData theme)
         {
@@ -72,6 +75,12 @@ namespace Code.Infrastructure.Editor
             MarkDirtyRepaint();
         }
 
+        public void SetAddPointMode(bool enabled)
+        {
+            _addingPoints = enabled;
+            SetInsertPreview(null);
+        }
+
         public void DeleteSelectedPoint()
         {
             if (_selected <= 0 || _selected >= Path.NumPoints - 1 || _selected % 3 != 0 || Path.NumSegments < 2)
@@ -101,7 +110,7 @@ namespace Code.Infrastructure.Editor
             DrawGrid(p);
             p.lineCap = LineCap.Round;
             p.lineJoin = LineJoin.Round;
-            float roadWidth = Mathf.Max(2f, Geometry.RoadHalfWidth * 2f * Scale);
+            float roadWidth = RoadWidth;
             DrawRoad(p, MarkerBackground, roadWidth + 4f);
             DrawRoad(p, RoadColor, roadWidth);
 
@@ -128,6 +137,16 @@ namespace Code.Infrastructure.Editor
             Vector2 player = ToCanvas(Geometry.PlayerPosition);
             DrawPlayer(p, player, _selected == PlayerHandle ? Color.white : PlayerColor);
             context.DrawText("Frog", player + new Vector2(14f, -8f), 11f, PlayerColor, null);
+
+            if (_insertPreview.HasValue)
+            {
+                Vector2 marker = ToCanvas(_insertPreview.Value);
+                DrawPoint(p, marker, 9f, MarkerBackground);
+                p.strokeColor = Color.white;
+                p.lineWidth = 2f;
+                DrawLine(p, marker - Vector2.right * 4f, marker + Vector2.right * 4f);
+                DrawLine(p, marker - Vector2.up * 4f, marker + Vector2.up * 4f);
+            }
         }
 
         private void DrawRoad(Painter2D p, Color color, float width)
@@ -234,13 +253,14 @@ namespace Code.Infrastructure.Editor
 
             Vector2 position = this.WorldToLocal((Vector2)evt.position);
             Focus();
-            if (evt.button == 0 && evt.shiftKey)
+            if (evt.button == 0 && (_addingPoints || evt.shiftKey))
             {
                 InsertPoint(position);
                 evt.StopPropagation();
                 return;
             }
 
+            SetInsertPreview(null);
             _panning = evt.button != 0;
             if (!_panning)
             {
@@ -260,10 +280,15 @@ namespace Code.Infrastructure.Editor
 
         private void OnPointerMove(PointerMoveEvent evt)
         {
+            Vector2 position = this.WorldToLocal((Vector2)evt.position);
+            if (_pointer < 0 && _addingPoints)
+            {
+                SetInsertPreview(TryFindInsertPoint(position, out _, out _, out Vector3 anchor) ? anchor : null);
+            }
+
             if (evt.pointerId != _pointer)
                 return;
 
-            Vector2 position = this.WorldToLocal((Vector2)evt.position);
             if (_panning)
             {
                 _pan = _panStart + position - _pointerStart;
@@ -328,6 +353,8 @@ namespace Code.Infrastructure.Editor
             Vector3 before = ToLevel(cursor);
             _zoom = Mathf.Clamp(_zoom * Mathf.Pow(1.06f, -evt.delta.y), 0.2f, 8f);
             _pan += cursor - ToCanvas(before);
+            if (_addingPoints)
+                SetInsertPreview(TryFindInsertPoint(cursor, out _, out _, out Vector3 anchor) ? anchor : null);
             MarkDirtyRepaint();
             evt.StopPropagation();
         }
@@ -372,12 +399,14 @@ namespace Code.Infrastructure.Editor
             }
         }
 
-        private void InsertPoint(Vector2 position)
+        private bool TryFindInsertPoint(Vector2 position, out int segment, out float time, out Vector3 anchor)
         {
             const int steps = 32;
-            float best = HitRadius * HitRadius;
-            int segment = -1;
-            float time = 0f;
+            float radius = Mathf.Max(HitRadius, RoadWidth * 0.5f + 2f);
+            float best = radius * radius;
+            segment = -1;
+            time = 0f;
+            anchor = default;
             for (int index = 0; index < Path.NumSegments; index++)
             {
                 Vector3[] points = Path.GetPointsInSegment(index);
@@ -400,17 +429,34 @@ namespace Code.Infrastructure.Editor
             }
 
             if (segment < 0 || time < 0.01f || time > 0.99f)
+                return false;
+
+            anchor = CubicBezierUtility.EvaluateCurve(Path.GetPointsInSegment(segment), time);
+            return (anchor - Path[segment * 3]).sqrMagnitude >= 0.00001f &&
+                (anchor - Path[segment * 3 + 3]).sqrMagnitude >= 0.00001f;
+        }
+
+        private void SetInsertPreview(Vector3? anchor)
+        {
+            if (_insertPreview == anchor)
                 return;
 
-            Vector3 anchor = CubicBezierUtility.EvaluateCurve(Path.GetPointsInSegment(segment), time);
-            if ((anchor - Path[segment * 3]).sqrMagnitude < 0.00001f ||
-                (anchor - Path[segment * 3 + 3]).sqrMagnitude < 0.00001f)
+            _insertPreview = anchor;
+            MarkDirtyRepaint();
+        }
+
+        private void OnPointerLeave(PointerLeaveEvent evt) => SetInsertPreview(null);
+
+        private void InsertPoint(Vector2 position)
+        {
+            if (!TryFindInsertPoint(position, out int segment, out float time, out Vector3 anchor))
                 return;
 
             Undo.RecordObject(_level, "Insert path point");
             Path.ControlPointMode = BezierPath.ControlMode.Free;
             Path.SplitSegment(anchor, segment, time);
             _selected = segment * 3 + 3;
+            _insertPreview = null;
             LevelEditorModel.Save(_level);
             MarkDirtyRepaint();
         }
@@ -428,6 +474,7 @@ namespace Code.Infrastructure.Editor
             {
                 target.RegisterCallback<PointerDownEvent>(_canvas.OnPointerDown);
                 target.RegisterCallback<PointerMoveEvent>(_canvas.OnPointerMove);
+                target.RegisterCallback<PointerLeaveEvent>(_canvas.OnPointerLeave);
                 target.RegisterCallback<PointerUpEvent>(_canvas.OnPointerUp);
                 target.RegisterCallback<PointerCaptureOutEvent>(_canvas.OnCaptureOut);
             }
@@ -436,6 +483,7 @@ namespace Code.Infrastructure.Editor
             {
                 target.UnregisterCallback<PointerDownEvent>(_canvas.OnPointerDown);
                 target.UnregisterCallback<PointerMoveEvent>(_canvas.OnPointerMove);
+                target.UnregisterCallback<PointerLeaveEvent>(_canvas.OnPointerLeave);
                 target.UnregisterCallback<PointerUpEvent>(_canvas.OnPointerUp);
                 target.UnregisterCallback<PointerCaptureOutEvent>(_canvas.OnCaptureOut);
             }

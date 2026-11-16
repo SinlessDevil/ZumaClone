@@ -23,6 +23,7 @@ using NSubstitute;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Zenject;
 using Object = UnityEngine.Object;
 
 namespace Tests.PlayMode
@@ -40,6 +41,7 @@ namespace Tests.PlayMode
         private BallChainDTO _settings;
         private BallChainController _chain;
         private LevelLocalProgressService _progress;
+        private IBallProvider _balls;
         private IFinishService _finish;
         private IInputService _input;
         private ITimeService _timer;
@@ -53,6 +55,7 @@ namespace Tests.PlayMode
             _level = Object.Instantiate(Resources.Load<GameObject>(ResourcePath.LevelPath), _root.transform)
                 .GetComponent<LevelHolder>();
             new LevelGeometryService().Apply(_level, levelAsset);
+            _level.SetTrackData(_level.PrimaryTunnels, Array.Empty<Pose>());
             _level.PathCreator.bezierPath = new BezierPath(new[] { Vector3.zero, Vector3.right * 30f }, false, PathSpace.xz);
 
             _scoreData = ScriptableObject.CreateInstance<LevelScoreStaticData>();
@@ -66,6 +69,7 @@ namespace Tests.PlayMode
             levels.GetCurrentLevelStaticData().Returns(_levelData);
 
             IBallProvider balls = Substitute.For<IBallProvider>();
+            _balls = balls;
             balls.GetBall(Arg.Any<Vector3>(), Arg.Any<Quaternion>())
                 .Returns(call => CreateBall(call.Arg<Vector3>()));
 
@@ -101,7 +105,8 @@ namespace Tests.PlayMode
                 TimeToSpawnWidget = 1
             };
 
-            _chain = new BallChainController(balls, widgets, levels, _progress, _finish, _input, factory, _timer);
+            _chain = new BallChainController(balls, widgets, levels, _progress, _finish, _input, factory, _timer,
+                new CoinFactory(new DiContainer()));
             _chain.Initialize(_level.PathCreator, _settings);
             _player.PlayerShooting.Constructor(_input, balls, new RandomService(levels), _chain, null);
         }
@@ -131,6 +136,119 @@ namespace Tests.PlayMode
             Assert.That(balls[1].transform.position.x, Is.GreaterThan(balls[2].transform.position.x));
             Assert.That(Vector3.Angle(balls[0].transform.forward, Vector3.back), Is.LessThan(0.1f));
             _timer.Received(1).StartTimer();
+        }
+
+        [UnityTest]
+        public IEnumerator Coin_StaysUntilHitThenReusesOneInstanceWithoutStoppingShot()
+        {
+            Vector3 first = new Vector3(1f, 0.03f, 3f);
+            Vector3 second = new Vector3(3f, 0.03f, 3f);
+            _level.SetTrackData(Array.Empty<Vector2>(), new[]
+            {
+                new Pose(first, Quaternion.identity),
+                new Pose(second, Quaternion.identity),
+            });
+            _levelData.LevelConfig.CoinInterval = 1f;
+            _chain.Initialize(_level.PathCreator, _settings);
+
+            ZumaCoin coin = _level.GetComponentsInChildren<ZumaCoin>(true).Single();
+            Assert.That(coin.gameObject.activeSelf, Is.False);
+
+            yield return Spawn(Color.red, Color.blue);
+            yield return AdvanceUntil(() => coin.gameObject.activeSelf);
+            Assert.That(coin.transform.localPosition, Is.EqualTo(first));
+            Assert.That(coin.CanBeHit, Is.False);
+
+            Vector3 start = coin.transform.position - Vector3.right;
+            Vector3 end = start + Vector3.right * 4f;
+            Ball shot = CreateBall(start, Color.green);
+            shot.SetInteractive(true);
+            Assert.That(_chain.TryAttachBall(shot, start, end), Is.False);
+            Assert.That(_progress.Score, Is.Zero);
+
+            yield return AdvanceUntil(() => coin.CanBeHit);
+            float afterFormerExpiry = Time.time + 4.1f;
+            yield return AdvanceUntil(() => Time.time >= afterFormerExpiry);
+            Assert.That(_level.GetComponentsInChildren<ZumaCoin>(), Is.EqualTo(new[] { coin }));
+            Assert.That(coin.CanBeHit, Is.True);
+            Assert.That(coin.transform.localPosition, Is.EqualTo(first));
+
+            Assert.That(_chain.AccuracyEnd(start, end), Is.EqualTo(end));
+            Assert.That(_chain.TryAttachBall(shot, start, end), Is.False);
+            Assert.That(_progress.Score, Is.EqualTo(500));
+            Assert.That(coin.gameObject.activeSelf, Is.False);
+            Assert.That(shot.IsInteractive, Is.True);
+            _balls.DidNotReceive().ReturnBall(shot);
+
+            Assert.That(_chain.TryAttachBall(shot, start, end), Is.False);
+            Assert.That(_progress.Score, Is.EqualTo(500));
+            yield return AdvanceUntil(() => coin.gameObject.activeSelf);
+            Assert.That(_level.GetComponentsInChildren<ZumaCoin>(true), Is.EqualTo(new[] { coin }));
+            Assert.That(coin.transform.localPosition, Is.EqualTo(second));
+            Assert.That(coin.CanBeHit, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator CoinAndChainInSameStep_CoinMustBeReachedBeforeTheChain()
+        {
+            Pose marker = new Pose(Vector3.zero, Quaternion.identity);
+            _level.SetTrackData(Array.Empty<Vector2>(), new[] { marker });
+            _levelData.LevelConfig.CoinInterval = 0.05f;
+            _chain.Initialize(_level.PathCreator, _settings);
+
+            yield return Spawn(Color.red, Color.blue);
+            ZumaCoin coin = _level.GetComponentsInChildren<ZumaCoin>(true).Single();
+            yield return AdvanceUntil(() => coin.CanBeHit);
+
+            Vector3 target = ActiveBalls()[0].transform.position;
+            Vector3 start = target + Vector3.forward * 2f;
+            Vector3 end = target - Vector3.forward * 2f;
+            coin.transform.position = target - Vector3.forward;
+            Ball blockedShot = CreateBall(start, Color.green);
+
+            Assert.That(_chain.TryAttachBall(blockedShot, start, end), Is.True);
+            Assert.That(coin.CanBeHit, Is.True);
+            Assert.That(_progress.Score, Is.Zero);
+
+            yield return AdvanceUntil(() => !blockedShot.IsEnteringChain &&
+                Mathf.Abs(blockedShot.PreviousChainPosition.z) < 0.01f);
+            target = ActiveBalls()[0].transform.position;
+            start = target + Vector3.forward * 2f;
+            end = target - Vector3.forward * 2f;
+            coin.transform.position = target + Vector3.forward;
+            Ball shot = CreateBall(start, Color.green);
+            Assert.That(_chain.TryAttachBall(shot, start, end), Is.True);
+            Assert.That(ActiveBalls(), Does.Contain(shot));
+            Assert.That(coin.gameObject.activeSelf, Is.False);
+            Assert.That(_progress.Score, Is.EqualTo(500));
+            _balls.DidNotReceive().ReturnBall(shot);
+        }
+
+        [UnityTest]
+        public IEnumerator MissedShot_ReturnsToPoolOnlyAfterItsMeshLeavesTheCamera()
+        {
+            Camera camera = new GameObject("Test Camera").AddComponent<Camera>();
+            camera.transform.SetParent(_root.transform);
+            camera.tag = "MainCamera";
+            camera.transform.SetPositionAndRotation(Vector3.up * 10f, Quaternion.Euler(90f, 0f, 0f));
+            camera.orthographic = true;
+            camera.orthographicSize = 5f;
+            camera.aspect = 1f;
+
+            yield return Spawn(Color.red, Color.blue);
+            Ball shot = CreateBall(new Vector3(4.9f, 0f, 3f), Color.green);
+            DiContainer container = new DiContainer();
+            container.BindInstance<IBallProvider>(_balls);
+            container.BindInstance<IBallChainController>(_chain);
+            container.Inject(shot.BallIntersectionTracker);
+            shot.BallIntersectionTracker.Initialize(shot);
+            shot.BallMover.StartMoveToDirection(Vector3.right, 0.2f);
+
+            Assert.That(shot.AdvanceProjectile(1f), Is.False);
+            Assert.That(camera.WorldToViewportPoint(shot.transform.position).x, Is.GreaterThan(1f));
+            _balls.DidNotReceive().ReturnBall(shot);
+            Assert.That(shot.AdvanceProjectile(1f), Is.True);
+            _balls.Received(1).ReturnBall(shot);
         }
 
         [Test]
@@ -350,7 +468,12 @@ namespace Tests.PlayMode
             _levelData.LevelConfig.PowerupDuration = 1f;
             _player.Initialize();
             _player.PlayerShooting.Activate(new List<Color> { Color.green, Color.red });
-            LineRenderer beam = _player.GetComponent<LineRenderer>();
+            Transform beamObject = _player.transform.Find("AccuracyBeam");
+            Assert.That(beamObject, Is.Not.Null);
+            LineRenderer beam = beamObject.GetComponent<LineRenderer>();
+            Assert.That(beam, Is.Not.Null);
+            Assert.That(beam.widthMultiplier * beam.widthCurve.Evaluate(0f), Is.GreaterThan(0f));
+            Assert.That(beam.widthCurve.Evaluate(1f), Is.Zero);
             Assert.That(beam.enabled, Is.False);
 
             yield return MatchPowerup(BallPowerup.Accuracy);

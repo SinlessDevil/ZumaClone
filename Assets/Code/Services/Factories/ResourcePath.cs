@@ -6,7 +6,7 @@ namespace Code.Services.Factories
         public const string LevelsStaticDataPath = "StaticData/Levels";
         public const string PlayerPath = "Players/Player";
         public const string BallPath = "Balls/Ball";
-        public const string ZumaCoinPath = "Balls/ZumaCoin";
+        public const string CoinPath = "Coins/Coin";
         
         public const string GameHudPath = "Huds/GameHud";
         public const string MenuHudPath = "Huds/MenuHud";

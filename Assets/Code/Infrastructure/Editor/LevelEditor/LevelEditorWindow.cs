@@ -175,10 +175,17 @@ namespace Code.Infrastructure.Editor
             VisualElement controls = new VisualElement();
             controls.AddToClassList("canvas-toolbar");
             controls.Add(new Button(canvas.Fit) { text = "Fit map" });
+            Toggle addPoint = new Toggle("Add point")
+            {
+                name = "addPointToggle",
+                tooltip = "Click the road to insert a point. Turn this off to drag points. Shift-click is a shortcut."
+            };
+            addPoint.RegisterValueChangedCallback(change => canvas.SetAddPointMode(change.newValue));
+            controls.Add(addPoint);
             controls.Add(new Button(canvas.DeleteSelectedPoint) { text = "Delete point" });
             panel.Add(controls);
             panel.Add(canvas);
-            Label hint = new Label("Drag handles or markers · Shift-click road to insert · Scroll to zoom · Middle-drag to pan");
+            Label hint = new Label("Add point or Shift-click the road · Drag handles to move · Scroll to zoom · Middle-drag to pan");
             hint.AddToClassList("map-hint");
             panel.Add(hint);
 
