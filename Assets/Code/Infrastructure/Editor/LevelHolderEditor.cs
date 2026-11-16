@@ -1,5 +1,6 @@
 using Code.Logic.Zuma.Level;
 using Code.PathCreation;
+using Code.StaticData.Levels;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace Code.Infrastructure.Editor
     public class LevelHolderEditor : UnityEditor.Editor
     {
         private const float HeadingSampleDistance = 0.15f;
-        private static readonly Quaternion StartYawOffset = Quaternion.Euler(0f, 30f, 0f);
+        private static readonly Quaternion StartYawOffset = Quaternion.Euler(0f, LevelGeometry.DefaultStartYaw, 0f);
         private static readonly Quaternion EndYawOffset = Quaternion.Euler(0f, 90f, 0f);
 
         public override void OnInspectorGUI()

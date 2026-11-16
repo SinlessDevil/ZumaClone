@@ -7,9 +7,11 @@ namespace Code.StaticData.Levels
     [Serializable]
     public sealed class LevelGeometry
     {
+        public const float DefaultStartYaw = 24f;
+
         public BezierPath Path = new BezierPath(Vector3.zero, false, PathSpace.xz);
         public Vector3 PlayerPosition = new Vector3(0f, 0f, 2f);
-        public GatePlacement Start = new GatePlacement(30f);
+        public GatePlacement Start = new GatePlacement(DefaultStartYaw);
         public GatePlacement End = new GatePlacement(90f);
         public Pose[] CoinSpawns = Array.Empty<Pose>();
         public Vector2[] Tunnels = Array.Empty<Vector2>();

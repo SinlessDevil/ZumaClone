@@ -93,7 +93,7 @@ MonoBehaviour:
     PlayerPosition: {x: 0, y: 0, z: 0.6}
     Start:
       Offset: {x: 0, y: 0, z: 0}
-      Rotation: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
+      Rotation: {x: 0, y: 0.2079117, z: 0, w: 0.9781476}
     End:
       Offset: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
