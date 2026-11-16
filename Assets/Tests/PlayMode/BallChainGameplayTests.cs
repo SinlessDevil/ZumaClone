@@ -350,7 +350,12 @@ namespace Tests.PlayMode
             _levelData.LevelConfig.PowerupDuration = 1f;
             _player.Initialize();
             _player.PlayerShooting.Activate(new List<Color> { Color.green, Color.red });
-            LineRenderer beam = _player.GetComponent<LineRenderer>();
+            Transform beamObject = _player.transform.Find("AccuracyBeam");
+            Assert.That(beamObject, Is.Not.Null);
+            LineRenderer beam = beamObject.GetComponent<LineRenderer>();
+            Assert.That(beam, Is.Not.Null);
+            Assert.That(beam.widthMultiplier * beam.widthCurve.Evaluate(0f), Is.GreaterThan(0f));
+            Assert.That(beam.widthCurve.Evaluate(1f), Is.Zero);
             Assert.That(beam.enabled, Is.False);
 
             yield return MatchPowerup(BallPowerup.Accuracy);
